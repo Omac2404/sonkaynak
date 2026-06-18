@@ -119,6 +119,9 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || "dev-secret-change-me",
 
   db: postgresAdapter({
+    // Şemayı veritabanına otomatik uygula (production'da da). Migrasyon dosyası
+    // tutmuyoruz; tablolar açılışta drizzle push ile oluşturulur/güncellenir.
+    push: true,
     pool: {
       connectionString: process.env.DATABASE_URI || "",
     },

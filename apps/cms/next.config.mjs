@@ -1,11 +1,11 @@
 import { withPayload } from "@payloadcms/next/withPayload";
-import path from "path";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  output: "standalone",
-  outputFileTracingRoot: path.join(import.meta.dirname, "../../"),
+  // CMS standalone KULLANMIYOR — Payload'ın çalışma anındaki dinamik
+  // bağımlılıkları (drizzle-kit ile şema push vb.) için tam node_modules
+  // ile `next start` olarak çalışır (bkz. apps/cms/Dockerfile).
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**" },

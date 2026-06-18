@@ -24,14 +24,15 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @sonkaynak/cms build
 
 # --- runtime ---
+# CMS standalone DEĞİL: Payload'ın çalışma anı dinamik bağımlılıkları
+# (drizzle-kit ile şema push dahil) için tam node_modules ile next start.
 FROM base AS runner
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3101
 ENV HOSTNAME=0.0.0.0
 WORKDIR /app
-COPY --from=build /app/apps/cms/.next/standalone ./
-COPY --from=build /app/apps/cms/.next/static ./apps/cms/.next/static
-COPY --from=build /app/apps/cms/public ./apps/cms/public
+COPY --from=build /app ./
+WORKDIR /app/apps/cms
 EXPOSE 3101
-CMD ["node", "apps/cms/server.js"]
+CMD ["pnpm", "exec", "next", "start", "-p", "3101", "-H", "0.0.0.0"]
