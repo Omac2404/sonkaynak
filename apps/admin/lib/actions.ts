@@ -174,6 +174,9 @@ export async function saveNews(formData: FormData) {
   if (intent === "publish") _status = "published";
   else if (intent === "submit") reviewState = "onaya_gonderildi";
 
+  // Geçici teşhis: yayınla butonunun intent'i gerçekten geliyor mu?
+  console.log(`[saveNews] intent=${JSON.stringify(intent)} → _status=${_status}`);
+
   const data: Record<string, any> = {
     title,
     excerpt,
@@ -375,9 +378,16 @@ export async function saveTicker(formData: FormData) {
 /** Medya: çoklu görsel yükle. */
 export async function uploadMediaFiles(formData: FormData) {
   const files = (formData.getAll("files") as File[]).filter((f) => f && typeof f === "object" && f.size > 0);
-  for (const f of files) await uploadMedia(f);
+  let ok = 0;
+  let fail = 0;
+  for (const f of files) {
+    const id = await uploadMedia(f);
+    if (id) ok++;
+    else fail++;
+  }
   revalidatePath("/medya");
-  redirect("/medya?m=uploaded");
+  // Gerçekten yüklenip yüklenmediğini bildir (sahte "yüklendi" toast'ı yok)
+  redirect(fail > 0 ? `/medya?m=uploaderror&ok=${ok}&fail=${fail}` : "/medya?m=uploaded");
 }
 
 /** Medya: sil. */
