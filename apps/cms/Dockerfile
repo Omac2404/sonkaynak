@@ -35,4 +35,6 @@ WORKDIR /app
 COPY --from=build /app ./
 WORKDIR /app/apps/cms
 EXPOSE 3101
-CMD ["pnpm", "exec", "next", "start", "-p", "3101", "-H", "0.0.0.0"]
+# Açılışta önce şema push (NODE_ENV=development, sadece bu komuta özel) → tablolar
+# kurulur; ardından prod sunucu (container ENV NODE_ENV=production ile) başlar.
+CMD ["sh", "-c", "NODE_ENV=development pnpm exec tsx src/push-schema.ts && pnpm exec next start -p 3101 -H 0.0.0.0"]
