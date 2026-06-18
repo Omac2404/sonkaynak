@@ -1,0 +1,40 @@
+{
+  "name": "@sonkaynak/cms",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3101",
+    "prebuild": "payload generate:importmap",
+    "build": "next build",
+    "start": "next start -p 3101",
+    "generate:types": "payload generate:types",
+    "generate:importmap": "payload generate:importmap",
+    "seed": "tsx src/seed.ts",
+    "reindex": "tsx src/reindex.ts",
+    "payload": "payload"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.40.0",
+    "@payloadcms/next": "^3.40.0",
+    "@payloadcms/richtext-lexical": "^3.40.0",
+    "@payloadcms/storage-s3": "^3.85.1",
+    "@payloadcms/translations": "^3.40.0",
+    "@payloadcms/ui": "^3.40.0",
+    "dotenv": "^16.4.7",
+    "graphql": "^16.9.0",
+    "meilisearch": "^0.58.0",
+    "next": "^15.1.6",
+    "payload": "^3.40.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "tsx": "^4.22.4",
+    "typescript": "^5.7.3"
+  }
+}

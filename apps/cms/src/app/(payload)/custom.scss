@@ -1,0 +1,458 @@
+/* ============================================================
+   Son Kaynak — Modern Yönetim Paneli Teması
+   Payload varsayılan arayüzünün üzerine markalı bir katman.
+   ============================================================ */
+
+:root {
+  --sk-red: #d4141c;
+  --sk-red-dark: #a50f15;
+  --sk-red-soft: #fdecec;
+  --sk-ink: #14161c;
+
+  /* Köşe yarıçapları — daha yumuşak, modern */
+  --style-radius-s: 7px;
+  --style-radius-m: 10px;
+  --style-radius-l: 14px;
+
+  /* Uygulama arka planı: yumuşak gri (beyaz kartlar öne çıksın) */
+  --theme-bg: #f5f6f8;
+  --theme-elevation-0: #ffffff;
+}
+
+html {
+  --theme-bg: #f5f6f8;
+}
+
+body {
+  font-family:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--theme-bg);
+}
+
+/* ── ÜST / STEP NAV ── */
+.step-nav {
+  font-weight: 600;
+}
+
+/* ── SOL MENÜ (NAV) ── */
+.nav {
+  background: #ffffff;
+  border-right: 1px solid #e9eaee;
+}
+.nav__wrap {
+  padding-top: 8px;
+}
+.nav .nav__link,
+.nav a[class*="nav__link"] {
+  position: relative;
+  margin: 2px 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-weight: 600;
+  color: #41454e;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.nav .nav__link:hover {
+  background: #f3f4f6;
+  color: var(--sk-ink);
+}
+.nav .nav__link.active,
+.nav .nav__link[aria-current="page"],
+.nav a[aria-current="page"] {
+  background: var(--sk-red-soft);
+  color: var(--sk-red-dark);
+}
+.nav .nav__link.active::before,
+.nav .nav__link[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--sk-red);
+}
+.nav-group__label,
+.nav-group__toggle {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #9aa0aa !important;
+}
+
+/* ── BUTONLAR ── */
+.btn--style-primary {
+  --bg-color: var(--sk-red);
+  --hover-bg: var(--sk-red-dark);
+  background: var(--sk-red) !important;
+  border-color: var(--sk-red) !important;
+  border-radius: 9px;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(212, 20, 28, 0.25);
+}
+.btn--style-primary:hover {
+  background: var(--sk-red-dark) !important;
+  border-color: var(--sk-red-dark) !important;
+}
+.btn--style-secondary {
+  border-radius: 9px;
+  font-weight: 600;
+}
+.btn {
+  border-radius: 9px;
+}
+
+/* ── FORM ALANLARI ── */
+.field-type input,
+.field-type textarea,
+.field-type .rs__control {
+  border-radius: 9px !important;
+  border-color: #dfe1e6 !important;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.field-type input:focus,
+.field-type textarea:focus,
+.field-type .rs__control--is-focused {
+  border-color: var(--sk-red) !important;
+  box-shadow: 0 0 0 3px rgba(212, 20, 28, 0.12) !important;
+}
+.field-label {
+  font-weight: 600;
+}
+
+/* ── KARTLAR (Dashboard koleksiyon kartları) ── */
+.card {
+  --card-bg-color: #ffffff;
+  border: 1px solid #e9eaee !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 2px rgba(20, 22, 28, 0.04);
+  transition:
+    box-shadow 0.18s,
+    transform 0.18s,
+    border-color 0.18s;
+}
+.card:hover {
+  box-shadow: 0 8px 24px rgba(20, 22, 28, 0.1);
+  transform: translateY(-2px);
+  border-color: #dcdee3 !important;
+}
+.card__title {
+  font-weight: 700;
+}
+
+/* ── DASHBOARD başlık alanı ── */
+.dashboard__group-name {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #9aa0aa;
+}
+
+/* ── TABLOLAR (liste görünümü) ── */
+.table table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+.table thead th {
+  background: #fafbfc;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+}
+
+/* ── PILL / rozet ── */
+.pill {
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+/* ── GİRİŞ EKRANI ── */
+.login {
+  background:
+    radial-gradient(900px 500px at 100% -10%, rgba(212, 20, 28, 0.08), transparent 60%),
+    var(--theme-bg);
+}
+.login__wrap,
+.login .login__form-wrap {
+  background: #ffffff;
+  border: 1px solid #e9eaee;
+  border-radius: 16px;
+  padding: 36px 32px;
+  box-shadow: 0 16px 48px rgba(20, 22, 28, 0.08);
+}
+.login .form-submit .btn,
+.login button[type="submit"] {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Son Kaynak marka rozeti (beforeLogin bileşeni) */
+.sk-login-brand {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.sk-login-brand__logo {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+.sk-login-brand__logo .red {
+  color: var(--sk-red);
+}
+.sk-login-brand__sub {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9aa0aa;
+}
+
+/* ============================================================
+   ÖZEL DASHBOARD (beforeDashboard) + varsayılanı gizle
+   ============================================================ */
+.dashboard__label,
+.dashboard__group {
+  display: none !important;
+}
+.dashboard .dashboard__wrap {
+  padding-top: 24px;
+}
+
+.sk-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding-bottom: 30px;
+}
+.sk-dash__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sk-dash__hello {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--sk-ink);
+}
+.sk-dash__date {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #9aa0aa;
+  text-transform: capitalize;
+}
+.sk-dash__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sk-dash__btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid #e2e4e9;
+  background: #fff;
+  color: var(--sk-ink);
+  transition: all 0.15s;
+}
+.sk-dash__btn:hover {
+  border-color: #cfd2d9;
+  background: #f7f8fa;
+}
+.sk-dash__btn--primary {
+  background: var(--sk-red);
+  border-color: var(--sk-red);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(212, 20, 28, 0.3);
+}
+.sk-dash__btn--primary:hover {
+  background: var(--sk-red-dark);
+  border-color: var(--sk-red-dark);
+  color: #fff;
+}
+
+/* İstatistik kartları */
+.sk-dash__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 14px;
+}
+.sk-stat {
+  --accent: var(--sk-red);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 18px 18px 16px;
+  background: #fff;
+  border: 1px solid #e9eaee;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+.sk-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--accent);
+}
+.sk-stat:hover {
+  box-shadow: 0 10px 28px rgba(20, 22, 28, 0.1);
+  transform: translateY(-2px);
+}
+.sk-stat__icon {
+  font-size: 20px;
+}
+.sk-stat__value {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--sk-ink);
+}
+.sk-stat__label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #9aa0aa;
+}
+
+/* İki sütun: onay + son haberler */
+.sk-dash__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 1000px) {
+  .sk-dash__cols {
+    grid-template-columns: 1fr;
+  }
+}
+.sk-panel {
+  background: #fff;
+  border: 1px solid #e9eaee;
+  border-radius: 14px;
+  padding: 18px 20px 8px;
+}
+.sk-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.sk-panel__head h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--sk-ink);
+}
+.sk-panel__badge {
+  background: var(--sk-red);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.sk-panel__link {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sk-red);
+}
+.sk-panel__empty {
+  padding: 18px 0 22px;
+  color: #9aa0aa;
+  font-size: 13px;
+}
+.sk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sk-list li a {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 11px 10px;
+  margin: 0 -10px;
+  border-radius: 9px;
+  border-bottom: 1px solid #f1f2f4;
+  transition: background 0.15s;
+}
+.sk-list li:last-child a {
+  border-bottom: none;
+}
+.sk-list li a:hover {
+  background: #f7f8fa;
+}
+.sk-list__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--sk-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sk-list__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: #9aa0aa;
+}
+.sk-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.sk-dot--green {
+  background: #16a34a;
+}
+.sk-dot--amber {
+  background: #ca8a04;
+}
+
+/* ── Marka logosu (nav + üst) ── */
+.sk-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.4px;
+  color: var(--sk-ink);
+}
+.sk-logo .red {
+  color: var(--sk-red);
+}
+.sk-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--sk-red);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+}
