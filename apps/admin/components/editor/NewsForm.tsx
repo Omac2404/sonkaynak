@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { RichEditor } from "./RichEditor";
 import { SubmitButton } from "../SubmitButton";
 import { ImageField } from "../ImageField";
@@ -38,6 +38,9 @@ export function NewsForm({
 }) {
   const initialBody = news?.body || (news?.content ? lexicalToHtml(news.content) : "");
   const [body, setBody] = useState<string>(initialBody);
+  // intent'i submit butonu name/value yerine ref'li gizli alandan gönderiyoruz
+  // (submitter değeri bazı durumlarda server action'a ulaşmıyordu)
+  const intentRef = useRef<HTMLInputElement>(null);
   const [hasCover, setHasCover] = useState<boolean>(Boolean(mediaUrl));
   const [title, setTitle] = useState<string>(news?.title ?? "");
   const [excerpt, setExcerpt] = useState<string>(news?.excerpt ?? "");
@@ -57,19 +60,20 @@ export function NewsForm({
     <form action={saveNews} className="mx-auto max-w-5xl">
       <input type="hidden" name="id" value={news?.id ?? ""} />
       <input type="hidden" name="body" value={body} />
+      <input ref={intentRef} type="hidden" name="intent" defaultValue="draft" />
 
       <div className="mb-5 flex items-center justify-between gap-3">
         <a href="/haberler" className="text-sm font-bold text-neutral-500 hover:text-sk-red">← Haberler</a>
         <div className="flex gap-2">
-          <SubmitButton name="intent" value="draft" pendingText="Kaydediliyor…" className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
+          <SubmitButton onClick={() => { if (intentRef.current) intentRef.current.value = "draft"; }} pendingText="Kaydediliyor…" className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-bold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60">
             Taslak Kaydet
           </SubmitButton>
           {canPublish ? (
-            <SubmitButton name="intent" value="publish" pendingText="Yayınlanıyor…" className="rounded-lg bg-sk-red px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-sk-red-dark disabled:opacity-60">
+            <SubmitButton onClick={() => { if (intentRef.current) intentRef.current.value = "publish"; }} pendingText="Yayınlanıyor…" className="rounded-lg bg-sk-red px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-sk-red-dark disabled:opacity-60">
               Yayınla
             </SubmitButton>
           ) : (
-            <SubmitButton name="intent" value="submit" pendingText="Gönderiliyor…" className="rounded-lg bg-sk-red px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-sk-red-dark disabled:opacity-60">
+            <SubmitButton onClick={() => { if (intentRef.current) intentRef.current.value = "submit"; }} pendingText="Gönderiliyor…" className="rounded-lg bg-sk-red px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-sk-red-dark disabled:opacity-60">
               Onaya Gönder
             </SubmitButton>
           )}
