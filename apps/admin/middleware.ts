@@ -7,14 +7,13 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get(TOKEN_COOKIE)?.value;
   const { pathname } = req.nextUrl;
 
+  // Yalnızca çerez YOKKEN koru. Çerez var ama geçersizse (token süresi dolmuş
+  // veya CMS bir an ulaşılamamış) yönlendirmeyi /login sayfasına bırakıyoruz;
+  // aksi halde layout (geçerlilik) ile middleware (varlık) çakışıp sonsuz
+  // yönlendirme döngüsü (ERR_TOO_MANY_REDIRECTS) oluşuyordu.
   if (!token && pathname !== "/login") {
     const url = req.nextUrl.clone();
     url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-  if (token && pathname === "/login") {
-    const url = req.nextUrl.clone();
-    url.pathname = "/";
     return NextResponse.redirect(url);
   }
   return NextResponse.next();

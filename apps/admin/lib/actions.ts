@@ -174,9 +174,6 @@ export async function saveNews(formData: FormData) {
   if (intent === "publish") _status = "published";
   else if (intent === "submit") reviewState = "onaya_gonderildi";
 
-  // Geçici teşhis: yayınla butonunun intent'i gerçekten geliyor mu?
-  console.log(`[saveNews] intent=${JSON.stringify(intent)} → _status=${_status}`);
-
   const data: Record<string, any> = {
     title,
     excerpt,

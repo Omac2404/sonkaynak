@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { loginAction } from "@/lib/actions";
+import { getMe } from "@/lib/payload";
 
 const ERRORS: Record<string, string> = {
   missing: "E-posta ve şifre gerekli.",
@@ -11,6 +13,8 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string }>;
 }) {
+  // Zaten geçerli oturum varsa panele al (geçersizse form gösterilir → döngü yok)
+  if (await getMe()) redirect("/");
   const { error } = await searchParams;
 
   return (
