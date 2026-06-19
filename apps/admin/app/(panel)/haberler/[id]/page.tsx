@@ -5,8 +5,15 @@ import { mediaUrl } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
 
-export default async function HaberDuzenle({ params }: { params: Promise<{ id: string }> }) {
+export default async function HaberDuzenle({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
+}) {
   const { id } = await params;
+  const { error } = await searchParams;
   const [newsRes, cats, auths, me] = await Promise.all([
     pf(`/news/${id}?depth=2&draft=true`),
     pf("/categories?limit=100&sort=order&depth=0"),
@@ -24,6 +31,11 @@ export default async function HaberDuzenle({ params }: { params: Promise<{ id: s
   return (
     <div>
       <h1 className="mb-5 text-2xl font-black tracking-tight text-ink">Haber Düzenle</h1>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          ⚠ {error}
+        </div>
+      )}
       <NewsForm news={news} categories={categories} authors={authors} canPublish={canPublish} mediaUrl={cover} />
     </div>
   );

@@ -190,10 +190,18 @@ export async function saveNews(formData: FormData) {
   if (category) data.category = category;
   if (coverImage) data.coverImage = coverImage;
 
-  if (id) {
-    await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify(data) });
-  } else {
-    await pf(`/news`, { method: "POST", body: JSON.stringify(data) });
+  const res = id
+    ? await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify(data) })
+    : await pf(`/news`, { method: "POST", body: JSON.stringify(data) });
+
+  // Kayıt başarısızsa (örn. zorunlu kategori eksik) sessizce "kaydedildi" deme
+  if (!res.ok) {
+    const apiErr = res.data?.errors?.[0];
+    const fieldMsg = apiErr?.data?.errors?.[0]
+      ? `${apiErr.data.errors[0].label ?? apiErr.data.errors[0].path}: ${apiErr.data.errors[0].message}`
+      : apiErr?.message;
+    const msg = fieldMsg || "Kayıt başarısız — zorunlu alanları (özellikle Kategori) kontrol edin.";
+    redirect(`${id ? `/haberler/${id}` : "/haberler/yeni"}?error=${encodeURIComponent(msg)}`);
   }
 
   revalidatePath("/haberler");
