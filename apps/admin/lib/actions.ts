@@ -94,6 +94,9 @@ export async function loginAction(formData: FormData) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
+  // Giriş öncesi router önbelleğinde "/" → /login yönlendirmesi cache'lenmiş
+  // olabilir; temizlemezsek giriş sonrası yumuşak geçiş login'de takılıyor.
+  revalidatePath("/", "layout");
   redirect("/");
 }
 
