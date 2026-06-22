@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { loginAction } from "@/lib/actions";
 import { getMe } from "@/lib/payload";
+import { Logo } from "@/components/Logo";
 
 const ERRORS: Record<string, string> = {
   missing: "E-posta ve şifre gerekli.",
@@ -25,9 +26,8 @@ export default async function LoginPage({
           className="pointer-events-none absolute inset-0 opacity-30"
           style={{ background: "radial-gradient(700px 400px at 80% 0%, rgba(212,20,28,.5), transparent 60%)" }}
         />
-        <div className="relative flex items-center gap-2 text-2xl font-black">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-sk-red text-base">SK</span>
-          SON<span className="text-sk-red">KAYNAK</span>
+        <div className="relative">
+          <Logo className="h-11 w-auto" variant="white" priority />
         </div>
         <div className="relative">
           <h1 className="text-4xl font-black leading-tight">Yönetim Paneli</h1>
@@ -41,10 +41,8 @@ export default async function LoginPage({
       {/* Sağ form */}
       <div className="flex items-center justify-center bg-neutral-50 p-6">
         <div className="w-full max-w-sm">
-          <div className="mb-8 text-center lg:hidden">
-            <div className="inline-flex items-center gap-2 text-2xl font-black text-ink">
-              SON<span className="text-sk-red">KAYNAK</span>
-            </div>
+          <div className="mb-8 flex justify-center lg:hidden">
+            <Logo className="h-10 w-auto" priority />
           </div>
 
           <h2 className="text-2xl font-black text-ink">Giriş Yap</h2>

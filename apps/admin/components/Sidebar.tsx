@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { navForPerms } from "@/lib/nav";
 import { Icon } from "./Icon";
+import { Logo } from "./Logo";
 
 export function Sidebar({ open, onClose, perms }: { open: boolean; onClose: () => void; perms: string[] }) {
   const pathname = usePathname();
@@ -19,13 +20,8 @@ export function Sidebar({ open, onClose, perms }: { open: boolean; onClose: () =
         }`}
       >
         {/* Logo */}
-        <div className="sticky top-0 z-10 flex h-16 items-center gap-2.5 border-b border-panel-line bg-panel px-5">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-sk-red text-[13px] font-black text-white shadow-sm">
-            SK
-          </span>
-          <span className="text-[17px] font-extrabold tracking-tight text-white">
-            SON<span className="text-sk-red">KAYNAK</span>
-          </span>
+        <div className="sticky top-0 z-10 flex h-16 items-center border-b border-panel-line bg-panel px-5">
+          <Logo className="h-8 w-auto" variant="white" />
         </div>
 
         <nav className="flex-1 px-3 py-4">
