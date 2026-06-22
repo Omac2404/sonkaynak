@@ -1,10 +1,14 @@
 import type { GlobalConfig } from "payload";
 import { editorialOnly } from "../access/roles";
+import { revalidateWeb } from "../lib/revalidate";
 
 const baseAccess = {
   read: () => true,
   update: editorialOnly,
 };
+
+// Kürasyon değişince web önbelleğini anında tazele (anasayfa manşet/vitrin vb.)
+const curationHooks = { afterChange: [async () => { await revalidateWeb(); }] };
 
 /** Manşet — anasayfa büyük slider sırası */
 export const Manset: GlobalConfig = {
@@ -12,6 +16,7 @@ export const Manset: GlobalConfig = {
   label: "Manşet",
   admin: { group: "Kürasyon" },
   access: baseAccess,
+  hooks: curationHooks,
   fields: [
     {
       name: "items",
@@ -32,6 +37,7 @@ export const SicakGundem: GlobalConfig = {
   label: "Sıcak Gündem",
   admin: { group: "Kürasyon" },
   access: baseAccess,
+  hooks: curationHooks,
   fields: [
     {
       name: "items",
@@ -51,6 +57,7 @@ export const Secmece: GlobalConfig = {
   label: "Seçmece Haberler",
   admin: { group: "Kürasyon" },
   access: baseAccess,
+  hooks: curationHooks,
   fields: [
     {
       name: "items",
@@ -68,6 +75,7 @@ export const Ozel: GlobalConfig = {
   label: "Özel Haberler",
   admin: { group: "Kürasyon" },
   access: baseAccess,
+  hooks: curationHooks,
   fields: [
     {
       name: "items",
@@ -85,6 +93,7 @@ export const Vitrin: GlobalConfig = {
   label: "Kategori Vitrini",
   admin: { group: "Kürasyon" },
   access: baseAccess,
+  hooks: curationHooks,
   fields: [
     {
       name: "slots",
@@ -116,6 +125,7 @@ export const AnaMenu: GlobalConfig = {
   label: "Ana Menü",
   admin: { group: "Kürasyon" },
   access: baseAccess,
+  hooks: curationHooks,
   fields: [
     {
       name: "items",
@@ -140,6 +150,7 @@ export const Ticker: GlobalConfig = {
   label: "Kayan Şeritler",
   admin: { group: "Kürasyon" },
   access: baseAccess,
+  hooks: curationHooks,
   fields: [
     {
       label: "Son Dakika Şeridi",

@@ -3,6 +3,7 @@ import { isEditorial, publishedOrLoggedIn } from "../access/roles";
 import { slugField } from "../fields/slug";
 import { computeSeoScore, lexicalToPlainText } from "../lib/seo";
 import { syncNewsToMeili, removeNewsFromMeili } from "../lib/meili";
+import { revalidateWeb } from "../lib/revalidate";
 
 /**
  * Haberler — platformun çekirdek koleksiyonu.
@@ -84,6 +85,8 @@ export const News: CollectionConfig = {
         } catch (e) {
           req.payload.logger.warn(`[meili] senkron başarısız: ${(e as Error).message}`);
         }
+        // Web önbelleğini anında tazele (on-demand revalidation)
+        await revalidateWeb();
       },
     ],
     afterDelete: [
@@ -93,6 +96,7 @@ export const News: CollectionConfig = {
         } catch {
           /* yoksay */
         }
+        await revalidateWeb();
       },
     ],
   },
