@@ -71,6 +71,7 @@ export const NAV: NavGroup[] = [
       { href: "/kullanicilar", label: "Kullanıcılar", icon: "users", roles: ADMIN_ONLY },
       { href: "/roller", label: "Roller", icon: "users", roles: ADMIN_ONLY },
       { href: "/ayarlar", label: "Site Ayarları", icon: "cog", roles: ADMIN_ONLY },
+      { href: "/test-uret", label: "Test İçeriği Üret", icon: "grid", roles: ADMIN_ONLY },
     ],
   },
 ];

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { TOKEN_COOKIE, pf, getMe } from "./payload";
+import * as fk from "./faker";
 
 const API = process.env.PAYLOAD_URL ?? "http://localhost:3101";
 
@@ -480,4 +481,139 @@ export async function saveSettings(formData: FormData) {
   await pf(`/globals/site-settings`, { method: "POST", body: JSON.stringify(data) });
   revalidatePath("/ayarlar");
   redirect("/ayarlar?m=saved");
+}
+
+/* ───────────────────────── Test İçerik Üreteci ───────────────────────── */
+const TEST_TYPES = ["haber", "galeri", "ilan", "firma", "vefat", "story"] as const;
+type TestType = (typeof TEST_TYPES)[number];
+
+/**
+ * Rastgele test içeriği üretip yayınlar (tasarımı görmek için).
+ * Tür: tek bir tür ya da "hepsi"; adet 1–10.
+ */
+export async function generateTestContent(formData: FormData) {
+  const me = await getMe();
+  if (!me || me.role !== "admin") redirect("/login");
+
+  const typeSel = String(formData.get("type") ?? "haber");
+  let count = parseInt(String(formData.get("count") ?? "3"), 10);
+  if (!Number.isFinite(count)) count = 3;
+  count = Math.max(1, Math.min(10, count));
+
+  // Medya havuzu
+  const mediaRes = await pf("/media?limit=50&depth=0");
+  const mediaIds: number[] = (mediaRes.data?.docs ?? []).map((m: any) => m.id);
+  const randMedia = () => (mediaIds.length ? fk.pick(mediaIds) : undefined);
+
+  // Kategoriler (haber için zorunlu) — yoksa oluştur
+  const catRes = await pf("/categories?limit=100&depth=0");
+  const catIds: number[] = (catRes.data?.docs ?? []).map((c: any) => c.id);
+  if (catIds.length === 0) {
+    for (const name of ["Gündem", "Ekonomi", "Spor", "Teknoloji", "Dünya"]) {
+      const r = await pf("/categories", { method: "POST", body: JSON.stringify({ name }) });
+      if (r.data?.doc?.id) catIds.push(r.data.doc.id);
+    }
+  }
+
+  const want = (t: TestType) => typeSel === "hepsi" || typeSel === t;
+  const done: Record<string, number> = {};
+  const newsIds: number[] = [];
+  const bump = (k: string) => (done[k] = (done[k] ?? 0) + 1);
+
+  // Haber
+  if (want("haber") && catIds.length) {
+    for (let i = 0; i < count; i++) {
+      const data: any = {
+        title: fk.benzersiz(fk.baslik()),
+        excerpt: fk.ozet(),
+        body: fk.govdeHtml(),
+        category: fk.pick(catIds),
+        _status: "published",
+      };
+      const cover = randMedia();
+      if (cover) data.coverImage = cover;
+      const r = await pf("/news", { method: "POST", body: JSON.stringify(data) });
+      if (r.ok && r.data?.doc?.id) {
+        newsIds.push(r.data.doc.id);
+        bump("haber");
+      }
+    }
+  }
+
+  // Galeri (görsel zorunlu)
+  if (want("galeri") && mediaIds.length) {
+    for (let i = 0; i < count; i++) {
+      const items = Array.from({ length: fk.rand(3, 8) }, () => ({ image: randMedia(), caption: fk.ozet().slice(0, 60) }));
+      const data: any = {
+        title: fk.benzersiz("Foto Galeri: " + fk.baslik()),
+        excerpt: fk.ozet(),
+        cover: randMedia(),
+        items,
+        _status: "published",
+      };
+      const r = await pf("/galeriler", { method: "POST", body: JSON.stringify(data) });
+      if (r.ok) bump("galeri");
+    }
+  }
+
+  // İlan
+  if (want("ilan")) {
+    for (let i = 0; i < count; i++) {
+      const data: any = {
+        title: fk.benzersiz("İlan: " + fk.firmaAdi()),
+        body: fk.govdeHtml(),
+        _status: "published",
+      };
+      const cover = randMedia();
+      if (cover) data.coverImage = cover;
+      const r = await pf("/ilanlar", { method: "POST", body: JSON.stringify(data) });
+      if (r.ok) bump("ilan");
+    }
+  }
+
+  // Firma
+  if (want("firma")) {
+    for (let i = 0; i < count; i++) {
+      const data: any = {
+        name: fk.benzersiz(fk.firmaAdi()),
+        category: fk.sehir(),
+        phone: fk.telefon(),
+        email: "info@ornekfirma.com",
+        website: "https://ornekfirma.com",
+        address: fk.sehir() + ", örnek mahalle no:" + fk.rand(1, 99),
+        description: fk.ozet(),
+        _status: "published",
+      };
+      const logo = randMedia();
+      if (logo) data.logo = logo;
+      const r = await pf("/firmalar", { method: "POST", body: JSON.stringify(data) });
+      if (r.ok) bump("firma");
+    }
+  }
+
+  // Vefat
+  if (want("vefat")) {
+    for (let i = 0; i < count; i++) {
+      const data: any = { isim: fk.kisiAdi(), aciklama: "Vefat etmiştir. Ailesine başsağlığı dileriz.", aktif: true, order: i };
+      const r = await pf("/vefat", { method: "POST", body: JSON.stringify(data) });
+      if (r.ok) bump("vefat");
+    }
+  }
+
+  // Story (mevcut/üretilen haberlerden)
+  if (want("story")) {
+    let pool = newsIds;
+    if (pool.length < count) {
+      const ex = await pf("/news?where[_status][equals]=published&limit=20&depth=0");
+      pool = [...pool, ...(ex.data?.docs ?? []).map((n: any) => n.id)];
+    }
+    for (let i = 0; i < count && pool.length; i++) {
+      const r = await pf("/stories", { method: "POST", body: JSON.stringify({ news: fk.pick(pool), order: i }) });
+      if (r.ok) bump("story");
+    }
+  }
+
+  revalidatePath("/haberler");
+  const summary = Object.entries(done).map(([k, v]) => `${k}:${v}`).join(",") || "yok";
+  redirect(`/test-uret?m=generated&ozet=${encodeURIComponent(summary)}`);
 }
