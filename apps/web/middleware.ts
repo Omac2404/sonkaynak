@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const PREVIEW_COOKIE = "sk_preview";
 
-const html = (logoOrigin: string) => `<!doctype html>
+const html = `<!doctype html>
 <html lang="tr"><head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -30,7 +30,7 @@ const html = (logoOrigin: string) => `<!doctype html>
   @keyframes pulse{0%,100%{opacity:.4;transform:scaleX(.7)}50%{opacity:1;transform:scaleX(1)}}
 </style></head>
 <body><div class="card">
-  <img class="logo" src="${logoOrigin}/logo.png" alt="Son Kaynak" />
+  <img class="logo" src="/logo.png" alt="Son Kaynak" />
   <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.7 2.7-2-2 2.7-2.7z"/>
   </svg>
@@ -43,7 +43,7 @@ export function middleware(req: NextRequest) {
   if (process.env.MAINTENANCE_MODE !== "true") return NextResponse.next();
 
   const secret = process.env.PREVIEW_SECRET || "";
-  const { pathname, searchParams, origin } = req.nextUrl;
+  const { searchParams } = req.nextUrl;
 
   // Önizleme linkiyle gelindiyse çerez bırak, temiz URL'e yönlendir
   if (secret && searchParams.get("preview") === secret) {
@@ -65,7 +65,7 @@ export function middleware(req: NextRequest) {
   }
 
   // Herkese bakım sayfası
-  return new NextResponse(html(origin), {
+  return new NextResponse(html, {
     status: 503,
     headers: { "content-type": "text/html; charset=utf-8", "retry-after": "3600" },
   });
