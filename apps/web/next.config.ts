@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**" },
       { protocol: "http", hostname: "**" },
     ],
+    // Optimize edilen görseller uzun süre önbellekte kalsın (yeniden işlemeyi azaltır)
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 gün
   },
 };
 

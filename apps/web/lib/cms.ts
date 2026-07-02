@@ -255,7 +255,7 @@ export type SiteSettings = {
   footerColumns?: { title?: string; links?: { label: string; url: string }[] }[];
 };
 export async function getSettings(): Promise<SiteSettings> {
-  return (await cms<SiteSettings>(`/api/globals/site-settings?depth=1`, 300)) ?? {};
+  return (await cms<SiteSettings>(`/api/globals/site-settings?depth=1`, 900)) ?? {};
 }
 
 export type VitrinSlot = { category?: Category; pinnedNews?: News | null };

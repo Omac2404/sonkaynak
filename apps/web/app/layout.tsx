@@ -8,6 +8,7 @@ import { getSettings, mediaUrl } from "@/lib/cms";
 const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-inter" });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3100";
+const CMS_URL = process.env.NEXT_PUBLIC_CMS_URL ?? "http://localhost:3101";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -52,6 +53,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="tr" className={inter.variable}>
       <body suppressHydrationWarning className="font-sans">
+        {/* Bağlantıyı erken aç (doğrudan CMS'ten yüklenen görseller için) */}
+        <link rel="preconnect" href={CMS_URL} crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href={CMS_URL} />
+
         {/* Site geneli Organization JSON-LD */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
 
