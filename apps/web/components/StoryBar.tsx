@@ -98,10 +98,14 @@ export function StoryBar({ items }: { items: News[] }) {
             const big = mediaUrl(n.coverImage, "feature") || mediaUrl(n.coverImage);
             return (
               <div className="relative h-full w-full max-w-[500px] overflow-hidden bg-neutral-900">
-                {/* Görsel */}
+                {/* Görsel: bulanık arka plan + tam sığan asıl görsel */}
                 {big ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={big} alt={n.title} className="absolute inset-0 h-full w-full object-cover" />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={big} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl brightness-50" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={big} alt={n.title} className="absolute inset-0 h-full w-full object-contain" />
+                  </>
                 ) : (
                   <div className="absolute inset-0 grid place-items-center text-6xl">📰</div>
                 )}
