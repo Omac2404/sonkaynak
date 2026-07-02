@@ -22,6 +22,7 @@ import { VefatStrip } from "@/components/VefatStrip";
 import { VitrinTabs } from "@/components/VitrinTabs";
 import { InfoBar } from "@/components/InfoBar";
 import { AuthorsSlider } from "@/components/AuthorsSlider";
+import { StoryBar } from "@/components/StoryBar";
 import { Ticker } from "@/components/Ticker";
 import { getFinance } from "@/lib/finance";
 
@@ -61,29 +62,8 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-[1240px] px-4 py-8">
-      {/* Story'ler */}
-      {storyItems.length > 0 && (
-        <div className="mb-6 flex gap-4 overflow-x-auto pb-2">
-          {storyItems.map((n) => {
-            const img = mediaUrl(n.coverImage, "thumbnail");
-            return (
-              <a key={n.id} href={newsUrl(n)} className="group flex w-20 shrink-0 flex-col items-center gap-1.5 text-center">
-                <span className="rounded-full bg-gradient-to-tr from-sk-red to-orange-400 p-[2.5px]">
-                  <span className="block rounded-full border-2 border-white">
-                    {img ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={img} alt={n.title} className="h-16 w-16 rounded-full object-cover" />
-                    ) : (
-                      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 text-xl">📰</span>
-                    )}
-                  </span>
-                </span>
-                <span className="line-clamp-2 text-[11px] font-semibold leading-tight text-sk-ink group-hover:text-sk-red">{n.title}</span>
-              </a>
-            );
-          })}
-        </div>
-      )}
+      {/* Story'ler — yalnızca mobil, tıklayınca tam ekran görüntüleyici */}
+      {storyItems.length > 0 && <StoryBar items={storyItems} />}
 
       {/* Manşet */}
       {hero && (

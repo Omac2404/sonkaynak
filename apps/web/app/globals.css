@@ -121,3 +121,9 @@ a {
   border-top: 2px solid #f0f0f0;
   margin: 2em 0;
 }
+
+/* Story ilerleme çubuğu animasyonu */
+@keyframes storyProgress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
