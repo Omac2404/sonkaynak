@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { type News, mediaUrl, newsUrl, categoryUrl, categoryColor } from "@/lib/shared";
+import { type News, mediaUrl, newsUrl, categoryColor } from "@/lib/shared";
 
 function fmtDate(d?: string): string {
   if (!d) return "";
@@ -32,30 +32,38 @@ function Cover({ src, alt, className, sizes }: { src?: string; alt: string; clas
 }
 
 export function HeroCard({ news }: { news: News }) {
+  const src = mediaUrl(news.coverImage, "feature");
   return (
     <article className="group">
-      <a href={newsUrl(news)} className="block overflow-hidden rounded-xl">
-        <Cover
-          src={mediaUrl(news.coverImage, "feature")}
-          alt={news.title}
-          className="aspect-[16/9] w-full object-cover"
-        />
-      </a>
-      <div className="mt-4">
-        {news.category && (
-          <a
-            href={categoryUrl(news.category)}
-            className="inline-block rounded px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white"
-            style={{ background: categoryColor(news.category) }}
-          >
-            {news.category.name}
-          </a>
+      <a
+        href={newsUrl(news)}
+        className="relative block aspect-[16/10] overflow-hidden rounded-lg bg-neutral-200 sm:aspect-[16/9]"
+      >
+        {src ? (
+          <Image src={src} alt={news.title} fill priority sizes="(max-width:1024px) 100vw, 960px" className="object-cover transition duration-300 group-hover:scale-[1.03]" />
+        ) : (
+          <div className="absolute inset-0" />
         )}
-        <h2 className="mt-3 text-2xl font-black leading-tight text-sk-ink transition group-hover:text-sk-red md:text-3xl">
-          <a href={newsUrl(news)}>{news.title}</a>
-        </h2>
-        {news.excerpt && <p className="mt-2 line-clamp-2 text-base leading-relaxed text-sk-muted">{news.excerpt}</p>}
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
+          {news.category && (
+            <span
+              className="inline-block rounded px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white"
+              style={{ background: categoryColor(news.category) }}
+            >
+              {news.category.name}
+            </span>
+          )}
+          <h2 className="mt-2.5 text-xl font-black leading-tight text-white drop-shadow-sm sm:text-3xl md:text-[34px]">
+            {news.title}
+          </h2>
+          {news.excerpt && (
+            <p className="mt-2 hidden max-w-2xl line-clamp-2 text-[15px] leading-relaxed text-white/80 sm:block">
+              {news.excerpt}
+            </p>
+          )}
+        </div>
+      </a>
     </article>
   );
 }
@@ -84,23 +92,23 @@ export function SideCard({ news }: { news: News }) {
 
 export function GridCard({ news }: { news: News }) {
   return (
-    <article className="group overflow-hidden rounded-xl border border-sk-line">
+    <article className="group overflow-hidden rounded-lg border border-sk-line bg-white transition hover:shadow-md">
       <a href={newsUrl(news)}>
         <Cover
           src={mediaUrl(news.coverImage, "card")}
           alt={news.title}
           className="aspect-[16/9] w-full object-cover"
         />
-        <div className="p-4">
+        <div className="p-3">
           {news.category && (
-            <span className="text-[11px] font-extrabold uppercase tracking-wide" style={{ color: categoryColor(news.category) }}>
+            <span className="text-[10.5px] font-extrabold uppercase tracking-wide" style={{ color: categoryColor(news.category) }}>
               {news.category.name}
             </span>
           )}
-          <h3 className="mt-1.5 line-clamp-3 text-base font-bold leading-snug text-sk-ink transition group-hover:text-sk-red">
+          <h3 className="mt-1 line-clamp-3 text-[15px] font-bold leading-tight text-sk-ink transition group-hover:text-sk-red">
             {news.title}
           </h3>
-          <div className="mt-2 text-xs text-neutral-400">{fmtDate(news.publishedAt ?? news.createdAt)}</div>
+          <div className="mt-1.5 text-[11px] text-neutral-400">{fmtDate(news.publishedAt ?? news.createdAt)}</div>
         </div>
       </a>
     </article>
