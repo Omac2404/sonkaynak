@@ -201,6 +201,17 @@ export default async function HaberDetay({ params }: Props) {
           <p className="mt-4 text-lg font-medium leading-relaxed text-neutral-600 md:text-xl">{news.excerpt}</p>
         )}
 
+        {/* Başlık altı etiketler */}
+        {news.tags && news.tags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
+            {news.tags.map((t) => (
+              <a key={t.id} href={`/etiket/${t.slug}`} className="text-[13px] font-extrabold uppercase tracking-tight text-sk-red transition hover:underline">
+                #{t.name}
+              </a>
+            ))}
+          </div>
+        )}
+
         {/* Meta + paylaşım */}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-y border-sk-line py-3">
           <div className="flex items-center gap-3">
@@ -222,6 +233,11 @@ export default async function HaberDetay({ params }: Props) {
               )}
               <span className="text-xs text-neutral-400">
                 {fmtDateTime(news.publishedAt)} · {readMin} dk okuma
+                {news.updatedAt &&
+                  news.publishedAt &&
+                  new Date(news.updatedAt).getTime() - new Date(news.publishedAt).getTime() > 300000 && (
+                    <span className="ml-1 text-neutral-400">· Güncelleme: {fmtDateTime(news.updatedAt)}</span>
+                  )}
               </span>
             </div>
           </div>
@@ -289,6 +305,38 @@ export default async function HaberDetay({ params }: Props) {
           )}
           <ShareBar url={url} title={news.title} />
         </div>
+
+        {/* Yazar bio kutusu */}
+        {news.author && (news.author.bio || news.author.title) && (
+          <div className="mt-8 max-w-[760px] rounded-xl border border-sk-line bg-white p-5">
+            <div className="flex items-start gap-4">
+              {avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={avatar} alt={authorName(news.author)} className="h-16 w-16 shrink-0 rounded-full object-cover" />
+              ) : (
+                <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-neutral-100 text-xl font-black text-neutral-400">
+                  {news.author.name?.[0] ?? "S"}
+                </span>
+              )}
+              <div className="min-w-0 flex-1">
+                <a href={`/yazar/${news.author.slug}`} className="text-lg font-black text-sk-ink transition hover:text-sk-red">
+                  {authorName(news.author)}
+                </a>
+                {news.author.title && (
+                  <div className="text-[11px] font-extrabold uppercase tracking-wide text-sk-red">{news.author.title}</div>
+                )}
+                {news.author.bio && (
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-600">{news.author.bio}</p>
+                )}
+                <div className="mt-3">
+                  <a href={`/yazar/${news.author.slug}`} className="text-[13px] font-bold text-sk-red hover:underline">
+                    Tüm yazıları ›
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* İlgili Haberler */}
         {related.length > 0 && (

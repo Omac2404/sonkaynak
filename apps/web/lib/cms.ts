@@ -235,6 +235,21 @@ export async function getStories(): Promise<Story[]> {
   return r?.docs ?? [];
 }
 
+/** Son haberlerdeki en sık geçen etiketler ("Bugün neler oldu?" şeridi için). */
+export async function getTrendingTags(limit = 8): Promise<Tag[]> {
+  const r = await cms<ListResponse<News>>(`/api/news?${PUBLISHED}&depth=1&sort=-publishedAt&limit=40`, 120);
+  const counts = new Map<number, { tag: Tag; n: number }>();
+  for (const news of r?.docs ?? []) {
+    for (const t of news.tags ?? []) {
+      if (typeof t !== "object" || !t) continue;
+      const e = counts.get(t.id) ?? { tag: t, n: 0 };
+      e.n += 1;
+      counts.set(t.id, e);
+    }
+  }
+  return [...counts.values()].sort((a, b) => b.n - a.n).slice(0, limit).map((e) => e.tag);
+}
+
 /**
  * Kesintisiz okuma için "sıradaki haber": önce aynı etiket, yoksa aynı kategori,
  * o da yoksa en yeni. Zaten gösterilenler (exclude) hariç.

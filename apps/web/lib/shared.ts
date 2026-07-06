@@ -46,6 +46,7 @@ export type News = {
   tags?: Tag[];
   publishedAt?: string;
   createdAt?: string;
+  updatedAt?: string;
   seo?: { focusKeyword?: string; metaDescription?: string };
   seoScore?: number;
 };
