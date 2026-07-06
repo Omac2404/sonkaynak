@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { ContinuousReader } from "@/components/ContinuousReader";
 import {
   getNewsBySlug,
   getRelatedNews,
@@ -318,6 +319,15 @@ export default async function HaberDetay({ params }: Props) {
             </div>
           </section>
         )}
+
+        {/* Kesintisiz okuma: en alta gelince aynı etiketten sıradaki haberler */}
+        <ContinuousReader
+          firstId={news.id}
+          firstUrl={url}
+          firstTitle={news.title}
+          tagIds={Array.isArray(news.tags) ? news.tags.map((t) => (typeof t === "object" && t ? t.id : Number(t))).filter(Boolean) : []}
+          categoryId={news.category?.id ?? null}
+        />
       </article>
 
       {/* ── SIDEBAR ── */}

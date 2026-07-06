@@ -234,6 +234,34 @@ export async function getStories(): Promise<Story[]> {
   const r = await cms<ListResponse<Story>>(`/api/stories?depth=2&sort=order&limit=20`);
   return r?.docs ?? [];
 }
+
+/**
+ * Kesintisiz okuma için "sıradaki haber": önce aynı etiket, yoksa aynı kategori,
+ * o da yoksa en yeni. Zaten gösterilenler (exclude) hariç.
+ */
+export async function getNextArticle(
+  tagIds: number[],
+  categoryId: number | null,
+  excludeIds: number[],
+): Promise<News | null> {
+  const notIn = excludeIds.length ? `&where[id][not_in]=${excludeIds.join(",")}` : "";
+  const pick = async (filter: string): Promise<News | null> => {
+    const r = await cms<ListResponse<News>>(
+      `/api/news?${PUBLISHED}${filter}${notIn}&depth=2&sort=-publishedAt&limit=1`,
+      30,
+    );
+    return r?.docs?.[0] ?? null;
+  };
+  if (tagIds.length) {
+    const byTag = await pick(`&where[tags][in]=${tagIds.join(",")}`);
+    if (byTag) return byTag;
+  }
+  if (categoryId) {
+    const byCat = await pick(`&where[category][equals]=${categoryId}`);
+    if (byCat) return byCat;
+  }
+  return pick("");
+}
 export async function getAllNewsForSitemap(limit = 1000): Promise<News[]> {
   const r = await cms<ListResponse<News>>(`/api/news?${PUBLISHED}&depth=0&sort=-publishedAt&limit=${limit}`, 300);
   return r?.docs ?? [];
