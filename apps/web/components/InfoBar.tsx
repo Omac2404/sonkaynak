@@ -10,10 +10,9 @@ const WMO: Record<number, string> = {
   95: "⛈️", 96: "⛈️", 99: "⛈️",
 };
 
-function Cell({ label, value, sub, icon }: { label: string; value: string; sub?: string; icon?: string }) {
+function Cell({ label, value, sub }: { label: string; value: string; sub?: string; icon?: string }) {
   return (
     <div className="flex items-center gap-2.5 px-4 py-2.5">
-      {icon && <span className="text-xl leading-none">{icon}</span>}
       <div className="leading-tight">
         <div className="text-[10px] font-bold uppercase tracking-wide text-white/60">{label}</div>
         <div className="flex items-baseline gap-1.5">

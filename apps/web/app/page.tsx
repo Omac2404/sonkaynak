@@ -183,7 +183,6 @@ export default async function HomePage() {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                   <div className="absolute bottom-0 p-4">
-                    <span className="mb-1 inline-block rounded bg-sk-red px-2 py-0.5 text-[10px] font-bold text-white">📷 {g.items?.length ?? 0}</span>
                     <h3 className="text-base font-bold leading-snug text-white">{g.title}</h3>
                   </div>
                 </a>

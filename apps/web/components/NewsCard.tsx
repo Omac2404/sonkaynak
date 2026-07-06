@@ -1,17 +1,6 @@
 import Image from "next/image";
 import { type News, mediaUrl, newsUrl, categoryColor } from "@/lib/shared";
 
-function fmtDate(d?: string): string {
-  if (!d) return "";
-  try {
-    return new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "long", year: "numeric" }).format(
-      new Date(d),
-    );
-  } catch {
-    return "";
-  }
-}
-
 function Cover({ src, alt, className, sizes }: { src?: string; alt: string; className: string; sizes?: string }) {
   if (src) {
     return (
@@ -100,15 +89,14 @@ export function GridCard({ news }: { news: News }) {
           className="aspect-[16/9] w-full object-cover"
         />
         <div className="p-3">
-          {news.category && (
-            <span className="text-[10.5px] font-extrabold uppercase tracking-wide" style={{ color: categoryColor(news.category) }}>
-              {news.category.name}
-            </span>
-          )}
-          <h3 className="mt-1 line-clamp-3 text-[15px] font-bold leading-tight text-sk-ink transition group-hover:text-sk-red">
+          <h3 className="line-clamp-3 text-[15px] font-bold leading-tight text-sk-ink transition group-hover:text-sk-red">
             {news.title}
           </h3>
-          <div className="mt-1.5 text-[11px] text-neutral-400">{fmtDate(news.publishedAt ?? news.createdAt)}</div>
+          {news.category && (
+            <span className="mt-2 inline-block text-[11px] font-extrabold uppercase tracking-wide text-sk-red">
+              #{news.category.name}
+            </span>
+          )}
         </div>
       </a>
     </article>

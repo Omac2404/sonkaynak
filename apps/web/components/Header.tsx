@@ -44,7 +44,7 @@ export async function Header() {
     <>
       {/* Üst bilgi çubuğu */}
       <div className="border-b border-sk-line bg-white">
-        <div className="mx-auto flex h-9 max-w-[1280px] items-center justify-between px-4 text-[12.5px] text-sk-muted">
+        <div className="mx-auto flex h-9 max-w-[1360px] items-center justify-between px-4 text-[12.5px] text-sk-muted">
           <span className="truncate capitalize">{today}</span>
           <div className="flex items-center gap-4">
             <nav className="hidden items-center gap-4 font-medium sm:flex">
@@ -60,21 +60,49 @@ export async function Header() {
       {/* Son dakika */}
       <Ticker items={ticker.sonDakika ?? []} speed={ticker.sonDakikaSpeed ?? 10} />
 
-      {/* Masthead */}
+      {/* Masthead + menü (tek satır) */}
       <header className="border-b border-sk-line bg-white">
-        <div className="mx-auto flex max-w-[1280px] items-center gap-3 px-4 py-4 sm:py-5">
+        <div className="mx-auto flex max-w-[1360px] items-center gap-4 px-4 py-3">
           {/* Mobil hamburger */}
           <div className="lg:hidden">
             <MobileNav categories={navCategories} secondary={secondary} utility={utility} social={social} />
           </div>
 
           {/* Logo (mobilde ortalı, masaüstünde solda) */}
-          <a href="/" aria-label="Son Kaynak — Anasayfa" className="mx-auto lg:mx-0">
-            <Logo className="h-9 w-auto sm:h-11 lg:h-14" priority />
+          <a href="/" aria-label="Son Kaynak — Anasayfa" className="mx-auto shrink-0 lg:mx-0">
+            <Logo className="h-8 w-auto sm:h-9 lg:h-11" priority />
           </a>
 
+          {/* Masaüstü menü — logonun yanında */}
+          <nav className="hidden flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
+            <a
+              href="/"
+              className="whitespace-nowrap px-3 py-2 text-[14px] font-bold text-sk-ink transition hover:text-sk-red"
+            >
+              Anasayfa
+            </a>
+            {navCategories.map((c) => (
+              <a
+                key={c.id}
+                href={`/kategori/${c.slug}`}
+                className="whitespace-nowrap px-3 py-2 text-[14px] font-bold text-sk-ink transition hover:text-sk-red"
+              >
+                {c.name}
+              </a>
+            ))}
+            {secondary.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="whitespace-nowrap px-3 py-2 text-[14px] font-semibold text-sk-muted transition hover:text-sk-red"
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
+
           {/* Masaüstü arama */}
-          <div className="hidden flex-1 justify-end lg:flex">
+          <div className="hidden shrink-0 lg:flex">
             <HeaderSearch />
           </div>
 
@@ -91,42 +119,6 @@ export async function Header() {
           </a>
         </div>
       </header>
-
-      {/* Kategori menüsü — yalnızca masaüstü (mobilde hamburger var) */}
-      <nav className="sticky top-0 z-30 hidden border-b border-sk-line bg-white/90 backdrop-blur lg:block">
-        <div className="mx-auto flex max-w-[1280px] items-center gap-1 px-4">
-          <a href="/" aria-label="Anasayfa" className="mr-1 shrink-0 py-2">
-            <Logo className="h-6 w-auto" />
-          </a>
-          <div className="flex flex-1 items-center gap-0.5 overflow-x-auto">
-            <a
-              href="/"
-              className="whitespace-nowrap border-b-[3px] border-transparent px-3 py-3 text-[13.5px] font-bold text-sk-ink transition hover:border-sk-red hover:text-sk-red"
-            >
-              Anasayfa
-            </a>
-            {navCategories.map((c) => (
-              <a
-                key={c.id}
-                href={`/kategori/${c.slug}`}
-                className="whitespace-nowrap border-b-[3px] border-transparent px-3 py-3 text-[13.5px] font-bold text-sk-ink transition hover:border-sk-red hover:text-sk-red"
-              >
-                {c.name}
-              </a>
-            ))}
-            <span className="mx-1.5 h-4 w-px shrink-0 self-center bg-sk-line" />
-            {secondary.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="whitespace-nowrap border-b-[3px] border-transparent px-3 py-3 text-[13.5px] font-semibold text-sk-muted transition hover:border-sk-red hover:text-sk-red"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </nav>
     </>
   );
 }

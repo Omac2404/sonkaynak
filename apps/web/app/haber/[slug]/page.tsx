@@ -116,13 +116,10 @@ function SidebarList({ title, items }: { title: string; items: News[] }) {
         {title}
       </div>
       <div className="divide-y divide-sk-line">
-        {items.map((n, i) => {
+        {items.map((n) => {
           const img = mediaUrl(n.coverImage, "thumbnail");
           return (
             <a key={n.id} href={newsUrl(n)} className="group flex gap-3 p-3">
-              <span className="grid h-7 w-7 shrink-0 place-items-center self-start rounded-md bg-neutral-100 text-sm font-black text-sk-red">
-                {i + 1}
-              </span>
               {img && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={img} alt="" className="h-14 w-20 shrink-0 rounded-md object-cover" />
@@ -324,8 +321,8 @@ export default async function HaberDetay({ params }: Props) {
       </article>
 
       {/* ── SIDEBAR ── */}
-      <aside className="space-y-6 lg:sticky lg:top-20 lg:self-start">
-        <SidebarList title="🔥 Sıcak Gündem" items={sicak.length ? sicak : latest.slice(0, 3)} />
+      <aside className="space-y-6">
+        <SidebarList title="Sıcak Gündem" items={sicak.length ? sicak : latest.slice(0, 3)} />
         <SidebarList title="Son Haberler" items={latest.slice(0, 3)} />
       </aside>
     </div>
