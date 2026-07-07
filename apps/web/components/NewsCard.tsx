@@ -57,6 +57,34 @@ export function HeroCard({ news }: { news: News }) {
   );
 }
 
+export function PosterCard({ news }: { news: News }) {
+  const src = mediaUrl(news.coverImage, "feature");
+  return (
+    <a
+      href={newsUrl(news)}
+      className="group relative block aspect-[16/10] overflow-hidden rounded-lg bg-neutral-800"
+    >
+      {src ? (
+        <Image src={src} alt={news.title} fill sizes="(max-width:768px) 100vw, 440px" className="object-cover transition duration-300 group-hover:scale-105" />
+      ) : null}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 p-4">
+        {news.category && (
+          <span
+            className="inline-block rounded px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white"
+            style={{ background: categoryColor(news.category) }}
+          >
+            {news.category.name}
+          </span>
+        )}
+        <h3 className="mt-1.5 line-clamp-3 text-lg font-black leading-tight text-white drop-shadow-sm">
+          {news.title}
+        </h3>
+      </div>
+    </a>
+  );
+}
+
 export function SideCard({ news }: { news: News }) {
   return (
     <a href={newsUrl(news)} className="group flex gap-3 p-3">

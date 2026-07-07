@@ -17,7 +17,8 @@ import {
   newsUrl,
   type News,
 } from "@/lib/cms";
-import { HeroCard, SideCard, GridCard } from "@/components/NewsCard";
+import { PosterCard, SideCard, GridCard } from "@/components/NewsCard";
+import { MansetSlider } from "@/components/MansetSlider";
 import { VefatStrip } from "@/components/VefatStrip";
 import { VitrinTabs } from "@/components/VitrinTabs";
 import { InfoBar } from "@/components/InfoBar";
@@ -64,8 +65,10 @@ export default async function HomePage() {
     ]);
   const storyItems = stories.map((s) => s.news).filter((n): n is News => Boolean(n));
 
-  const hero = manset[0] ?? latest[0];
-  const sideList = (manset.length > 1 ? manset.slice(1, 6) : latest.slice(1, 6)) as News[];
+  // Manşet slider: manşet kürasyonu doluysa onu, değilse en yeni 10 haber
+  const sliderItems = ((manset.length ? manset : latest).slice(0, 10)) as News[];
+  // Yan kartlar: slider'da olmayan en yeni haberler
+  const sideList = latest.filter((n) => !sliderItems.some((s) => s.id === n.id)).slice(0, 5);
 
   return (
     <div className="mx-auto max-w-[1360px] px-3 py-4 sm:px-4 sm:py-6">
@@ -88,10 +91,24 @@ export default async function HomePage() {
       {/* Story'ler — yalnızca mobil, tıklayınca tam ekran görüntüleyici */}
       {storyItems.length > 0 && <StoryBar items={storyItems} />}
 
-      {/* Manşet */}
-      {hero && (
+      {/* Sıcak Gündem — üstte 3 büyük poster (Hürriyet tarzı) */}
+      {sicak.length > 0 && (
+        <section className="mb-6">
+          <div className="mb-3 inline-block bg-sk-red px-3 py-1 text-[13px] font-black uppercase tracking-wide text-white">
+            Sıcak Gündem
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {sicak.slice(0, 3).map((n) => (
+              <PosterCard key={n.id} news={n} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Manşet slider (sol) + yan kartlar (sağ) */}
+      {sliderItems.length > 0 && (
         <section className="grid gap-5 lg:grid-cols-[1fr_380px]">
-          <HeroCard news={hero} />
+          <MansetSlider items={sliderItems} />
           <aside className="flex flex-col divide-y divide-sk-line overflow-hidden rounded-lg border border-sk-line">
             {sideList.map((n) => (
               <SideCard key={n.id} news={n} />
@@ -123,18 +140,6 @@ export default async function HomePage() {
         <div className="mt-5">
           <VefatStrip items={vefat} />
         </div>
-      )}
-
-      {/* Sıcak Gündem */}
-      {sicak.length > 0 && (
-        <section className="mt-8">
-          <SectionTitle>Sıcak Gündem</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {sicak.slice(0, 3).map((n) => (
-              <GridCard key={n.id} news={n} />
-            ))}
-          </div>
-        </section>
       )}
 
       {/* Kategori Vitrini (sekmeli) */}
