@@ -13,6 +13,10 @@ import {
   getAuthorsForSlider,
   getTicker,
   getTrendingTags,
+  getCategories,
+  getNewsByCategory,
+  categoryUrl,
+  categoryColor,
   mediaUrl,
   newsUrl,
   type News,
@@ -69,6 +73,16 @@ export default async function HomePage() {
   const sliderItems = ((manset.length ? manset : latest).slice(0, 10)) as News[];
   // Yan kartlar: slider'da olmayan en yeni haberler
   const sideList = latest.filter((n) => !sliderItems.some((s) => s.id === n.id)).slice(0, 5);
+  // Sıcak Gündem: kürasyon boşsa en yeni haberlerle doldur
+  const sicakItems = (sicak.length ? sicak : latest).slice(0, 3);
+
+  // Her kategoriden en son 5 haber
+  const categories = await getCategories();
+  const categoryBlocks = (
+    await Promise.all(
+      categories.map(async (c) => ({ cat: c, items: (await getNewsByCategory(c.id, 1, 5)).docs })),
+    )
+  ).filter((b) => b.items.length > 0);
 
   return (
     <div className="mx-auto max-w-[1360px] px-3 py-4 sm:px-4 sm:py-6">
@@ -92,13 +106,13 @@ export default async function HomePage() {
       {storyItems.length > 0 && <StoryBar items={storyItems} />}
 
       {/* Sıcak Gündem — üstte 3 büyük poster (Hürriyet tarzı) */}
-      {sicak.length > 0 && (
+      {sicakItems.length > 0 && (
         <section className="mb-6">
           <div className="mb-3 inline-block bg-sk-red px-3 py-1 text-[13px] font-black uppercase tracking-wide text-white">
             Sıcak Gündem
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            {sicak.slice(0, 3).map((n) => (
+            {sicakItems.map((n) => (
               <PosterCard key={n.id} news={n} />
             ))}
           </div>
@@ -156,6 +170,20 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Her kategoriden son 5 haber */}
+      {categoryBlocks.map(({ cat, items }) => (
+        <section key={cat.id} className="mt-8">
+          <SectionTitle href={categoryUrl(cat)} color={categoryColor(cat)}>
+            {cat.name}
+          </SectionTitle>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {items.map((n) => (
+              <GridCard key={n.id} news={n} />
+            ))}
+          </div>
+        </section>
+      ))}
 
       {/* Seçmece Haberler */}
       {secmece.length > 0 && (
