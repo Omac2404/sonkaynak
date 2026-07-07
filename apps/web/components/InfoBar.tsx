@@ -11,14 +11,18 @@ const WMO: Record<number, string> = {
 };
 
 function Cell({ label, value, sub }: { label: string; value: string; sub?: string; icon?: string }) {
+  const up = sub?.includes("+");
+  const down = sub?.includes("-");
   return (
-    <div className="flex items-center gap-2.5 px-4 py-2.5">
-      <div className="leading-tight">
-        <div className="text-[10px] font-bold uppercase tracking-wide text-white/60">{label}</div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-sm font-extrabold text-white">{value}</span>
-          {sub && <span className="text-[11px] font-bold text-white/70">{sub}</span>}
-        </div>
+    <div className="shrink-0 px-4 py-2 leading-tight">
+      <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{label}</div>
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-[15px] font-semibold text-sk-ink">{value}</span>
+        {sub && (
+          <span className={`text-[11px] font-semibold ${up ? "text-green-600" : down ? "text-sk-red" : "text-neutral-400"}`}>
+            {sub}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -68,8 +72,8 @@ export function InfoBar({ finance }: { finance: Finance }) {
   const bistUp = (finance.bistChange ?? "").startsWith("+");
 
   return (
-    <div className="overflow-hidden rounded-xl bg-gradient-to-r from-sk-ink to-neutral-800">
-      <div className="flex flex-wrap items-center divide-x divide-white/10">
+    <div className="overflow-x-auto rounded-lg border border-sk-line bg-white">
+      <div className="flex min-w-max items-stretch divide-x divide-sk-line">
         <Cell label={weather?.city ?? "Hava"} value={weather?.temp ?? "—"} icon={weather?.icon ?? "🌡️"} />
         <Cell label="Dolar" value={finance.usd ? `₺${finance.usd}` : "—"} icon="💵" />
         <Cell label="Euro" value={finance.eur ? `₺${finance.eur}` : "—"} icon="💶" />

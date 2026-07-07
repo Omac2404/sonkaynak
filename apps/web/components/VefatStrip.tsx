@@ -2,7 +2,7 @@
 
 type Item = { isim: string; aciklama?: string; haberUrl?: string };
 
-/** Vefat ilanları — kayan şerit (ticker animasyonunu yeniden kullanır). */
+/** Vefat ilanları — minimal/çizgisel kayan şerit. */
 export function VefatStrip({ items }: { items: Item[] }) {
   if (!items?.length) return null;
   const duration = Math.max(20, items.length * 8);
@@ -10,14 +10,14 @@ export function VefatStrip({ items }: { items: Item[] }) {
     <div className="sk-ticker-row" aria-hidden={key === "clone" ? true : undefined}>
       {items.map((v, i) => {
         const content = (
-          <span key={`${key}-${i}`} className="sk-ticker-item">
-            🕊 <strong>{v.isim}</strong>
+          <span key={`${key}-${i}`} className="sk-ticker-item !font-normal">
+            <span className="font-semibold text-neutral-800">{v.isim}</span>
             {v.aciklama ? ` — ${v.aciklama}` : ""}
-            <span className="sk-ticker-sep">◆</span>
+            <span className="px-10 text-neutral-300">◆</span>
           </span>
         );
         return v.haberUrl ? (
-          <a key={`${key}-${i}`} href={v.haberUrl}>
+          <a key={`${key}-${i}`} href={v.haberUrl} className="hover:text-sk-red">
             {content}
           </a>
         ) : (
@@ -28,9 +28,9 @@ export function VefatStrip({ items }: { items: Item[] }) {
   );
 
   return (
-    <div className="overflow-hidden rounded-lg bg-neutral-800 text-white">
+    <div className="overflow-hidden rounded-lg border border-sk-line bg-white text-neutral-600">
       <div className="flex items-stretch">
-        <span className="flex shrink-0 items-center bg-black px-4 text-[11px] font-extrabold uppercase tracking-wide">
+        <span className="flex shrink-0 items-center border-r border-sk-line px-4 text-[11px] font-bold uppercase tracking-wide text-sk-red">
           Vefat
         </span>
         <div className="sk-ticker-viewport">
