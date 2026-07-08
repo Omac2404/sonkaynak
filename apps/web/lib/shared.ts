@@ -44,6 +44,7 @@ export type News = {
   category?: Category | null;
   author?: Author | null;
   tags?: Tag[];
+  sonDakika?: boolean;
   publishedAt?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -64,6 +65,26 @@ export function mediaUrl(
 export function authorName(a?: Author | null): string {
   if (!a) return "Son Kaynak";
   return a.fullName ?? `${a.name ?? ""} ${a.surname ?? ""}`.trim();
+}
+
+/** "5 saat önce" tarzı göreli zaman; 1 haftadan eskiyse tam tarih. */
+export function timeAgo(d?: string): string {
+  if (!d) return "";
+  const then = new Date(d).getTime();
+  if (Number.isNaN(then)) return "";
+  const s = Math.floor((Date.now() - then) / 1000);
+  if (s < 60) return "az önce";
+  const m = Math.floor(s / 60);
+  if (m < 60) return `${m} dakika önce`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h} saat önce`;
+  const dd = Math.floor(h / 24);
+  if (dd < 7) return `${dd} gün önce`;
+  try {
+    return new Intl.DateTimeFormat("tr-TR", { day: "numeric", month: "long", year: "numeric" }).format(new Date(d));
+  } catch {
+    return "";
+  }
 }
 
 export function newsUrl(n: Pick<News, "slug" | "id">): string {

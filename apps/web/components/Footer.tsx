@@ -11,14 +11,15 @@ export async function Footer() {
       : [
           {
             title: "Kategoriler",
-            links: categories.slice(0, 6).map((c) => ({ label: c.name, url: `/kategori/${c.slug}` })),
+            links: categories.slice(0, 8).map((c) => ({ label: c.name, url: `/kategori/${c.slug}` })),
           },
           {
             title: "Keşfet",
             links: [
               { label: "Son Haberler", url: "/" },
-              { label: "Galeri", url: "/galeri" },
-              { label: "İlanlar", url: "/ilanlar" },
+              { label: "Tüm Kategoriler", url: "/tum-kategoriler" },
+              { label: "Foto Galeri", url: "/galeri" },
+              { label: "Resmî İlanlar", url: "/ilanlar" },
               { label: "Firma Rehberi", url: "/firma-rehberi" },
               { label: "Yazarlar", url: "/yazarlar" },
             ],
@@ -29,6 +30,8 @@ export async function Footer() {
               { label: "Hakkımızda", url: "/hakkimizda" },
               { label: "Künye", url: "/kunye" },
               { label: "İletişim", url: "/iletisim" },
+              { label: "RSS", url: "/rss.xml" },
+              { label: "Site Haritası", url: "/sitemap.xml" },
             ],
           },
         ];

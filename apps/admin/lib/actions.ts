@@ -184,6 +184,7 @@ export async function saveNews(formData: FormData) {
     body,
     _status,
     reviewState,
+    sonDakika: formData.get("sonDakika") === "on",
     author: authorVal ?? null,
     tags: tagIds,
     seo: { focusKeyword, metaDescription },

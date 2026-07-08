@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BackToTop } from "@/components/BackToTop";
 import { getSettings, mediaUrl } from "@/lib/cms";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-inter" });
@@ -53,6 +54,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="tr" className={inter.variable}>
       <body suppressHydrationWarning className="font-sans">
+        {/* Karanlık mod tercihini boyamadan önce uygula (flash önleme) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}}catch(e){}`,
+          }}
+        />
+
         {/* Bağlantıyı erken aç (doğrudan CMS'ten yüklenen görseller için) */}
         <link rel="preconnect" href={CMS_URL} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={CMS_URL} />
@@ -63,6 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Header />
         <main className="min-h-screen">{children}</main>
         <Footer />
+        <BackToTop />
 
         {/* Google Analytics */}
         {s.gaId && (

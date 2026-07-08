@@ -127,3 +127,22 @@ a {
   from { width: 0%; }
   to { width: 100%; }
 }
+
+/* ── Karanlık mod ── */
+.dark {
+  --color-sk-paper: #14161a;
+  --color-sk-line: #2b2f38;
+  --color-sk-muted: #9aa1ac;
+}
+.dark body { color: #e5e7eb; }
+.dark .bg-white { background-color: #1d2026 !important; }
+.dark .bg-white\/95,
+.dark .bg-white\/90,
+.dark .bg-white\/80 { background-color: rgba(29, 32, 38, 0.95) !important; }
+.dark .bg-neutral-50 { background-color: #1d2026 !important; }
+.dark .bg-neutral-100 { background-color: #24272f !important; }
+.dark .text-sk-ink { color: #e8eaed !important; }
+.dark .text-neutral-700 { color: #c7ccd4 !important; }
+.dark .text-neutral-600 { color: #b7bcc6 !important; }
+.dark .text-neutral-500 { color: #9aa1ac !important; }
+.dark .sk-article-body { color: #d7dbe2; }

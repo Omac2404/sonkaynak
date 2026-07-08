@@ -25,6 +25,7 @@ export const SECTION_GROUPS: { title: string; perms: [string, string][] }[] = [
       ["manset", "Manşet"],
       ["sicak-gundem", "Sıcak Gündem"],
       ["secmece", "Seçmece"],
+      ["gozden-kacmasin", "Gözden Kaçmasın"],
       ["ozel", "Özel Haberler"],
       ["vitrin", "Vitrin"],
       ["ticker", "Ticker"],

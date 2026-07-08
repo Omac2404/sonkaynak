@@ -110,6 +110,13 @@ export const News: CollectionConfig = {
     },
     ...slugField("title"),
     {
+      name: "sonDakika",
+      label: "Son Dakika",
+      type: "checkbox",
+      defaultValue: false,
+      admin: { position: "sidebar", description: "Kartlarda kırmızı SON DAKİKA rozeti gösterir." },
+    },
+    {
       type: "tabs",
       tabs: [
         {

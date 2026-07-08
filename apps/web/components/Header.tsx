@@ -4,6 +4,8 @@ import { HeaderSearch } from "./HeaderSearch";
 import { Logo } from "./Logo";
 import { SocialLinks } from "./SocialIcons";
 import { MobileNav } from "./MobileNav";
+import { ThemeToggle } from "./ThemeToggle";
+import { StickyHeader } from "./StickyHeader";
 
 export async function Header() {
   const [menu, categories, ticker, settings] = await Promise.all([
@@ -53,9 +55,14 @@ export async function Header() {
             </nav>
             {social.length > 0 && <span className="hidden h-4 w-px bg-sk-line sm:block" />}
             <SocialLinks items={social} itemClassName="grid h-7 w-7 place-items-center rounded-full text-sk-muted transition hover:bg-sk-red hover:text-white" />
+            <span className="h-4 w-px bg-sk-line" />
+            <ThemeToggle />
           </div>
         </div>
       </div>
+
+      {/* Scroll'da beliren yapışkan kompakt header */}
+      <StickyHeader categories={navCategories} secondary={secondary} />
 
       {/* Son dakika */}
       <Ticker items={ticker.sonDakika ?? []} speed={ticker.sonDakikaSpeed ?? 10} />

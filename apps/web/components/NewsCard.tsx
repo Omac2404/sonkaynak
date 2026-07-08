@@ -1,5 +1,13 @@
 import Image from "next/image";
-import { type News, mediaUrl, newsUrl, categoryColor } from "@/lib/shared";
+import { type News, mediaUrl, newsUrl, categoryColor, authorName, timeAgo } from "@/lib/shared";
+
+function SonDakikaBadge() {
+  return (
+    <span className="absolute left-2 top-2 z-10 rounded bg-sk-red px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white shadow">
+      Son Dakika
+    </span>
+  );
+}
 
 function Cover({ src, alt, className, sizes }: { src?: string; alt: string; className: string; sizes?: string }) {
   if (src) {
@@ -64,6 +72,7 @@ export function PosterCard({ news }: { news: News }) {
       href={newsUrl(news)}
       className="group relative block aspect-[16/10] overflow-hidden rounded-lg bg-neutral-800"
     >
+      {news.sonDakika && <SonDakikaBadge />}
       {src ? (
         <Image src={src} alt={news.title} fill sizes="(max-width:768px) 100vw, 440px" className="object-cover transition duration-300 group-hover:scale-105" />
       ) : null}
@@ -111,11 +120,14 @@ export function GridCard({ news }: { news: News }) {
   return (
     <article className="group overflow-hidden rounded-lg border border-sk-line bg-white transition hover:shadow-md">
       <a href={newsUrl(news)}>
-        <Cover
-          src={mediaUrl(news.coverImage, "card")}
-          alt={news.title}
-          className="aspect-[16/9] w-full object-cover"
-        />
+        <div className="relative">
+          {news.sonDakika && <SonDakikaBadge />}
+          <Cover
+            src={mediaUrl(news.coverImage, "card")}
+            alt={news.title}
+            className="aspect-[16/9] w-full object-cover"
+          />
+        </div>
         <div className="p-3">
           <h3 className="line-clamp-3 text-[15px] font-bold leading-tight text-sk-ink transition group-hover:text-sk-red">
             {news.title}
@@ -125,6 +137,11 @@ export function GridCard({ news }: { news: News }) {
               #{news.category.name}
             </span>
           )}
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[11px] text-neutral-400">
+            {news.author && <span className="font-semibold text-neutral-500">{authorName(news.author)}</span>}
+            {news.author && <span>·</span>}
+            <span>{timeAgo(news.publishedAt ?? news.createdAt)}</span>
+          </div>
         </div>
       </a>
     </article>

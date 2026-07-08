@@ -10,6 +10,7 @@ import {
   getStories,
   getSecmece,
   getOzel,
+  getGozdenKacmasin,
   getAuthorsForSlider,
   getTicker,
   getTrendingTags,
@@ -49,7 +50,7 @@ function SectionTitle({ children, href, color = "#d4141c" }: { children: React.R
 }
 
 export default async function HomePage() {
-  const [manset, sicak, latest, vitrin, galeriler, ilanlar, firmalar, vefat, stories, secmece, ozel, authors, ticker, finance, trending] =
+  const [manset, sicak, latest, vitrin, galeriler, ilanlar, firmalar, vefat, stories, secmece, ozel, gozden, authors, ticker, finance, trending] =
     await Promise.all([
       getManset(),
       getSicakGundem(),
@@ -62,6 +63,7 @@ export default async function HomePage() {
       getStories(),
       getSecmece(),
       getOzel(),
+      getGozdenKacmasin(),
       getAuthorsForSlider(20),
       getTicker(),
       getFinance(),
@@ -154,6 +156,18 @@ export default async function HomePage() {
         <div className="mt-5">
           <VefatStrip items={vefat} />
         </div>
+      )}
+
+      {/* Gözden Kaçmasın (admin'den seçilir) */}
+      {gozden.length > 0 && (
+        <section className="mt-8">
+          <SectionTitle color="#0891b2">Gözden Kaçmasın</SectionTitle>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+            {gozden.slice(0, 10).map((n) => (
+              <GridCard key={n.id} news={n} />
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Kategori Vitrini (sekmeli) */}

@@ -32,7 +32,7 @@ const SYSTEM_ROLES = [
     permissions: [
       "haberler", "haberler/yeni", "kategoriler", "etiketler", "yazarlar", "medya",
       "ilanlar", "firmalar", "galeriler", "manset", "sicak-gundem", "secmece", "ozel",
-      "vitrin", "ticker", "ana-menu", "storyler", "vefat", "onay-bekleyenler", "arsiv",
+      "gozden-kacmasin", "vitrin", "ticker", "ana-menu", "storyler", "vefat", "onay-bekleyenler", "arsiv",
     ],
     isSystem: true,
   },
@@ -55,6 +55,7 @@ import {
   Ticker,
   Secmece,
   Ozel,
+  GozdenKacmasin,
 } from "./globals/Curation";
 
 const filename = fileURLToPath(import.meta.url);
@@ -112,7 +113,7 @@ export default buildConfig({
     Users,
   ],
 
-  globals: [Manset, SicakGundem, Secmece, Ozel, Vitrin, AnaMenu, Ticker, SiteSettings],
+  globals: [Manset, SicakGundem, Secmece, Ozel, GozdenKacmasin, Vitrin, AnaMenu, Ticker, SiteSettings],
 
   editor: lexicalEditor(),
 

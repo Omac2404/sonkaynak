@@ -135,6 +135,11 @@ export async function getOzel(): Promise<News[]> {
   return (r?.items ?? []).map((i) => i.news).filter(Boolean) as News[];
 }
 
+export async function getGozdenKacmasin(): Promise<News[]> {
+  const r = await cms<GlobalResp<{ items?: { news?: News }[] }>>(`/api/globals/gozden-kacmasin?depth=2`);
+  return (r?.items ?? []).map((i) => i.news).filter(Boolean) as News[];
+}
+
 export type AuthorWithCount = Author & { newsCount: number };
 export async function getAuthorsForSlider(limit = 20): Promise<AuthorWithCount[]> {
   return cached("authors:slider", 300, async () => {

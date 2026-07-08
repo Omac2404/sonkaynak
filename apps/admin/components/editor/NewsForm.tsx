@@ -112,6 +112,14 @@ export function NewsForm({
 
         {/* Kenar çubuğu */}
         <div className="space-y-5">
+          {/* Son Dakika */}
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200 bg-white p-4">
+            <input type="checkbox" name="sonDakika" defaultChecked={Boolean(news?.sonDakika)} className="h-4 w-4 accent-sk-red" />
+            <span className="text-sm font-bold text-ink">
+              Son Dakika <span className="font-normal text-neutral-400">— kartlarda kırmızı rozet</span>
+            </span>
+          </label>
+
           {/* Canlı SEO skoru */}
           <div className="rounded-xl border border-neutral-200 bg-white p-4">
             <div className="mb-3 flex items-center gap-3">

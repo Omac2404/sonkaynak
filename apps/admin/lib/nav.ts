@@ -55,6 +55,7 @@ export const NAV: NavGroup[] = [
       { href: "/manset", label: "Manşet", icon: "star", roles: SENIOR },
       { href: "/sicak-gundem", label: "Sıcak Gündem", icon: "flame", roles: SENIOR },
       { href: "/secmece", label: "Seçmece", icon: "star", roles: SENIOR },
+      { href: "/gozden-kacmasin", label: "Gözden Kaçmasın", icon: "star", roles: SENIOR },
       { href: "/ozel", label: "Özel Haberler", icon: "star", roles: SENIOR },
       { href: "/vitrin", label: "Kategori Vitrini", icon: "layout", roles: SENIOR },
       { href: "/ticker", label: "Kayan Şeritler", icon: "ticker", roles: SENIOR },

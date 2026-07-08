@@ -69,6 +69,24 @@ export const Secmece: GlobalConfig = {
   ],
 };
 
+/** Gözden Kaçmasın — anasayfa öne çıkan seçki */
+export const GozdenKacmasin: GlobalConfig = {
+  slug: "gozden-kacmasin",
+  label: "Gözden Kaçmasın",
+  admin: { group: "Kürasyon" },
+  access: baseAccess,
+  hooks: curationHooks,
+  fields: [
+    {
+      name: "items",
+      label: "Gözden Kaçmasın Haberleri",
+      type: "array",
+      maxRows: 12,
+      fields: [{ name: "news", type: "relationship", relationTo: "news", required: true }],
+    },
+  ],
+};
+
 /** Özel Haberler — anasayfa özel bloğu */
 export const Ozel: GlobalConfig = {
   slug: "ozel",
