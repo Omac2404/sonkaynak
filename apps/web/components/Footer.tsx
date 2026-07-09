@@ -94,9 +94,11 @@ export async function Footer() {
         {/* Alt bar */}
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-neutral-500 sm:flex-row">
           <p>{settings.footerCopyright ?? `© ${year} Son Kaynak. Tüm hakları saklıdır.`}</p>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <a href="/kunye" className="transition hover:text-white">Künye</a>
-            <a href="/hakkimizda" className="transition hover:text-white">Hakkımızda</a>
+            <a href="/gizlilik" className="transition hover:text-white">Gizlilik &amp; KVKK</a>
+            <a href="/cerez-politikasi" className="transition hover:text-white">Çerez Politikası</a>
+            <a href="/kullanim-kosullari" className="transition hover:text-white">Kullanım Koşulları</a>
             <a href="/iletisim" className="transition hover:text-white">İletişim</a>
           </div>
         </div>

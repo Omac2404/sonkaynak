@@ -12,7 +12,7 @@ function SonDakikaBadge() {
 function Cover({ src, alt, className, sizes }: { src?: string; alt: string; className: string; sizes?: string }) {
   if (src) {
     return (
-      <div className={`relative overflow-hidden bg-neutral-100 ${className}`}>
+      <div className={`sk-img-skel relative overflow-hidden bg-neutral-100 ${className}`}>
         <Image src={src} alt={alt} fill sizes={sizes ?? "(max-width:768px) 100vw, 400px"} className="object-cover" />
       </div>
     );

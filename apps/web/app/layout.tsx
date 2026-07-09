@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
+import { CookieBanner } from "@/components/CookieBanner";
 import { getSettings, mediaUrl } from "@/lib/cms";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-inter" });
@@ -72,6 +73,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main className="min-h-screen">{children}</main>
         <Footer />
         <BackToTop />
+        <CookieBanner />
 
         {/* Google Analytics */}
         {s.gaId && (

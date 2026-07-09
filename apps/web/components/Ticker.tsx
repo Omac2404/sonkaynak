@@ -34,11 +34,12 @@ export function Ticker({
 
   return (
     <div className="text-white" style={{ background: color }}>
-      <div className="mx-auto flex max-w-[1240px] items-stretch overflow-hidden">
+      <div className="mx-auto flex max-w-[1360px] items-stretch overflow-hidden">
         <span
-          className="flex shrink-0 items-center px-4 text-[11px] font-extrabold uppercase tracking-wide"
+          className="flex shrink-0 items-center gap-2 px-4 text-[11px] font-extrabold uppercase tracking-wide"
           style={{ background: labelColor }}
         >
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-white" />
           {label}
         </span>
         <div className="sk-ticker-viewport">

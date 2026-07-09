@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ContinuousReader } from "@/components/ContinuousReader";
+import { ArticleLightbox } from "@/components/ArticleLightbox";
 import {
   getNewsBySlug,
   getRelatedNews,
@@ -156,6 +157,9 @@ export default async function HaberDetay({ params }: Props) {
     getLatestNews(5),
   ]);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const catColor = news.category ? categoryColor(news.category) : "#d4141c";
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -163,19 +167,45 @@ export default async function HaberDetay({ params }: Props) {
     description: news.seo?.metaDescription || news.excerpt,
     image: cover ? [cover] : [],
     datePublished: news.publishedAt,
-    dateModified: news.publishedAt,
-    author: { "@type": "Person", name: authorName(news.author) },
-    publisher: { "@type": "Organization", name: "Son Kaynak" },
+    dateModified: news.updatedAt || news.publishedAt,
+    author: {
+      "@type": "Person",
+      name: authorName(news.author),
+      ...(news.author?.slug ? { url: `${siteUrl}/yazar/${news.author.slug}` } : {}),
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Son Kaynak",
+      logo: { "@type": "ImageObject", url: `${siteUrl}/logo.png` },
+    },
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    ...(news.category ? { articleSection: news.category.name } : {}),
+    ...(news.tags?.length ? { keywords: news.tags.map((t) => t.name).join(", ") } : {}),
+  };
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Anasayfa", item: `${siteUrl}/` },
+      ...(news.category
+        ? [{ "@type": "ListItem", position: 2, name: news.category.name, item: `${siteUrl}${categoryUrl(news.category)}` }]
+        : []),
+      { "@type": "ListItem", position: news.category ? 3 : 2, name: news.title, item: url },
+    ],
   };
 
   return (
     <div className="mx-auto grid max-w-[1180px] gap-10 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
       <ReadingProgress />
+      <ArticleLightbox />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* ── ANA SÜTUN ── */}
       <article className="min-w-0">
+        {/* Kategori renk şeridi */}
+        <div className="mb-3 h-[3px] w-full rounded" style={{ background: catColor }} />
         {/* Breadcrumb */}
         <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-neutral-400">
           <a href="/" className="hover:text-sk-red">Anasayfa</a>
