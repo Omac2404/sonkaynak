@@ -54,7 +54,7 @@ export default async function HomePage() {
     await Promise.all([
       getManset(),
       getSicakGundem(),
-      getLatestNews(15),
+      getLatestNews(24),
       getVitrin(),
       getGaleriler(4),
       getIlanlar(4),
@@ -71,8 +71,13 @@ export default async function HomePage() {
     ]);
   const storyItems = stories.map((s) => s.news).filter((n): n is News => Boolean(n));
 
-  // Manşet slider: manşet kürasyonu doluysa onu, değilse en yeni 10 haber
-  const sliderItems = ((manset.length ? manset : latest).slice(0, 10)) as News[];
+  // Manşet slider: önce manşet kürasyonu, ardından en yeni haberlerle 19'a tamamla
+  const sliderPool: News[] = [...(manset as News[])];
+  for (const n of latest) {
+    if (sliderPool.length >= 19) break;
+    if (!sliderPool.some((p) => p.id === n.id)) sliderPool.push(n);
+  }
+  const sliderItems = sliderPool.slice(0, 19);
   // Yan kartlar: slider'da olmayan en yeni haberler
   const sideList = latest.filter((n) => !sliderItems.some((s) => s.id === n.id)).slice(0, 5);
   // Sıcak Gündem: kürasyon boşsa en yeni haberlerle doldur
@@ -107,13 +112,14 @@ export default async function HomePage() {
       {/* Story'ler — yalnızca mobil, tıklayınca tam ekran görüntüleyici */}
       {storyItems.length > 0 && <StoryBar items={storyItems} />}
 
-      {/* Sıcak Gündem — üstte 3 büyük poster (Hürriyet tarzı) */}
+      {/* Sıcak Gündem — üstte 3 büyük poster, kırmızı çerçeve (göze batsın) */}
       {sicakItems.length > 0 && (
-        <section className="mb-6">
-          <div className="mb-3 inline-block bg-sk-red px-3 py-1 text-[13px] font-black uppercase tracking-wide text-white">
+        <section className="mb-6 rounded-lg border-2 border-sk-red bg-white p-3">
+          <div className="mb-3 inline-flex items-center gap-2 rounded bg-sk-red px-3 py-1 text-[13px] font-black uppercase tracking-wide text-white">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-white" />
             Sıcak Gündem
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             {sicakItems.map((n) => (
               <PosterCard key={n.id} news={n} />
             ))}
@@ -178,7 +184,7 @@ export default async function HomePage() {
         <section className="mt-8">
           <SectionTitle color="#16181d">Son Haberler</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-            {latest.map((n) => (
+            {latest.slice(0, 15).map((n) => (
               <GridCard key={n.id} news={n} />
             ))}
           </div>

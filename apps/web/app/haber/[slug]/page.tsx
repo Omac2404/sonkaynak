@@ -293,23 +293,6 @@ export default async function HaberDetay({ params }: Props) {
           )}
         </div>
 
-        {/* Künye */}
-        <div className="mt-9 max-w-[760px] overflow-hidden rounded-xl border border-sk-line">
-          <div className="bg-sk-ink px-4 py-2.5 text-[11px] font-extrabold uppercase tracking-wider text-white">Künye</div>
-          <div className="grid grid-cols-1 sm:grid-cols-2">
-            {[
-              ["Yayın Sahibi", "SONKAYNAK"],
-              ["Sorumlu Yazı İşleri Müdürü", "Son Kaynak"],
-              ["Yönetim Yeri", "Merkez / Kırıkkale"],
-              ["İletişim / WhatsApp", "0538 441 07 71"],
-            ].map(([k, v], i) => (
-              <div key={i} className="border-b border-sk-line px-4 py-3 sm:[&:nth-child(odd)]:border-r">
-                <div className="text-[10px] font-bold uppercase tracking-wide text-neutral-400">{k}</div>
-                <div className="mt-0.5 text-[13px] font-bold text-sk-ink">{v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Etiketler */}
         {news.tags && news.tags.length > 0 && (

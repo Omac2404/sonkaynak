@@ -21,7 +21,7 @@ export function Logo({
       width={1647}
       height={509}
       priority={priority}
-      className={`${className} ${variant === "white" ? "[filter:brightness(0)_invert(1)]" : ""}`}
+      className={`${className} sk-logo ${variant === "white" ? "sk-logo-white" : "sk-logo-auto"}`}
     />
   );
 }

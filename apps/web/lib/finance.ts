@@ -3,9 +3,13 @@ import { cached } from "./redis";
 export type Finance = {
   usd?: string;
   eur?: string;
+  gbp?: string;
   gold?: string;
+  goldOz?: string;
   bist?: string;
   bistChange?: string;
+  btc?: string;
+  eth?: string;
 };
 
 async function safeJson(url: string, headers?: Record<string, string>): Promise<any> {
@@ -23,16 +27,29 @@ export async function getFinance(): Promise<Finance> {
   return cached("finance:data", 600, async () => {
     const out: Finance = {};
 
-    // Dolar / Euro (Frankfurter: 1 TRY = x USD → tersini al)
-    const fx = await safeJson("https://api.frankfurter.app/latest?from=TRY&to=USD,EUR");
+    // Dolar / Euro / Sterlin (Frankfurter: 1 TRY = x → tersini al)
+    const fx = await safeJson("https://api.frankfurter.app/latest?from=TRY&to=USD,EUR,GBP");
     if (fx?.rates?.USD) out.usd = (1 / fx.rates.USD).toFixed(2);
     if (fx?.rates?.EUR) out.eur = (1 / fx.rates.EUR).toFixed(2);
+    if (fx?.rates?.GBP) out.gbp = (1 / fx.rates.GBP).toFixed(2);
 
-    // Gram Altın (XAU USD/ons → gram TRY)
+    // Altın (XAU USD/ons → gram TRY ve ons USD)
     const gold = await safeJson("https://api.gold-api.com/price/XAU");
-    if (gold?.price && out.usd) {
-      const gram = (gold.price / 31.1035) * parseFloat(out.usd);
-      out.gold = Math.round(gram).toLocaleString("tr-TR");
+    if (gold?.price) {
+      out.goldOz = "$" + Math.round(gold.price).toLocaleString("en-US");
+      if (out.usd) {
+        const gram = (gold.price / 31.1035) * parseFloat(out.usd);
+        out.gold = Math.round(gram).toLocaleString("tr-TR");
+      }
+    }
+
+    // Kripto (Coinbase spot USD → TRY)
+    if (out.usd) {
+      const usd = parseFloat(out.usd);
+      const btc = await safeJson("https://api.coinbase.com/v2/prices/BTC-USD/spot");
+      if (btc?.data?.amount) out.btc = Math.round(parseFloat(btc.data.amount) * usd).toLocaleString("tr-TR");
+      const eth = await safeJson("https://api.coinbase.com/v2/prices/ETH-USD/spot");
+      if (eth?.data?.amount) out.eth = Math.round(parseFloat(eth.data.amount) * usd).toLocaleString("tr-TR");
     }
 
     // BİST 100

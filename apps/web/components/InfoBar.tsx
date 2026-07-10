@@ -14,7 +14,7 @@ function Cell({ label, value, sub }: { label: string; value: string; sub?: strin
   const up = sub?.includes("+");
   const down = sub?.includes("-");
   return (
-    <div className="shrink-0 px-4 py-2 leading-tight">
+    <div className="min-w-[100px] flex-1 px-4 py-2 leading-tight">
       <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-400">{label}</div>
       <div className="flex items-baseline gap-1.5">
         <span className="text-[15px] font-semibold text-sk-ink">{value}</span>
@@ -69,21 +69,22 @@ export function InfoBar({ finance }: { finance: Finance }) {
     };
   }, []);
 
-  const bistUp = (finance.bistChange ?? "").startsWith("+");
-
   return (
     <div className="overflow-x-auto rounded-lg border border-sk-line bg-white">
-      <div className="flex min-w-max items-stretch divide-x divide-sk-line">
-        <Cell label={weather?.city ?? "Hava"} value={weather?.temp ?? "—"} icon={weather?.icon ?? "🌡️"} />
-        <Cell label="Dolar" value={finance.usd ? `₺${finance.usd}` : "—"} icon="💵" />
-        <Cell label="Euro" value={finance.eur ? `₺${finance.eur}` : "—"} icon="💶" />
-        <Cell label="Gram Altın" value={finance.gold ? `₺${finance.gold}` : "—"} icon="🪙" />
+      <div className="flex items-stretch divide-x divide-sk-line">
+        <Cell label={weather?.city ?? "Hava"} value={weather?.temp ?? "—"} />
+        <Cell label="Dolar" value={finance.usd ? `₺${finance.usd}` : "—"} />
+        <Cell label="Euro" value={finance.eur ? `₺${finance.eur}` : "—"} />
+        {finance.gbp && <Cell label="Sterlin" value={`₺${finance.gbp}`} />}
+        <Cell label="Gram Altın" value={finance.gold ? `₺${finance.gold}` : "—"} />
+        {finance.goldOz && <Cell label="ONS Altın" value={finance.goldOz} />}
         <Cell
           label="BİST 100"
           value={finance.bist ?? "—"}
           sub={finance.bistChange ? `%${finance.bistChange}` : undefined}
-          icon={bistUp ? "📈" : "📉"}
         />
+        {finance.btc && <Cell label="Bitcoin" value={`₺${finance.btc}`} />}
+        {finance.eth && <Cell label="Ethereum" value={`₺${finance.eth}`} />}
       </div>
     </div>
   );
