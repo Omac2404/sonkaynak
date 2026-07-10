@@ -61,9 +61,15 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
   return r?.docs?.[0] ?? null;
 }
 
-export async function getNewsByCategory(categoryId: number, page = 1, limit = 12): Promise<ListResponse<News>> {
+export async function getNewsByCategory(
+  categoryId: number,
+  page = 1,
+  limit = 12,
+  sort = "-publishedAt",
+): Promise<ListResponse<News>> {
+  const safeSort = sort === "publishedAt" ? "publishedAt" : "-publishedAt";
   const r = await cms<ListResponse<News>>(
-    `/api/news?where[category][equals]=${categoryId}&${PUBLISHED}&depth=1&sort=-publishedAt&limit=${limit}&page=${page}`,
+    `/api/news?where[category][equals]=${categoryId}&${PUBLISHED}&depth=1&sort=${safeSort}&limit=${limit}&page=${page}`,
   );
   return r ?? { docs: [], totalDocs: 0, totalPages: 0, page: 1 };
 }

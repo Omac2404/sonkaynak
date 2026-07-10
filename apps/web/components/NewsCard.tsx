@@ -13,7 +13,13 @@ function Cover({ src, alt, className, sizes }: { src?: string; alt: string; clas
   if (src) {
     return (
       <div className={`sk-img-skel relative overflow-hidden bg-neutral-100 ${className}`}>
-        <Image src={src} alt={alt} fill sizes={sizes ?? "(max-width:768px) 100vw, 400px"} className="object-cover" />
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes ?? "(max-width:768px) 100vw, 400px"}
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
       </div>
     );
   }
@@ -136,6 +142,11 @@ export function GridCard({ news }: { news: News }) {
             <span className="mt-2 inline-block text-[11px] font-extrabold uppercase tracking-wide text-sk-red">
               #{news.category.name}
             </span>
+          )}
+          {news.excerpt && (
+            <p className="line-clamp-2 max-h-0 overflow-hidden text-[12.5px] leading-snug text-neutral-500 opacity-0 transition-all duration-300 group-hover:mt-2 group-hover:max-h-16 group-hover:opacity-100">
+              {news.excerpt}
+            </p>
           )}
           <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[11px] text-neutral-400">
             {news.author && <span className="font-semibold text-neutral-500">{authorName(news.author)}</span>}

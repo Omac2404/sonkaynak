@@ -4,7 +4,7 @@ import { useState } from "react";
 import { GridCard } from "./NewsCard";
 import type { News } from "@/lib/shared";
 
-export function LoadMore({ categoryId, totalPages }: { categoryId: number; totalPages: number }) {
+export function LoadMore({ categoryId, totalPages, sort = "-publishedAt" }: { categoryId: number; totalPages: number; sort?: string }) {
   const [items, setItems] = useState<News[]>([]);
   const [page, setPage] = useState(1); // sayfa 1 sunucuda render edildi
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,7 @@ export function LoadMore({ categoryId, totalPages }: { categoryId: number; total
   const load = async () => {
     setLoading(true);
     try {
-      const r = await fetch(`/api/category-news?cat=${categoryId}&page=${next}`).then((x) => x.json());
+      const r = await fetch(`/api/category-news?cat=${categoryId}&page=${next}&sort=${encodeURIComponent(sort)}`).then((x) => x.json());
       setItems((p) => [...p, ...((r.docs as News[]) ?? [])]);
       setPage(next);
     } catch {

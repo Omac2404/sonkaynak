@@ -14,7 +14,7 @@ export type Media = {
   sizes?: Record<string, { url?: string; width?: number; height?: number }>;
 };
 
-export type Category = { id: number; name: string; slug: string; order?: number };
+export type Category = { id: number; name: string; slug: string; order?: number; description?: string };
 export type Tag = { id: number; name: string; slug: string };
 
 export type Author = {
