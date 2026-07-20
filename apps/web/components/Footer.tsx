@@ -5,37 +5,6 @@ import { SocialLinks } from "./SocialIcons";
 export async function Footer() {
   const [settings, categories] = await Promise.all([getSettings(), getCategories()]);
 
-  const columns =
-    settings.footerColumns && settings.footerColumns.length
-      ? settings.footerColumns
-      : [
-          {
-            title: "Kategoriler",
-            links: categories.slice(0, 8).map((c) => ({ label: c.name, url: `/kategori/${c.slug}` })),
-          },
-          {
-            title: "Keşfet",
-            links: [
-              { label: "Son Haberler", url: "/" },
-              { label: "Tüm Kategoriler", url: "/tum-kategoriler" },
-              { label: "Foto Galeri", url: "/galeri" },
-              { label: "Resmî İlanlar", url: "/ilanlar" },
-              { label: "Firma Rehberi", url: "/firma-rehberi" },
-              { label: "Yazarlar", url: "/yazarlar" },
-            ],
-          },
-          {
-            title: "Kurumsal",
-            links: [
-              { label: "Hakkımızda", url: "/hakkimizda" },
-              { label: "Künye", url: "/kunye" },
-              { label: "İletişim", url: "/iletisim" },
-              { label: "RSS", url: "/rss.xml" },
-              { label: "Site Haritası", url: "/sitemap.xml" },
-            ],
-          },
-        ];
-
   const social = [
     { key: "twitter", url: settings.twitter },
     { key: "facebook", url: settings.facebook },
@@ -46,42 +15,95 @@ export async function Footer() {
 
   const year = new Date().getFullYear();
 
+  const columns: { title: string; links: { label: string; url: string }[] }[] = [
+    {
+      title: "Kategoriler",
+      links: categories.slice(0, 9).map((c) => ({ label: c.name, url: `/kategori/${c.slug}` })),
+    },
+    {
+      title: "Keşfet",
+      links: [
+        { label: "Son Haberler", url: "/" },
+        { label: "Tüm Kategoriler", url: "/tum-kategoriler" },
+        { label: "Foto Galeri", url: "/galeri" },
+        { label: "Yazarlar", url: "/yazarlar" },
+        { label: "Firma Rehberi", url: "/firma-rehberi" },
+        { label: "Resmî İlanlar", url: "/ilanlar" },
+        { label: "Vefat İlanları", url: "/" },
+      ],
+    },
+    {
+      title: "Canlı Veri",
+      links: [
+        { label: "Piyasalar", url: "/piyasalar" },
+        { label: "Döviz Kuru", url: "/piyasalar" },
+        { label: "Altın Fiyatları", url: "/piyasalar" },
+        { label: "BİST 100", url: "/piyasalar" },
+        { label: "Bitcoin", url: "/piyasalar" },
+        { label: "Kripto Paralar", url: "/piyasalar" },
+      ],
+    },
+    {
+      title: "Kurumsal",
+      links: [
+        { label: "Hakkımızda", url: "/hakkimizda" },
+        { label: "Künye", url: "/kunye" },
+        { label: "İletişim", url: "/iletisim" },
+        { label: "Reklam Ver", url: "/reklam" },
+        { label: "Hata Bildir", url: "/hata-bildir" },
+      ],
+    },
+    {
+      title: "Yasal & Yardımcı",
+      links: [
+        { label: "Gizlilik & KVKK", url: "/gizlilik" },
+        { label: "Çerez Politikası", url: "/cerez-politikasi" },
+        { label: "Kullanım Koşulları", url: "/kullanim-kosullari" },
+        { label: "RSS", url: "/rss.xml" },
+        { label: "Site Haritası", url: "/sitemap.xml" },
+      ],
+    },
+  ];
+
+  const corporate = [
+    { label: "Reklam Ver", url: "/reklam" },
+    { label: "Bize Ulaşın", url: "/iletisim" },
+    { label: "Kurumsal", url: "/hakkimizda" },
+    { label: "Hata Bildirimi", url: "/hata-bildir" },
+    { label: "Künye", url: "/kunye" },
+  ];
+
   return (
-    <footer className="mt-16 bg-sk-ink text-neutral-300">
-      {/* Üst kırmızı vurgu */}
-      <div className="h-1 bg-sk-red" />
-
-      <div className="mx-auto max-w-[1280px] px-4 py-12">
-        <div className="grid gap-10 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
-          {/* Marka */}
-          <div>
-            <Logo className="h-12 w-auto" variant="white" />
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-neutral-400">
-              {settings.footerAbout ??
-                "Son Kaynak — gündemi, ekonomiyi ve yereli tarafsız ve hızlı biçimde aktaran yeni nesil haber platformu."}
-            </p>
-            {social.length > 0 && (
-              <div className="mt-5">
-                <SocialLinks
-                  items={social}
-                  itemClassName="grid h-9 w-9 place-items-center rounded-full bg-white/5 text-neutral-300 transition hover:bg-sk-red hover:text-white"
-                  iconClassName="h-4 w-4"
-                />
-              </div>
-            )}
+    <footer className="mt-16 border-t-2 border-sk-red bg-white text-neutral-600">
+      <div className="mx-auto max-w-[1360px] px-4">
+        {/* Üst satır: logo + telif + sosyal */}
+        <div className="flex flex-col items-center justify-between gap-4 border-b border-sk-line py-6 sm:flex-row">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+            <a href="/" aria-label="Anasayfa">
+              <Logo className="h-8 w-auto" />
+            </a>
+            <span className="text-[12px] text-neutral-400">
+              {settings.footerCopyright ?? `© ${year} Son Kaynak Gazetecilik. Tüm hakları saklıdır.`}
+            </span>
           </div>
+          {social.length > 0 && (
+            <SocialLinks
+              items={social}
+              itemClassName="grid h-9 w-9 place-items-center rounded-full border border-sk-line text-neutral-500 transition hover:border-sk-red hover:bg-sk-red hover:text-white"
+              iconClassName="h-4 w-4"
+            />
+          )}
+        </div>
 
-          {/* Bağlantı sütunları */}
+        {/* Bağlantı sütunları */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 py-9 sm:grid-cols-3 lg:grid-cols-5">
           {columns.map((col, i) => (
             <div key={i}>
-              <h4 className="mb-4 text-[13px] font-extrabold uppercase tracking-wider text-white">{col.title}</h4>
-              <ul className="space-y-2.5 text-sm">
-                {(col.links ?? []).map((l, j) => (
+              <h4 className="mb-3.5 text-[13px] font-extrabold uppercase tracking-wide text-sk-ink">{col.title}</h4>
+              <ul className="space-y-2.5 text-[13.5px]">
+                {col.links.map((l, j) => (
                   <li key={j}>
-                    <a
-                      href={l.url}
-                      className="inline-flex items-center text-neutral-400 transition hover:translate-x-0.5 hover:text-white"
-                    >
+                    <a href={l.url} className="text-neutral-600 transition hover:text-sk-red">
                       {l.label}
                     </a>
                   </li>
@@ -91,17 +113,21 @@ export async function Footer() {
           ))}
         </div>
 
-        {/* Alt bar */}
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-neutral-500 sm:flex-row">
-          <p>{settings.footerCopyright ?? `© ${year} Son Kaynak. Tüm hakları saklıdır.`}</p>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <a href="/kunye" className="transition hover:text-white">Künye</a>
-            <a href="/gizlilik" className="transition hover:text-white">Gizlilik &amp; KVKK</a>
-            <a href="/cerez-politikasi" className="transition hover:text-white">Çerez Politikası</a>
-            <a href="/kullanim-kosullari" className="transition hover:text-white">Kullanım Koşulları</a>
-            <a href="/iletisim" className="transition hover:text-white">İletişim</a>
-          </div>
+        {/* Kurumsal satır */}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-sk-line py-5 text-[13px] font-bold text-sk-ink">
+          {corporate.map((l) => (
+            <a key={l.url} href={l.url} className="transition hover:text-sk-red">
+              {l.label}
+            </a>
+          ))}
         </div>
+
+        {/* Telif paragrafı */}
+        <p className="border-t border-sk-line py-5 text-[12px] leading-relaxed text-neutral-400">
+          Türkiye&apos;den ve dünyadan son dakika haberleri, köşe yazıları, ekonomiden spora tüm içerikler Son Kaynak&apos;ta.
+          Son Kaynak haber içerikleri, kaynak gösterilse dahi izin alınmadan iktibas edilemez; kanuna aykırı ve izinsiz olarak
+          kopyalanamaz, başka yerde yayınlanamaz.
+        </p>
       </div>
     </footer>
   );
