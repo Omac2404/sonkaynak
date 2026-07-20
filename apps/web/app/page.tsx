@@ -29,6 +29,7 @@ import { VitrinTabs } from "@/components/VitrinTabs";
 import { InfoBar } from "@/components/InfoBar";
 import { AuthorsSlider } from "@/components/AuthorsSlider";
 import { StoryBar } from "@/components/StoryBar";
+import { TrendBar } from "@/components/TrendBar";
 import { Ticker } from "@/components/Ticker";
 import { getFinance } from "@/lib/finance";
 
@@ -92,32 +93,21 @@ export default async function HomePage() {
   ).filter((b) => b.items.length > 0);
 
   return (
-    <div className="mx-auto max-w-[1360px] px-3 py-4 sm:px-4 sm:py-6">
-      {/* Bugün neler oldu? — trend etiketler */}
-      {trending.length > 0 && (
-        <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-sk-line bg-white px-4 py-3">
-          <span className="text-[13px] font-black uppercase tracking-tight text-sk-ink">Bugün neler oldu?</span>
-          {trending.map((t) => (
-            <a
-              key={t.id}
-              href={`/etiket/${t.slug}`}
-              className="text-[13px] font-extrabold uppercase tracking-tight text-sk-red transition hover:underline"
-            >
-              #{t.name}
-            </a>
-          ))}
-        </div>
-      )}
+    <>
+      {/* Bugün neler oldu? — tam genişlik, kayan trend etiketler */}
+      {trending.length > 0 && <TrendBar tags={trending} />}
 
+      <div className="mx-auto max-w-[1360px] px-3 py-4 sm:px-4 sm:py-6">
       {/* Story'ler — yalnızca mobil, tıklayınca tam ekran görüntüleyici */}
       {storyItems.length > 0 && <StoryBar items={storyItems} />}
 
-      {/* Sıcak Gündem — üstte 3 büyük poster, kırmızı çerçeve (göze batsın) */}
+      {/* Sıcak Gündem — desenli kırmızı zemin üstünde 3 büyük poster */}
       {sicakItems.length > 0 && (
-        <section className="mb-6 rounded-lg border-2 border-sk-red bg-white p-3">
-          <div className="mb-3 inline-flex items-center gap-2 rounded bg-sk-red px-3 py-1 text-[13px] font-black uppercase tracking-wide text-white">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-white" />
-            Sıcak Gündem
+        <section className="sk-hot-bg mb-6 overflow-hidden rounded-lg p-3 shadow-sm sm:p-4">
+          <div className="mb-3 flex items-center gap-2 text-white">
+            <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-white shadow" />
+            <span className="text-[15px] font-black uppercase tracking-wide drop-shadow-sm">Sıcak Gündem</span>
+            <span className="ml-1 h-px flex-1 bg-white/25" />
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             {sicakItems.map((n) => (
@@ -325,6 +315,7 @@ export default async function HomePage() {
           İçerikler çok yakında burada olacak.
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
