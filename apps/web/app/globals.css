@@ -163,6 +163,7 @@ body {
   to { background-position: -200% 0; }
 }
 
-/* Logo renk yönetimi */
-.sk-logo-white { filter: brightness(0) invert(1); }
-.dark .sk-logo-auto { filter: brightness(0) invert(1); }
+/* Logo renk yönetimi — karanlık modda K kırmızı kalan varyanta geçer */
+.sk-logo-d { display: none; }
+.dark .sk-logo-l { display: none; }
+.dark .sk-logo-d { display: inline-block; }

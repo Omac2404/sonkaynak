@@ -196,7 +196,7 @@ export default async function HaberDetay({ params }: Props) {
   };
 
   return (
-    <div className="mx-auto grid max-w-[1180px] gap-10 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="mx-auto grid max-w-[1180px] gap-10 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
       <ReadingProgress />
       <ArticleLightbox />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -392,7 +392,7 @@ export default async function HaberDetay({ params }: Props) {
       </article>
 
       {/* ── SIDEBAR ── */}
-      <aside className="space-y-6">
+      <aside className="space-y-6 lg:sticky lg:top-4 lg:self-start">
         <SidebarList title="Sıcak Gündem" items={sicak.length ? sicak : latest.slice(0, 3)} />
         <SidebarList title="Son Haberler" items={latest.slice(0, 3)} />
       </aside>
