@@ -103,13 +103,13 @@ export default async function HomePage() {
 
       {/* Sıcak Gündem — desenli kırmızı zemin üstünde 3 büyük poster */}
       {sicakItems.length > 0 && (
-        <section className="sk-hot-bg mb-6 overflow-hidden rounded-lg p-3 shadow-sm sm:p-4">
-          <div className="mb-3 flex items-center gap-2 text-white">
+        <section className="sk-hot-bg mb-6 rounded-lg p-3 sm:p-4">
+          <div className="relative z-10 mb-3 flex items-center gap-2 text-white">
             <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-white shadow" />
             <span className="text-[15px] font-black uppercase tracking-wide drop-shadow-sm">Sıcak Gündem</span>
             <span className="ml-1 h-px flex-1 bg-white/25" />
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="relative z-10 grid gap-3 sm:grid-cols-3">
             {sicakItems.map((n) => (
               <PosterCard key={n.id} news={n} />
             ))}
