@@ -96,25 +96,7 @@ export function categoryUrl(c?: Category | null): string {
 }
 
 // ── Kategori renk kodları ──
-const CAT_COLORS: Record<string, string> = {
-  gundem: "#d4141c",
-  ekonomi: "#15803d",
-  spor: "#1d4ed8",
-  dunya: "#0891b2",
-  siyaset: "#7c3aed",
-  teknoloji: "#0ea5e9",
-  saglik: "#db2777",
-  yasam: "#ca8a04",
-  "kultur-sanat": "#9333ea",
-  yerel: "#ea580c",
-};
-const PALETTE = ["#d4141c", "#15803d", "#1d4ed8", "#0891b2", "#7c3aed", "#db2777", "#ca8a04", "#ea580c", "#0ea5e9", "#9333ea"];
-
-export function categoryColor(c?: Category | { slug?: string } | string | null): string {
-  const slug = typeof c === "string" ? c : c?.slug;
-  if (!slug) return "#d4141c";
-  if (CAT_COLORS[slug]) return CAT_COLORS[slug];
-  let h = 0;
-  for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
-  return PALETTE[h % PALETTE.length];
+// Tüm kategori/etiket renkleri tek marka kırmızısı.
+export function categoryColor(_c?: Category | { slug?: string } | string | null): string {
+  return "#d4141c";
 }

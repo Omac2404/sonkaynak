@@ -157,7 +157,7 @@ export default async function HomePage() {
       {/* Gözden Kaçmasın (admin'den seçilir) */}
       {gozden.length > 0 && (
         <section className="mt-8">
-          <SectionTitle color="#0891b2">Gözden Kaçmasın</SectionTitle>
+          <SectionTitle>Gözden Kaçmasın</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {gozden.slice(0, 10).map((n) => (
               <GridCard key={n.id} news={n} />
@@ -172,7 +172,7 @@ export default async function HomePage() {
       {/* Son Haberler */}
       {latest.length > 0 && (
         <section className="mt-8">
-          <SectionTitle color="#16181d">Son Haberler</SectionTitle>
+          <SectionTitle>Son Haberler</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {latest.slice(0, 15).map((n) => (
               <GridCard key={n.id} news={n} />
@@ -198,7 +198,7 @@ export default async function HomePage() {
       {/* Seçmece Haberler */}
       {secmece.length > 0 && (
         <section className="mt-8">
-          <SectionTitle color="#1d4ed8">Seçmece Haberler</SectionTitle>
+          <SectionTitle>Seçmece Haberler</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
             {secmece.slice(0, 10).map((n) => (
               <GridCard key={n.id} news={n} />
@@ -218,7 +218,7 @@ export default async function HomePage() {
       {/* Özel Haberler */}
       {ozel.length > 0 && (
         <section className="mt-8">
-          <SectionTitle color="#7c3aed">Özel Haberler</SectionTitle>
+          <SectionTitle>Özel Haberler</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {ozel.slice(0, 8).map((n) => (
               <GridCard key={n.id} news={n} />
@@ -230,7 +230,7 @@ export default async function HomePage() {
       {/* Foto Galeri */}
       {galeriler.length > 0 && (
         <section className="mt-8">
-          <SectionTitle href="/galeri" color="#16a34a">Foto Galeri</SectionTitle>
+          <SectionTitle href="/galeri">Foto Galeri</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {galeriler.map((g) => {
               const cover = mediaUrl(g.cover, "card");
@@ -263,7 +263,7 @@ export default async function HomePage() {
       {/* Resmî İlanlar */}
       {ilanlar.length > 0 && (
         <section className="mt-8">
-          <SectionTitle href="/ilanlar" color="#b45309">Resmî İlanlar</SectionTitle>
+          <SectionTitle href="/ilanlar">Resmî İlanlar</SectionTitle>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {ilanlar.map((il) => {
               const cover = mediaUrl(il.coverImage, "card");
@@ -288,7 +288,7 @@ export default async function HomePage() {
       {/* Firma Rehberi */}
       {firmalar.length > 0 && (
         <section className="mt-8">
-          <SectionTitle href="/firma-rehberi" color="#0d9488">Firma Rehberi</SectionTitle>
+          <SectionTitle href="/firma-rehberi">Firma Rehberi</SectionTitle>
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
             {firmalar.slice(0, 16).map((f) => {
               const logo = mediaUrl(f.logo, "thumbnail");
