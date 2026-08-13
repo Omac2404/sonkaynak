@@ -5,7 +5,10 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BackToTop } from "@/components/BackToTop";
 import { CookieBanner } from "@/components/CookieBanner";
-import { getSettings, mediaUrl } from "@/lib/cms";
+import { FinanceTicker } from "@/components/FinanceTicker";
+import { SonDakikaBar } from "@/components/SonDakikaBar";
+import { getSettings, getSonDakika, mediaUrl } from "@/lib/cms";
+import { getFinance } from "@/lib/finance";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-inter" });
 
@@ -30,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const s = await getSettings();
+  const [s, finance, sonDakika] = await Promise.all([getSettings(), getFinance(), getSonDakika(8)]);
   const siteName = s.siteName ?? "Son Kaynak";
   const logo = mediaUrl(s.logo, "feature");
 
@@ -84,7 +87,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
 
+        <FinanceTicker finance={finance} />
         <Header />
+        <SonDakikaBar items={sonDakika} />
         <main className="min-h-screen">{children}</main>
         <Footer />
         <BackToTop />

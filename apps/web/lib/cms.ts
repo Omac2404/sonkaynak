@@ -126,6 +126,14 @@ export async function getManset(): Promise<News[]> {
   return (r?.items ?? []).map((i) => i.news).filter(Boolean) as News[];
 }
 
+export async function getSonDakika(limit = 8): Promise<News[]> {
+  const r = await cms<ListResponse<News>>(
+    `/api/news?where[sonDakika][equals]=true&${PUBLISHED}&depth=1&sort=-publishedAt&limit=${limit}`,
+    30,
+  );
+  return r?.docs ?? [];
+}
+
 export async function getSicakGundem(): Promise<News[]> {
   const r = await cms<GlobalResp<{ items?: { news?: News }[] }>>(`/api/globals/sicak-gundem?depth=2`);
   return (r?.items ?? []).map((i) => i.news).filter(Boolean) as News[];

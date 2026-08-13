@@ -137,6 +137,16 @@ body {
   margin: 2em 0;
 }
 
+/* Son Dakika flaş bandı — hafif nabız atan kırmızı zemin */
+.sk-flash {
+  background: linear-gradient(90deg, #b00d13, #d4141c);
+  animation: sk-flash-pulse 2.4s ease-in-out infinite;
+}
+@keyframes sk-flash-pulse {
+  0%, 100% { background-color: #d4141c; filter: brightness(1); }
+  50% { filter: brightness(1.12); }
+}
+
 /* Story ilerleme çubuğu animasyonu */
 @keyframes storyProgress {
   from { width: 0%; }
