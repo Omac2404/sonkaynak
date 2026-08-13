@@ -1,5 +1,5 @@
 import { RESOURCES } from "@/lib/resources";
-import { pf } from "@/lib/payload";
+import { pf, getMe } from "@/lib/payload";
 import { mediaUrl, fmtDate } from "@/lib/media";
 import { deleteResource, bulkDeleteResource } from "@/lib/actions";
 import { ConfirmSubmit } from "./ConfirmSubmit";
@@ -104,6 +104,9 @@ export async function ResourceListView({
   if (isNews && review && review !== "all") q += `&where[reviewState][equals]=${review}`;
   const res = await pf(q);
   const rows: any[] = res.data?.docs ?? [];
+  // Silme yalnızca editöryel kadroda (yazar yıkıcı buton görmesin)
+  const me = await getMe();
+  const canManage = ["admin", "editor", "editor_limited"].includes(me?.role ?? "");
 
   const selCls = "rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-sk-red";
 
@@ -145,16 +148,18 @@ export async function ResourceListView({
               </button>
             </form>
           )}
-          <form id="bulkDel" action={bulkDeleteResource}>
-            <input type="hidden" name="slug" value={cfg.slug} />
-            <input type="hidden" name="back" value={`/${resourceKey}`} />
-            <ConfirmSubmit
-              message="Seçili kayıtları silmek istediğinize emin misiniz?"
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red"
-            >
-              Seçilenleri Sil
-            </ConfirmSubmit>
-          </form>
+          {canManage && (
+            <form id="bulkDel" action={bulkDeleteResource}>
+              <input type="hidden" name="slug" value={cfg.slug} />
+              <input type="hidden" name="back" value={`/${resourceKey}`} />
+              <ConfirmSubmit
+                message="Seçili kayıtları silmek istediğinize emin misiniz?"
+                className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red"
+              >
+                Seçilenleri Sil
+              </ConfirmSubmit>
+            </form>
+          )}
           <a
             href={`/${resourceKey}/yeni`}
             className="rounded-lg bg-sk-red px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-sk-red-dark"
@@ -188,7 +193,9 @@ export async function ResourceListView({
               rows.map((row) => (
                 <tr key={row.id} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/60">
                   <td className="px-4 py-2.5">
-                    <input type="checkbox" name="ids" value={row.id} form="bulkDel" className="h-4 w-4 accent-sk-red" />
+                    {canManage && (
+                      <input type="checkbox" name="ids" value={row.id} form="bulkDel" className="h-4 w-4 accent-sk-red" />
+                    )}
                   </td>
                   {cfg.columns.map((c) => (
                     <td key={c.key} className="px-4 py-2.5">
@@ -200,17 +207,19 @@ export async function ResourceListView({
                       <a href={`/${resourceKey}/${row.id}`} className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-600 hover:border-sk-red hover:text-sk-red">
                         Düzenle
                       </a>
-                      <form action={deleteResource}>
-                        <input type="hidden" name="slug" value={cfg.slug} />
-                        <input type="hidden" name="id" value={row.id} />
-                        <input type="hidden" name="back" value={`/${resourceKey}`} />
-                        <ConfirmSubmit
-                          message="Bu kaydı silmek istediğinize emin misiniz?"
-                          className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red"
-                        >
-                          Sil
-                        </ConfirmSubmit>
-                      </form>
+                      {canManage && (
+                        <form action={deleteResource}>
+                          <input type="hidden" name="slug" value={cfg.slug} />
+                          <input type="hidden" name="id" value={row.id} />
+                          <input type="hidden" name="back" value={`/${resourceKey}`} />
+                          <ConfirmSubmit
+                            message="Bu kaydı silmek istediğinize emin misiniz?"
+                            className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red"
+                          >
+                            Sil
+                          </ConfirmSubmit>
+                        </form>
+                      )}
                     </div>
                   </td>
                 </tr>

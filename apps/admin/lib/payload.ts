@@ -52,12 +52,18 @@ export function apiBase() {
 /** Kullanıcının etkin panel izinleri: özel rol (roleRef) varsa ondan, yoksa temel rolden. */
 export async function getEffectivePerms(user: any): Promise<string[]> {
   if (!user) return [];
+  // Temel rolün gerçek yetkisi — özel rol bunu genişletemez, yalnızca daraltabilir.
+  const base = DEFAULT_PERMS[user.role] ?? DEFAULT_PERMS.yazar;
   const ref = user.roleRef;
   const roleId = ref ? (typeof ref === "object" ? ref.id : ref) : null;
   if (roleId) {
     const r = await pf(`/roles/${roleId}`);
     const perms = r.data?.permissions;
-    if (Array.isArray(perms) && perms.length) return perms;
+    if (Array.isArray(perms) && perms.length) {
+      if (base.includes("*")) return perms; // admin: özel rol her izni seçebilir
+      if (perms.includes("*")) return base; // özel rol * → temel rolle sınırlı
+      return perms.filter((p) => base.includes(p)); // kesişim: temel rolün ötesine geçemez
+    }
   }
-  return DEFAULT_PERMS[user.role] ?? DEFAULT_PERMS.yazar;
+  return base;
 }

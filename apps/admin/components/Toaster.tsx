@@ -47,7 +47,7 @@ export function Toaster() {
 
     // URL'i temizle
     const sp = new URLSearchParams(params.toString());
-    ["m", "e", "msg", "ok", "fail"].forEach((k) => sp.delete(k));
+    ["m", "e", "msg", "ok", "fail", "ozet"].forEach((k) => sp.delete(k));
     router.replace(`${pathname}${sp.toString() ? `?${sp}` : ""}`, { scroll: false });
     const t = setTimeout(() => setToast(null), kind === "err" ? 5000 : 3000);
     return () => clearTimeout(t);
