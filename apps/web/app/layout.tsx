@@ -52,6 +52,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     ...(sameAs.length ? { sameAs } : {}),
   };
 
+  // WebSite + site içi arama kutusu (Google Sitelinks Searchbox)
+  const websiteLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: siteName,
+    url: SITE_URL,
+    inLanguage: "tr-TR",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/ara?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <html lang="tr" className={inter.variable}>
       <body suppressHydrationWarning className="font-sans">
