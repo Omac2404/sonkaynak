@@ -80,8 +80,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href={CMS_URL} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={CMS_URL} />
 
-        {/* Site geneli Organization JSON-LD */}
+        {/* Site geneli Organization + WebSite JSON-LD */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
 
         <Header />
         <main className="min-h-screen">{children}</main>
