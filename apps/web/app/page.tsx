@@ -248,7 +248,7 @@ export default async function HomePage() {
                 <a key={g.id} href={`/galeri/${g.slug}`} className="group relative block overflow-hidden rounded-lg">
                   {cover ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={cover} alt={g.title} className="aspect-[4/3] w-full object-cover transition group-hover:scale-105" />
+                    <img src={cover} alt={g.title} loading="lazy" className="aspect-[4/3] w-full object-cover transition group-hover:scale-105" />
                   ) : (
                     <div className="aspect-[4/3] w-full bg-neutral-100" />
                   )}
@@ -281,7 +281,7 @@ export default async function HomePage() {
                 <a key={il.id} href={`/ilan/${il.slug}`} className="group overflow-hidden rounded-lg border border-sk-line">
                   {cover ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={cover} alt={il.title} className="aspect-[16/9] w-full object-cover" />
+                    <img src={cover} alt={il.title} loading="lazy" className="aspect-[16/9] w-full object-cover" />
                   ) : (
                     <div className="flex aspect-[16/9] w-full items-center justify-center bg-neutral-100 text-3xl">📄</div>
                   )}
@@ -307,7 +307,7 @@ export default async function HomePage() {
                   <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border border-sk-line bg-neutral-50">
                     {logo ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={logo} alt={f.name} className="max-h-full max-w-full object-contain" />
+                      <img src={logo} alt={f.name} loading="lazy" className="max-h-full max-w-full object-contain" />
                     ) : (
                       <span className="text-xl">🏢</span>
                     )}

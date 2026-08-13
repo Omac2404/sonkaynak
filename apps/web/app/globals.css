@@ -160,6 +160,9 @@ body {
 .dark .text-neutral-700 { color: #c7ccd4 !important; }
 .dark .text-neutral-600 { color: #b7bcc6 !important; }
 .dark .text-neutral-500 { color: #9aa1ac !important; }
+.dark .text-neutral-400 { color: #8b929c !important; }
+.dark .bg-red-50 { background-color: rgba(212, 20, 28, 0.14) !important; }
+.dark .border-neutral-300 { border-color: #2b2f38 !important; }
 .dark .sk-article-body { color: #d7dbe2; }
 
 /* Görsel yüklenirken shimmer placeholder */

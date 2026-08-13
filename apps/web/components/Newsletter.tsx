@@ -59,7 +59,9 @@ export function Newsletter({ compact = false }: { compact?: boolean }) {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="E-posta adresiniz"
           className={`min-w-0 flex-1 rounded-lg border px-3.5 py-2.5 text-sm outline-none transition focus:border-sk-red focus:ring-4 focus:ring-sk-red/10 ${
-            compact ? "border-white/20 bg-white/10 text-white placeholder:text-white/50" : "border-neutral-300"
+            compact
+              ? "border-white/20 bg-white/10 text-white placeholder:text-white/50"
+              : "border-sk-line bg-white text-sk-ink placeholder:text-neutral-500"
           }`}
         />
         <button

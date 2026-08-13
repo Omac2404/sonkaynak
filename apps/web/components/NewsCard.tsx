@@ -40,7 +40,7 @@ export function HeroCard({ news }: { news: News }) {
     <article className="group">
       <a
         href={newsUrl(news)}
-        className="relative block aspect-[16/10] overflow-hidden rounded-lg bg-neutral-200 sm:aspect-[16/9]"
+        className="relative block aspect-[16/10] overflow-hidden rounded-lg bg-neutral-100 sm:aspect-[16/9]"
       >
         {src ? (
           <Image src={src} alt={news.title} fill priority sizes="(max-width:1024px) 100vw, 960px" className="object-cover transition duration-300 group-hover:scale-[1.03]" />

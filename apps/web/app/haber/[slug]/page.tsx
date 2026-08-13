@@ -95,7 +95,7 @@ function SidebarList({ title, items }: { title: string; items: News[] }) {
             <a key={n.id} href={newsUrl(n)} className="group flex gap-3 p-3">
               {img && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={img} alt="" className="h-14 w-20 shrink-0 rounded-md object-cover" />
+                <img src={img} alt="" loading="lazy" className="h-14 w-20 shrink-0 rounded-md object-cover" />
               )}
               <div className="min-w-0">
                 {n.category && <div className="text-[10px] font-extrabold uppercase text-sk-red">{n.category.name}</div>}
@@ -335,7 +335,7 @@ export default async function HaberDetay({ params }: Props) {
             <div className="flex items-start gap-4">
               {avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatar} alt={authorName(news.author)} className="h-16 w-16 shrink-0 rounded-full object-cover" />
+                <img src={avatar} alt={authorName(news.author)} loading="lazy" className="h-16 w-16 shrink-0 rounded-full object-cover" />
               ) : (
                 <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-neutral-100 text-xl font-black text-neutral-400">
                   {news.author.name?.[0] ?? "S"}
@@ -374,7 +374,7 @@ export default async function HaberDetay({ params }: Props) {
                   <a key={n.id} href={newsUrl(n)} className="group overflow-hidden rounded-xl border border-sk-line bg-white transition hover:shadow-lg">
                     {img ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={img} alt={n.title} className="aspect-[16/9] w-full object-cover" />
+                      <img src={img} alt={n.title} loading="lazy" className="aspect-[16/9] w-full object-cover" />
                     ) : (
                       <div className="aspect-[16/9] w-full bg-neutral-100" />
                     )}

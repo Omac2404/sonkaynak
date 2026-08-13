@@ -54,7 +54,7 @@ export async function Header() {
               <a href="/iletisim" className="transition hover:text-sk-red">İletişim</a>
             </nav>
             {social.length > 0 && <span className="hidden h-4 w-px bg-sk-line sm:block" />}
-            <SocialLinks items={social} itemClassName="grid h-7 w-7 place-items-center rounded-full text-sk-muted transition hover:bg-sk-red hover:text-white" />
+            <SocialLinks items={social} itemClassName="grid h-8 w-8 place-items-center rounded-full text-sk-muted transition hover:bg-sk-red hover:text-white" />
             <span className="h-4 w-px bg-sk-line" />
             <ThemeToggle />
           </div>

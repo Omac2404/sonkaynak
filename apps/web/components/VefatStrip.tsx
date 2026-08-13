@@ -11,7 +11,7 @@ export function VefatStrip({ items }: { items: Item[] }) {
       {items.map((v, i) => {
         const content = (
           <span key={`${key}-${i}`} className="sk-ticker-item !font-normal">
-            <span className="font-semibold text-neutral-800">{v.isim}</span>
+            <span className="font-semibold text-sk-ink">{v.isim}</span>
             {v.aciklama ? ` — ${v.aciklama}` : ""}
             <span className="px-10 text-neutral-300">◆</span>
           </span>

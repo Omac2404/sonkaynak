@@ -33,17 +33,17 @@ export function ArticleFontSize() {
         onClick={() => setIdx((i) => Math.max(0, i - 1))}
         disabled={idx === 0}
         aria-label="Yazıyı küçült"
-        className="grid h-7 w-7 place-items-center rounded-md text-sm font-black text-neutral-500 transition hover:bg-neutral-100 hover:text-sk-red disabled:opacity-30"
+        className="grid h-9 w-9 place-items-center rounded-md text-sm font-black text-neutral-500 transition hover:bg-neutral-100 hover:text-sk-red disabled:opacity-30"
       >
         A<span className="text-[10px]">−</span>
       </button>
-      <span className="px-0.5 text-[10px] font-bold uppercase tracking-wide text-neutral-300">Aa</span>
+      <span className="px-0.5 text-[10px] font-bold uppercase tracking-wide text-sk-muted">Aa</span>
       <button
         type="button"
         onClick={() => setIdx((i) => Math.min(LEVELS.length - 1, i + 1))}
         disabled={idx === LEVELS.length - 1}
         aria-label="Yazıyı büyült"
-        className="grid h-7 w-7 place-items-center rounded-md text-base font-black text-neutral-500 transition hover:bg-neutral-100 hover:text-sk-red disabled:opacity-30"
+        className="grid h-9 w-9 place-items-center rounded-md text-base font-black text-neutral-500 transition hover:bg-neutral-100 hover:text-sk-red disabled:opacity-30"
       >
         A<span className="text-[11px]">+</span>
       </button>
