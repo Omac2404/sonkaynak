@@ -16,6 +16,7 @@ import {
   getTrendingTags,
   getCategories,
   getNewsByCategory,
+  getMostRead,
   categoryUrl,
   categoryColor,
   mediaUrl,
@@ -31,6 +32,8 @@ import { AuthorsSlider } from "@/components/AuthorsSlider";
 import { StoryBar } from "@/components/StoryBar";
 import { TrendBar } from "@/components/TrendBar";
 import { Ticker } from "@/components/Ticker";
+import { MostReadList } from "@/components/MostReadList";
+import { Newsletter } from "@/components/Newsletter";
 import { getFinance } from "@/lib/finance";
 
 export const revalidate = 60;
@@ -70,6 +73,7 @@ export default async function HomePage() {
       getFinance(),
       getTrendingTags(8),
     ]);
+  const mostRead = await getMostRead(6);
   const storyItems = stories.map((s) => s.news).filter((n): n is News => Boolean(n));
 
   // Manşet slider: önce manşet kürasyonu, ardından en yeni haberlerle 19'a tamamla
@@ -169,14 +173,20 @@ export default async function HomePage() {
       {/* Kategori Vitrini (sekmeli) */}
       <VitrinTabs slots={vitrin} />
 
-      {/* Son Haberler */}
+      {/* Son Haberler + En Çok Okunanlar rayı */}
       {latest.length > 0 && (
-        <section className="mt-8">
-          <SectionTitle>Son Haberler</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-            {latest.slice(0, 15).map((n) => (
-              <GridCard key={n.id} news={n} />
-            ))}
+        <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start">
+          <div>
+            <SectionTitle>Son Haberler</SectionTitle>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {latest.slice(0, 12).map((n) => (
+                <GridCard key={n.id} news={n} />
+              ))}
+            </div>
+          </div>
+          <div className="space-y-6 lg:sticky lg:top-4">
+            <MostReadList items={mostRead} withImages />
+            <Newsletter />
           </div>
         </section>
       )}

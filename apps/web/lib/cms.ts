@@ -3,7 +3,7 @@
  * Faz 5'te arama Meilisearch'e taşınacak; gerisi cache/ISR ile kalır.
  */
 
-import { cached } from "./redis";
+import { cached, ztop } from "./redis";
 import type { Media, Category, Tag, Author, News } from "./shared";
 
 // İstemci-güvenli tipler + saf yardımcıları (mediaUrl, newsUrl, categoryUrl, authorName) yeniden ihraç et
@@ -288,6 +288,55 @@ export async function getNextArticle(
   }
   return pick("");
 }
+/** En çok okunanlar — Redis okunma sayacına göre; veri yoksa son haberlerle doldurur. */
+export async function getMostRead(limit = 5): Promise<News[]> {
+  const ids = await ztop("news:views", limit * 3);
+  if (!ids.length) return getLatestNews(limit);
+  const r = await cms<ListResponse<News>>(
+    `/api/news?where[id][in]=${ids.join(",")}&${PUBLISHED}&depth=1&limit=${limit * 3}`,
+    120,
+  );
+  const docs = r?.docs ?? [];
+  const order = new Map(ids.map((id, i) => [Number(id), i]));
+  const ranked = docs.sort((a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999)).slice(0, limit);
+  // Sayaç yeni/az ise eksiği son haberlerle tamamla
+  if (ranked.length < limit) {
+    const fill = await getLatestNews(limit);
+    for (const n of fill) {
+      if (ranked.length >= limit) break;
+      if (!ranked.some((x) => x.id === n.id)) ranked.push(n);
+    }
+  }
+  return ranked;
+}
+
+/** Kronolojik önceki (daha eski) / sonraki (daha yeni) haber — aynı kategoride, yoksa genel. */
+export async function getAdjacentNews(
+  publishedAt: string,
+  categoryId: number | null,
+): Promise<{ prev: News | null; next: News | null }> {
+  const when = encodeURIComponent(publishedAt);
+  const q = (extra: string, sort: string) =>
+    cms<ListResponse<News>>(`/api/news?${PUBLISHED}${extra}&depth=1&sort=${sort}&limit=1`, 60);
+  const catF = categoryId ? `&where[category][equals]=${categoryId}` : "";
+  const [olderCat, newerCat] = await Promise.all([
+    q(`${catF}&where[publishedAt][less_than]=${when}`, "-publishedAt"),
+    q(`${catF}&where[publishedAt][greater_than]=${when}`, "publishedAt"),
+  ]);
+  let prev = olderCat?.docs?.[0] ?? null;
+  let next = newerCat?.docs?.[0] ?? null;
+  // Kategoride komşu yoksa genel akıştan doldur
+  if (!prev && categoryId) {
+    const g = await q(`&where[publishedAt][less_than]=${when}`, "-publishedAt");
+    prev = g?.docs?.[0] ?? null;
+  }
+  if (!next && categoryId) {
+    const g = await q(`&where[publishedAt][greater_than]=${when}`, "publishedAt");
+    next = g?.docs?.[0] ?? null;
+  }
+  return { prev, next };
+}
+
 export async function getAllNewsForSitemap(limit = 1000): Promise<News[]> {
   const r = await cms<ListResponse<News>>(`/api/news?${PUBLISHED}&depth=0&sort=-publishedAt&limit=${limit}`, 300);
   return r?.docs ?? [];

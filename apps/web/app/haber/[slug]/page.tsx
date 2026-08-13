@@ -8,6 +8,8 @@ import {
   getRelatedNews,
   getSicakGundem,
   getLatestNews,
+  getAdjacentNews,
+  getMostRead,
   mediaUrl,
   authorName,
   categoryUrl,
@@ -17,6 +19,12 @@ import {
 } from "@/lib/cms";
 import { RichText } from "@/lib/lexical";
 import { ReadingProgress } from "@/components/ReadingProgress";
+import { ShareBar, StickyShare } from "@/components/ShareTools";
+import { ArticleFontSize } from "@/components/ArticleFontSize";
+import { ViewTracker } from "@/components/ViewTracker";
+import { MostReadList } from "@/components/MostReadList";
+import { Newsletter } from "@/components/Newsletter";
+import { GoogleNewsBox } from "@/components/GoogleNewsBox";
 
 export const revalidate = 60;
 
@@ -73,43 +81,6 @@ function fmtDateTime(d?: string): string {
   }
 }
 
-/* ── Paylaşım ikonları ── */
-const SHARE = {
-  x: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z",
-  fb: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z",
-  wa: "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884",
-};
-
-function ShareBar({ url, title, vertical = false }: { url: string; title: string; vertical?: boolean }) {
-  const u = encodeURIComponent(url);
-  const t = encodeURIComponent(title);
-  const links = [
-    { name: "X", href: `https://twitter.com/intent/tweet?url=${u}&text=${t}`, d: SHARE.x, color: "#000" },
-    { name: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${u}`, d: SHARE.fb, color: "#1877F2" },
-    { name: "WhatsApp", href: `https://api.whatsapp.com/send?text=${t}%20${u}`, d: SHARE.wa, color: "#25D366" },
-  ];
-  return (
-    <div className={`flex gap-2 ${vertical ? "flex-col" : "items-center"}`}>
-      {!vertical && <span className="mr-1 text-[11px] font-bold uppercase tracking-wide text-neutral-400">Paylaş</span>}
-      {links.map((l) => (
-        <a
-          key={l.name}
-          href={l.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${l.name} ile paylaş`}
-          className="sk-share grid h-9 w-9 place-items-center rounded-lg border border-sk-line text-neutral-600 transition hover:scale-105"
-          style={{ ["--c" as any]: l.color }}
-        >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-            <path d={l.d} />
-          </svg>
-        </a>
-      ))}
-    </div>
-  );
-}
-
 function SidebarList({ title, items }: { title: string; items: News[] }) {
   if (!items.length) return null;
   return (
@@ -151,10 +122,14 @@ export default async function HaberDetay({ params }: Props) {
   const url = `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}${newsUrl(news)}`;
   const readMin = readingMinutes(news);
 
-  const [related, sicak, latest] = await Promise.all([
+  const [related, sicak, latest, adjacent, mostRead] = await Promise.all([
     news.category ? getRelatedNews(news.category.id, news.id, 6) : Promise.resolve([]),
     getSicakGundem(),
     getLatestNews(5),
+    news.publishedAt
+      ? getAdjacentNews(news.publishedAt, news.category?.id ?? null)
+      : Promise.resolve({ prev: null, next: null }),
+    getMostRead(5),
   ]);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -198,6 +173,8 @@ export default async function HaberDetay({ params }: Props) {
   return (
     <div className="mx-auto grid max-w-[1180px] gap-10 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
       <ReadingProgress />
+      <StickyShare url={url} title={news.title} />
+      <ViewTracker id={news.id} />
       <ArticleLightbox />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
@@ -271,7 +248,10 @@ export default async function HaberDetay({ params }: Props) {
               </span>
             </div>
           </div>
-          <ShareBar url={url} title={news.title} />
+          <div className="flex items-center gap-3">
+            <ArticleFontSize />
+            <ShareBar url={url} title={news.title} />
+          </div>
         </div>
 
         {/* Kapak */}
@@ -318,6 +298,36 @@ export default async function HaberDetay({ params }: Props) {
           )}
           <ShareBar url={url} title={news.title} />
         </div>
+
+        {/* Önceki / Sonraki haber */}
+        {(adjacent.prev || adjacent.next) && (
+          <nav className="mt-8 grid max-w-[760px] gap-3 sm:grid-cols-2">
+            {adjacent.prev ? (
+              <a
+                href={newsUrl(adjacent.prev)}
+                className="group flex flex-col rounded-xl border border-sk-line bg-white p-4 transition hover:border-sk-red hover:shadow-md"
+              >
+                <span className="text-[11px] font-extrabold uppercase tracking-wide text-neutral-400">‹ Önceki Haber</span>
+                <span className="mt-1 line-clamp-2 text-[15px] font-bold leading-snug text-sk-ink transition group-hover:text-sk-red">
+                  {adjacent.prev.title}
+                </span>
+              </a>
+            ) : (
+              <span />
+            )}
+            {adjacent.next && (
+              <a
+                href={newsUrl(adjacent.next)}
+                className="group flex flex-col rounded-xl border border-sk-line bg-white p-4 text-right transition hover:border-sk-red hover:shadow-md"
+              >
+                <span className="text-[11px] font-extrabold uppercase tracking-wide text-neutral-400">Sonraki Haber ›</span>
+                <span className="mt-1 line-clamp-2 text-[15px] font-bold leading-snug text-sk-ink transition group-hover:text-sk-red">
+                  {adjacent.next.title}
+                </span>
+              </a>
+            )}
+          </nav>
+        )}
 
         {/* Yazar bio kutusu */}
         {news.author && (news.author.bio || news.author.title) && (
@@ -381,6 +391,11 @@ export default async function HaberDetay({ params }: Props) {
           </section>
         )}
 
+        {/* Bülten kaydı */}
+        <div className="mt-10 max-w-[760px]">
+          <Newsletter />
+        </div>
+
         {/* Kesintisiz okuma: en alta gelince aynı etiketten sıradaki haberler */}
         <ContinuousReader
           firstId={news.id}
@@ -393,7 +408,9 @@ export default async function HaberDetay({ params }: Props) {
 
       {/* ── SIDEBAR ── */}
       <aside className="space-y-6 lg:sticky lg:top-4 lg:self-start">
+        <MostReadList items={mostRead} />
         <SidebarList title="Sıcak Gündem" items={sicak.length ? sicak : latest.slice(0, 3)} />
+        <GoogleNewsBox />
         <SidebarList title="Son Haberler" items={latest.slice(0, 3)} />
       </aside>
     </div>

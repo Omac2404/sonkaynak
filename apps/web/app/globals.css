@@ -81,6 +81,19 @@ body {
   line-height: 1.85;
   color: #222;
 }
+/* Okuyucu yazı boyutu tercihi (ArticleFontSize) */
+:root[data-read="sm"] .sk-article-body {
+  font-size: 15.5px;
+  line-height: 1.8;
+}
+:root[data-read="lg"] .sk-article-body {
+  font-size: 19px;
+  line-height: 1.9;
+}
+:root[data-read="xl"] .sk-article-body {
+  font-size: 21px;
+  line-height: 1.95;
+}
 .sk-article-body p {
   margin: 0 0 1em;
 }

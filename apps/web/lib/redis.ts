@@ -55,6 +55,39 @@ export async function cacheSet(key: string, value: unknown, ttlSeconds = 60): Pr
   }
 }
 
+/** Sorted set üyesini artır (okunma sayacı). */
+export async function zincr(key: string, member: string, by = 1): Promise<void> {
+  const c = getRedis();
+  if (!c || !(await ready(c))) return;
+  try {
+    await c.zincrby(key, by, member);
+  } catch {
+    /* yoksay */
+  }
+}
+
+/** Sorted set'in en yüksek skorlu ilk n üyesi (skor sırasına göre). */
+export async function ztop(key: string, n: number): Promise<string[]> {
+  const c = getRedis();
+  if (!c || !(await ready(c))) return [];
+  try {
+    return await c.zrevrange(key, 0, Math.max(0, n - 1));
+  } catch {
+    return [];
+  }
+}
+
+/** Set'e üye ekle (bülten e-postaları vb.). Eklenen yeni üye sayısını döndürür. */
+export async function sadd(key: string, member: string): Promise<number> {
+  const c = getRedis();
+  if (!c || !(await ready(c))) return 0;
+  try {
+    return await c.sadd(key, member);
+  } catch {
+    return 0;
+  }
+}
+
 /** Redis destekli memoize: önce cache'e bakar, yoksa fn() çalıştırıp yazar. */
 export async function cached<T>(key: string, ttlSeconds: number, fn: () => Promise<T>): Promise<T> {
   const hit = await cacheGet<T>(key);

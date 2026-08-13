@@ -1,6 +1,7 @@
 import { getCategories, getSettings } from "@/lib/cms";
 import { Logo } from "./Logo";
 import { SocialLinks } from "./SocialIcons";
+import { Newsletter } from "./Newsletter";
 
 export async function Footer() {
   const [settings, categories] = await Promise.all([getSettings(), getCategories()]);
@@ -93,6 +94,19 @@ export async function Footer() {
               iconClassName="h-4 w-4"
             />
           )}
+        </div>
+
+        {/* Bülten kayıt bandı */}
+        <div className="border-b border-sk-line py-6">
+          <div className="flex flex-col items-center justify-between gap-4 rounded-xl bg-sk-ink px-5 py-5 sm:flex-row">
+            <div className="text-center sm:text-left">
+              <div className="text-base font-black text-white">📩 Günün özeti e-postanızda</div>
+              <div className="text-[13px] text-white/60">Öne çıkan haberleri her sabah alın. İstediğiniz an çıkabilirsiniz.</div>
+            </div>
+            <div className="w-full sm:w-auto sm:min-w-[360px]">
+              <Newsletter compact />
+            </div>
+          </div>
         </div>
 
         {/* Bağlantı sütunları */}
