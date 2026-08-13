@@ -1,10 +1,24 @@
 import Image from "next/image";
-import { type News, mediaUrl, newsUrl, categoryColor, authorName, timeAgo } from "@/lib/shared";
+import { type News, mediaUrl, newsUrl, categoryColor, authorName, timeAgo, readingTime } from "@/lib/shared";
 
 function SonDakikaBadge() {
   return (
-    <span className="absolute left-2 top-2 z-10 rounded bg-sk-red px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white shadow">
+    <span className="absolute left-2 top-2 z-10 inline-flex items-center gap-1 rounded bg-sk-red px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white shadow">
+      <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
       Son Dakika
+    </span>
+  );
+}
+
+/** Kart köşesinde foto/medya göstergesi (Hürriyet tarzı). */
+function MediaBadge() {
+  return (
+    <span className="absolute bottom-2 right-2 z-10 grid h-6 w-6 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="3" y="5" width="18" height="14" rx="2" />
+        <path d="M3 15l4-4 5 5M14 13l3-3 4 4" />
+        <circle cx="8.5" cy="9.5" r="1.5" />
+      </svg>
     </span>
   );
 }
@@ -123,16 +137,15 @@ export function SideCard({ news }: { news: News }) {
 }
 
 export function GridCard({ news }: { news: News }) {
+  const src = mediaUrl(news.coverImage, "card");
+  const rt = readingTime(news);
   return (
     <article className="group overflow-hidden rounded-lg border border-sk-line bg-white transition hover:shadow-md">
       <a href={newsUrl(news)}>
         <div className="relative">
           {news.sonDakika && <SonDakikaBadge />}
-          <Cover
-            src={mediaUrl(news.coverImage, "card")}
-            alt={news.title}
-            className="aspect-[16/9] w-full object-cover"
-          />
+          {src && <MediaBadge />}
+          <Cover src={src} alt={news.title} className="aspect-[16/9] w-full object-cover" />
         </div>
         <div className="p-3">
           <h3 className="line-clamp-3 text-[15px] font-bold leading-tight text-sk-ink transition group-hover:text-sk-red">
@@ -152,6 +165,18 @@ export function GridCard({ news }: { news: News }) {
             {news.author && <span className="font-semibold text-neutral-500">{authorName(news.author)}</span>}
             {news.author && <span>·</span>}
             <span>{timeAgo(news.publishedAt ?? news.createdAt)}</span>
+            {rt && (
+              <>
+                <span>·</span>
+                <span className="inline-flex items-center gap-0.5">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 2" />
+                  </svg>
+                  {rt} dk
+                </span>
+              </>
+            )}
           </div>
         </div>
       </a>

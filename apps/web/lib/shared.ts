@@ -87,6 +87,28 @@ export function timeAgo(d?: string): string {
   }
 }
 
+/** Kart/rozet için kaba okuma süresi (dk). Metin yoksa null. */
+export function readingTime(news: Pick<News, "body" | "excerpt">): number | null {
+  let text = "";
+  if (news.body) text = String(news.body).replace(/<[^>]+>/g, " ");
+  else if (news.excerpt) text = news.excerpt;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  if (!words) return null;
+  return Math.max(1, Math.round(words / 200));
+}
+
+/** Özet metnini cümlelere bölüp madde madde listeye çevirir (Haberin Özeti kutusu). */
+export function summaryBullets(text?: string, max = 4): string[] {
+  if (!text) return [];
+  return text
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(/(?<=[.!?…])\s+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .slice(0, max);
+}
+
 export function newsUrl(n: Pick<News, "slug" | "id">): string {
   return `/haber/${n.slug ?? n.id}`;
 }
