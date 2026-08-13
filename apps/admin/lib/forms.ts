@@ -21,6 +21,7 @@ export type FormField = {
   required?: boolean;
   hint?: string;
   side?: boolean; // kenar çubuğuna yerleştir
+  default?: boolean; // checkbox varsayılanı (yeni kayıtta)
 };
 
 export type FormSchema = {
@@ -123,7 +124,7 @@ export const FORM_SCHEMAS: Record<string, FormSchema> = {
       { name: "isim", label: "İsim", type: "text", required: true },
       { name: "aciklama", label: "Açıklama", type: "text" },
       { name: "haberUrl", label: "Haber Bağlantısı (URL)", type: "url" },
-      { name: "aktif", label: "Aktif", type: "checkbox", side: true },
+      { name: "aktif", label: "Aktif", type: "checkbox", side: true, default: true },
       { name: "order", label: "Sıra", type: "number", side: true },
     ],
   },

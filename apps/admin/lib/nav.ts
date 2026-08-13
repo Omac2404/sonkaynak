@@ -7,14 +7,6 @@ const EDITORIAL: Role[] = ["admin", "editor", "editor_limited"];
 const SENIOR: Role[] = ["admin", "editor"];
 const ADMIN_ONLY: Role[] = ["admin"];
 
-/** Bir rolün göreceği menü gruplarını döndürür (admin her şeyi görür). */
-export function navForRole(role: Role): NavGroup[] {
-  return NAV.map((g) => ({
-    ...g,
-    items: g.items.filter((it) => role === "admin" || !it.roles || it.roles.includes(role)),
-  })).filter((g) => g.items.length > 0);
-}
-
 /** İzin listesine göre menü (dinamik roller). '*' = hepsi. */
 export function navForPerms(perms: string[]): NavGroup[] {
   const has = (key: string) => perms.includes("*") || perms.includes(key);

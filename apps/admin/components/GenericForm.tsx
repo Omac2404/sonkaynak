@@ -63,7 +63,7 @@ export function GenericForm({
         return (
           <label className="flex items-center gap-2.5">
             <input type="hidden" name={`__bool__${f.name}`} value="1" />
-            <input type="checkbox" name={f.name} defaultChecked={val !== false} className="h-5 w-5 accent-sk-red" />
+            <input type="checkbox" name={f.name} defaultChecked={typeof val === "boolean" ? val : Boolean(f.default)} className="h-5 w-5 accent-sk-red" />
             <span className="text-sm text-neutral-600">Etkin</span>
           </label>
         );
