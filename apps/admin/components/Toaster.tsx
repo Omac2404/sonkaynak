@@ -12,6 +12,7 @@ const MESSAGES: Record<string, string> = {
   restored: "Geri yüklendi ✓",
   purged: "Kalıcı olarak silindi",
   uploaded: "Yüklendi ✓",
+  generated: "Test içeriği üretildi ✓",
 };
 
 export function Toaster() {
@@ -24,13 +25,31 @@ export function Toaster() {
     const m = params.get("m");
     const e = params.get("e");
     if (!m && !e) return;
-    setToast(e ? { text: e, kind: "err" } : { text: MESSAGES[m ?? ""] ?? "İşlem tamamlandı", kind: "ok" });
+
+    let text = "İşlem tamamlandı";
+    let kind: "ok" | "err" = "ok";
+    if (e) {
+      text = e;
+      kind = "err";
+    } else if (m === "error") {
+      text = params.get("msg") || "İşlem başarısız oldu";
+      kind = "err";
+    } else if (m === "uploaderror") {
+      text = `${params.get("ok") ?? 0} yüklendi, ${params.get("fail") ?? 0} başarısız`;
+      kind = "err";
+    } else if (m === "forbidden") {
+      text = "Bu işlem için yetkiniz yok";
+      kind = "err";
+    } else {
+      text = MESSAGES[m ?? ""] ?? "İşlem tamamlandı";
+    }
+    setToast({ text, kind });
+
     // URL'i temizle
     const sp = new URLSearchParams(params.toString());
-    sp.delete("m");
-    sp.delete("e");
+    ["m", "e", "msg", "ok", "fail"].forEach((k) => sp.delete(k));
     router.replace(`${pathname}${sp.toString() ? `?${sp}` : ""}`, { scroll: false });
-    const t = setTimeout(() => setToast(null), 3000);
+    const t = setTimeout(() => setToast(null), kind === "err" ? 5000 : 3000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, pathname]);

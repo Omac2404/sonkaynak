@@ -8,6 +8,28 @@ import * as fk from "./faker";
 
 const API = process.env.PAYLOAD_URL ?? "http://localhost:3101";
 
+/** pf() sonucundan okunabilir hata mesajı çıkarır. */
+function firstErr(res: { data?: any }): string {
+  const e = res?.data?.errors?.[0];
+  const f = e?.data?.errors?.[0];
+  return (f ? `${f.label ?? f.path}: ${f.message}` : e?.message) || "İşlem başarısız oldu";
+}
+/** İşlem başarısızsa hata mesajıyla geri yönlendir (redirect fırlatır). */
+function failRedirect(route: string, res: { ok: boolean; data?: any }): void {
+  const sep = route.includes("?") ? "&" : "?";
+  redirect(`${route}${sep}m=error&msg=${encodeURIComponent(firstErr(res))}`);
+}
+/** Belirli rollerden biri değilse engelle (getMe ile). */
+async function requireRole(roles: string[]): Promise<{ id: number; role: string }> {
+  const me = await getMe();
+  if (!me) redirect("/login");
+  if (!roles.includes(me.role)) redirect("/?m=forbidden");
+  return me as { id: number; role: string };
+}
+const EDITORIAL = ["admin", "editor", "editor_limited"];
+const SENIOR = ["admin", "editor"];
+const ADMIN_ONLY = ["admin"];
+
 /** Profil güncelle (ad + isteğe bağlı şifre). */
 export async function updateProfile(formData: FormData) {
   const me = await getMe();
@@ -17,7 +39,10 @@ export async function updateProfile(formData: FormData) {
   const data: Record<string, any> = {};
   if (name) data.name = name;
   if (password) data.password = password;
-  if (Object.keys(data).length) await pf(`/users/${me.id}`, { method: "PATCH", body: JSON.stringify(data) });
+  if (Object.keys(data).length) {
+    const res = await pf(`/users/${me.id}`, { method: "PATCH", body: JSON.stringify(data) });
+    if (!res.ok) failRedirect("/profil", res);
+  }
   revalidatePath("/profil");
   redirect("/profil?m=saved");
 }
@@ -27,27 +52,29 @@ const TRASH_SLUGS = new Set(["news", "ilanlar", "firmalar", "galeriler", "vefat"
 
 /** Genel silme — trash'li koleksiyonlarda çöp kutusuna taşır, değilse kalıcı siler. */
 export async function deleteResource(formData: FormData) {
+  await requireRole(EDITORIAL);
   const slug = String(formData.get("slug") ?? "");
   const id = String(formData.get("id") ?? "");
   const back = String(formData.get("back") ?? "/");
   if (slug && id) {
-    if (TRASH_SLUGS.has(slug)) {
-      // Soft-delete: deletedAt set → varsayılan listelerde gizlenir (FK sorunu yok)
-      await pf(`/${slug}/${id}`, { method: "PATCH", body: JSON.stringify({ deletedAt: new Date().toISOString() }) });
-    } else {
-      await pf(`/${slug}/${id}`, { method: "DELETE" });
-    }
+    const res = TRASH_SLUGS.has(slug)
+      ? await pf(`/${slug}/${id}`, { method: "PATCH", body: JSON.stringify({ deletedAt: new Date().toISOString() }) })
+      : await pf(`/${slug}/${id}`, { method: "DELETE" });
+    if (!res.ok) failRedirect(back, res);
     revalidatePath(back);
     redirect(`${back}?m=${TRASH_SLUGS.has(slug) ? "deleted" : "removed"}`);
   }
+  redirect(back);
 }
 
 /** Çöp kutusundan geri yükle (deletedAt = null). */
 export async function restoreResource(formData: FormData) {
+  await requireRole(EDITORIAL);
   const slug = String(formData.get("slug") ?? "");
   const id = String(formData.get("id") ?? "");
   if (slug && id) {
-    await pf(`/${slug}/${id}?trash=true`, { method: "PATCH", body: JSON.stringify({ deletedAt: null }) });
+    const res = await pf(`/${slug}/${id}?trash=true`, { method: "PATCH", body: JSON.stringify({ deletedAt: null }) });
+    if (!res.ok) failRedirect("/arsiv", res);
     revalidatePath("/arsiv");
   }
   redirect("/arsiv?m=restored");
@@ -55,10 +82,12 @@ export async function restoreResource(formData: FormData) {
 
 /** Kalıcı sil (trash param'sız → hard delete). */
 export async function purgeResource(formData: FormData) {
+  await requireRole(EDITORIAL);
   const slug = String(formData.get("slug") ?? "");
   const id = String(formData.get("id") ?? "");
   if (slug && id) {
-    await pf(`/${slug}/${id}`, { method: "DELETE" });
+    const res = await pf(`/${slug}/${id}`, { method: "DELETE" });
+    if (!res.ok) failRedirect("/arsiv", res);
     revalidatePath("/arsiv");
   }
   redirect("/arsiv?m=purged");
@@ -95,8 +124,6 @@ export async function loginAction(formData: FormData) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
-  // Giriş öncesi router önbelleğinde "/" → /login yönlendirmesi cache'lenmiş
-  // olabilir; temizlemezsek giriş sonrası yumuşak geçiş login'de takılıyor.
   revalidatePath("/", "layout");
   redirect("/");
 }
@@ -192,11 +219,12 @@ export async function saveNews(formData: FormData) {
   if (category) data.category = category;
   if (coverImage) data.coverImage = coverImage;
 
+  // Yayınlamıyorsak ?draft=true → taslak versiyonu yaz, yayındaki haberi kaldırma
+  const draftQs = intent === "publish" ? "" : "?draft=true";
   const res = id
-    ? await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify(data) })
-    : await pf(`/news`, { method: "POST", body: JSON.stringify(data) });
+    ? await pf(`/news/${id}${draftQs}`, { method: "PATCH", body: JSON.stringify(data) })
+    : await pf(`/news${draftQs}`, { method: "POST", body: JSON.stringify(data) });
 
-  // Kayıt başarısızsa (örn. zorunlu kategori eksik) sessizce "kaydedildi" deme
   if (!res.ok) {
     const apiErr = res.data?.errors?.[0];
     const fieldMsg = apiErr?.data?.errors?.[0]
@@ -223,9 +251,13 @@ const SLUG_ROUTE: Record<string, string> = {
 
 /** Şema-güdümlü genel kaydet (kategori/yazar/firma/ilan/galeri/vefat/kullanıcı). */
 export async function saveResource(formData: FormData) {
+  await requireRole(EDITORIAL);
   const slug = String(formData.get("__slug") ?? "");
   const id = String(formData.get("id") ?? "");
   if (!slug) redirect("/");
+  const back = SLUG_ROUTE[slug] ?? "/";
+  // Kullanıcı yönetimi yalnız admin
+  if (slug === "users") await requireRole(ADMIN_ONLY);
 
   const numFields = new Set<string>();
   const boolFields = new Set<string>();
@@ -238,17 +270,14 @@ export async function saveResource(formData: FormData) {
 
   const data: Record<string, any> = {};
 
-  // Skalar alanlar
   for (const [k, v] of formData.entries()) {
     if (k.startsWith("__") || k === "id") continue;
     if (typeof v !== "string") continue;
     if (boolFields.has(k)) continue;
     data[k] = numFields.has(k) ? (v === "" ? 0 : Number(v)) : v;
   }
-  // Boolean (checkbox)
   for (const b of boolFields) data[b] = formData.get(b) === "on";
 
-  // Tekli görseller
   for (const k of formData.keys()) {
     if (!k.startsWith("__img__")) continue;
     const name = k.slice(7);
@@ -261,7 +290,6 @@ export async function saveResource(formData: FormData) {
     }
   }
 
-  // Çoklu görseller (galeri items)
   for (const k of new Set(formData.keys())) {
     if (!k.startsWith("__imgs__")) continue;
     const name = k.slice(8);
@@ -276,60 +304,71 @@ export async function saveResource(formData: FormData) {
     }
   }
 
-  // Düzenlemede boş şifreyi gönderme
   if ("password" in data && !data.password) delete data.password;
-  // Boş ilişki alanını null yap (örn. roleRef)
   if (data.roleRef === "") data.roleRef = null;
 
-  if (id) {
-    await pf(`/${slug}/${id}`, { method: "PATCH", body: JSON.stringify(data) });
-  } else {
-    await pf(`/${slug}`, { method: "POST", body: JSON.stringify(data) });
-  }
+  const res = id
+    ? await pf(`/${slug}/${id}`, { method: "PATCH", body: JSON.stringify(data) })
+    : await pf(`/${slug}`, { method: "POST", body: JSON.stringify(data) });
+  if (!res.ok) failRedirect(id ? `${back}/${id}` : `${back}/yeni`, res);
 
-  const back = SLUG_ROUTE[slug] ?? "/";
   revalidatePath(back);
   redirect(`${back}?m=saved`);
 }
 
 /** Haber onayı (yayına al). */
 export async function approveNews(formData: FormData) {
+  await requireRole(EDITORIAL);
   const id = String(formData.get("id") ?? "");
-  if (id) await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify({ _status: "published", reviewState: "hazirlaniyor" }) });
+  if (id) {
+    const res = await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify({ _status: "published", reviewState: "hazirlaniyor" }) });
+    if (!res.ok) failRedirect("/onay-bekleyenler", res);
+  }
   revalidatePath("/onay-bekleyenler");
   redirect("/onay-bekleyenler?m=approved");
 }
 
 /** Toplu haber onayı. */
 export async function bulkApproveNews(formData: FormData) {
+  await requireRole(EDITORIAL);
   const ids = formData.getAll("ids").map(String).filter(Boolean);
-  for (const id of ids)
-    await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify({ _status: "published", reviewState: "hazirlaniyor" }) });
+  let failed = 0;
+  for (const id of ids) {
+    const res = await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify({ _status: "published", reviewState: "hazirlaniyor" }) });
+    if (!res.ok) failed++;
+  }
   revalidatePath("/onay-bekleyenler");
+  if (failed) redirect(`/onay-bekleyenler?m=error&msg=${encodeURIComponent(`${failed} kayıt onaylanamadı`)}`);
   redirect("/onay-bekleyenler?m=approved");
 }
 
 /** Toplu kayıt silme. */
 export async function bulkDeleteResource(formData: FormData) {
+  await requireRole(EDITORIAL);
   const slug = String(formData.get("slug") ?? "");
   const back = String(formData.get("back") ?? "/");
   const ids = formData.getAll("ids").map(String).filter(Boolean);
   const isTrash = TRASH_SLUGS.has(slug);
+  let failed = 0;
   for (const id of ids) {
-    if (isTrash) {
-      await pf(`/${slug}/${id}`, { method: "PATCH", body: JSON.stringify({ deletedAt: new Date().toISOString() }) });
-    } else {
-      await pf(`/${slug}/${id}`, { method: "DELETE" });
-    }
+    const res = isTrash
+      ? await pf(`/${slug}/${id}`, { method: "PATCH", body: JSON.stringify({ deletedAt: new Date().toISOString() }) })
+      : await pf(`/${slug}/${id}`, { method: "DELETE" });
+    if (!res.ok) failed++;
   }
   revalidatePath(back);
+  if (failed) redirect(`${back}?m=error&msg=${encodeURIComponent(`${failed} kayıt silinemedi`)}`);
   redirect(`${back}?m=deleted`);
 }
 
 /** Haber reddi. */
 export async function rejectNews(formData: FormData) {
+  await requireRole(EDITORIAL);
   const id = String(formData.get("id") ?? "");
-  if (id) await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify({ reviewState: "reddedildi" }) });
+  if (id) {
+    const res = await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify({ reviewState: "reddedildi" }) });
+    if (!res.ok) failRedirect("/onay-bekleyenler", res);
+  }
   revalidatePath("/onay-bekleyenler");
   redirect("/onay-bekleyenler?m=rejected");
 }
@@ -338,6 +377,7 @@ export async function rejectNews(formData: FormData) {
 
 /** Sıralı ilişki listesi (Manşet/Sıcak Gündem/Ana Menü). */
 export async function saveCuration(formData: FormData) {
+  await requireRole(SENIOR);
   const slug = String(formData.get("slug") ?? "");
   const relKey = String(formData.get("relKey") ?? "news");
   const route = String(formData.get("route") ?? "/");
@@ -346,13 +386,15 @@ export async function saveCuration(formData: FormData) {
     ids = JSON.parse(String(formData.get("ids") ?? "[]"));
   } catch {}
   const items = ids.map((id) => ({ [relKey]: id }));
-  await pf(`/globals/${slug}`, { method: "POST", body: JSON.stringify({ items }) });
+  const res = await pf(`/globals/${slug}`, { method: "POST", body: JSON.stringify({ items }) });
+  if (!res.ok) failRedirect(route, res);
   revalidatePath(route);
   redirect(`${route}?m=saved`);
 }
 
 /** Kategori Vitrini — 5 slot. */
 export async function saveVitrin(formData: FormData) {
+  await requireRole(SENIOR);
   const slots: any[] = [];
   for (let i = 0; i < 5; i++) {
     const c = Number(formData.get(`cat${i}`));
@@ -360,13 +402,15 @@ export async function saveVitrin(formData: FormData) {
     const p = Number(formData.get(`pin${i}`));
     slots.push({ category: c, ...(p ? { pinnedNews: p } : {}) });
   }
-  await pf(`/globals/vitrin`, { method: "POST", body: JSON.stringify({ slots }) });
+  const res = await pf(`/globals/vitrin`, { method: "POST", body: JSON.stringify({ slots }) });
+  if (!res.ok) failRedirect("/vitrin", res);
   revalidatePath("/vitrin");
   redirect("/vitrin?m=saved");
 }
 
 /** Kayan şeritler (Ticker). */
 export async function saveTicker(formData: FormData) {
+  await requireRole(SENIOR);
   const parse = (k: string) => {
     try {
       return JSON.parse(String(formData.get(k) ?? "[]"));
@@ -380,13 +424,16 @@ export async function saveTicker(formData: FormData) {
     editorSecimi: parse("editorSecimi"),
     editorSecimiSpeed: Number(formData.get("editorSecimiSpeed")) || 10,
   };
-  await pf(`/globals/ticker`, { method: "POST", body: JSON.stringify(data) });
+  const res = await pf(`/globals/ticker`, { method: "POST", body: JSON.stringify(data) });
+  if (!res.ok) failRedirect("/ticker", res);
   revalidatePath("/ticker");
   redirect("/ticker?m=saved");
 }
 
-/** Medya: çoklu görsel yükle. */
+/** Medya: çoklu görsel yükle (giriş yapan herkes — yazar da kapak yükler). */
 export async function uploadMediaFiles(formData: FormData) {
+  const me = await getMe();
+  if (!me) redirect("/login");
   const files = (formData.getAll("files") as File[]).filter((f) => f && typeof f === "object" && f.size > 0);
   let ok = 0;
   let fail = 0;
@@ -396,20 +443,24 @@ export async function uploadMediaFiles(formData: FormData) {
     else fail++;
   }
   revalidatePath("/medya");
-  // Gerçekten yüklenip yüklenmediğini bildir (sahte "yüklendi" toast'ı yok)
   redirect(fail > 0 ? `/medya?m=uploaderror&ok=${ok}&fail=${fail}` : "/medya?m=uploaded");
 }
 
-/** Medya: sil. */
+/** Medya: sil (editöryel). */
 export async function deleteMedia(formData: FormData) {
+  await requireRole(EDITORIAL);
   const id = String(formData.get("id") ?? "");
-  if (id) await pf(`/media/${id}`, { method: "DELETE" });
+  if (id) {
+    const res = await pf(`/media/${id}`, { method: "DELETE" });
+    if (!res.ok) failRedirect("/medya", res);
+  }
   revalidatePath("/medya");
   redirect("/medya?m=removed");
 }
 
 /** Story'leri seçilen haberlerle eşitle (sil + yeniden oluştur). */
 export async function saveStories(formData: FormData) {
+  await requireRole(SENIOR);
   let ids: number[] = [];
   try {
     ids = JSON.parse(String(formData.get("ids") ?? "[]"));
@@ -417,43 +468,59 @@ export async function saveStories(formData: FormData) {
   const existing = await pf("/stories?limit=200&depth=0");
   for (const s of existing.data?.docs ?? []) await pf(`/stories/${s.id}`, { method: "DELETE" });
   let order = 0;
-  for (const nid of ids) await pf("/stories", { method: "POST", body: JSON.stringify({ news: nid, order: order++ }) });
+  let failed = 0;
+  for (const nid of ids) {
+    const res = await pf("/stories", { method: "POST", body: JSON.stringify({ news: nid, order: order++ }) });
+    if (!res.ok) failed++;
+  }
   revalidatePath("/storyler");
+  if (failed) redirect(`/storyler?m=error&msg=${encodeURIComponent(`${failed} story eklenemedi`)}`);
   redirect("/storyler?m=saved");
 }
 
-/** Rol oluştur/güncelle (dinamik roller). */
+/** Rol oluştur/güncelle (yalnız admin). */
 export async function saveRole(formData: FormData) {
+  await requireRole(ADMIN_ONLY);
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const label = String(formData.get("label") ?? "").trim();
-  const permissions = formData.getAll("perms").map(String).filter(Boolean);
+  // "Tüm yetkiler" işaretliyse * ver; değilse seçili izinler
+  const grantAll = formData.get("grantAll") === "on";
+  const permissions = grantAll ? ["*"] : formData.getAll("perms").map(String).filter(Boolean);
   if (!label) redirect("/roller?error=eksik");
 
   if (id) {
-    // Mevcut rol: yalnız label + izinler güncellenir (name/isSystem korunur)
-    await pf(`/roles/${id}`, { method: "PATCH", body: JSON.stringify({ label, permissions }) });
+    // Sistem rolleri düzenlenemez (yetkileri bozulmasın)
+    const cur = await pf(`/roles/${id}`);
+    if (cur.data?.isSystem) redirect(`/roller?m=error&msg=${encodeURIComponent("Sistem rolleri düzenlenemez")}`);
+    const res = await pf(`/roles/${id}`, { method: "PATCH", body: JSON.stringify({ label, permissions }) });
+    if (!res.ok) failRedirect("/roller", res);
   } else {
     if (!name) redirect("/roller?error=eksik");
-    await pf(`/roles`, { method: "POST", body: JSON.stringify({ name, label, permissions, isSystem: false }) });
+    const res = await pf(`/roles`, { method: "POST", body: JSON.stringify({ name, label, permissions, isSystem: false }) });
+    if (!res.ok) failRedirect("/roller", res);
   }
   revalidatePath("/roller");
   redirect("/roller?m=saved");
 }
 
-/** Rol sil (sistem rolleri silinemez). */
+/** Rol sil (sistem rolleri silinemez, yalnız admin). */
 export async function deleteRole(formData: FormData) {
+  await requireRole(ADMIN_ONLY);
   const id = String(formData.get("id") ?? "");
   if (id) {
     const r = await pf(`/roles/${id}`);
-    if (!r.data?.isSystem) await pf(`/roles/${id}`, { method: "DELETE" });
+    if (r.data?.isSystem) redirect(`/roller?m=error&msg=${encodeURIComponent("Sistem rolleri silinemez")}`);
+    const res = await pf(`/roles/${id}`, { method: "DELETE" });
+    if (!res.ok) failRedirect("/roller", res);
   }
   revalidatePath("/roller");
   redirect("/roller?m=removed");
 }
 
-/** Site Ayarları. */
+/** Site Ayarları (yalnız admin). */
 export async function saveSettings(formData: FormData) {
+  await requireRole(ADMIN_ONLY);
   const data: Record<string, any> = {};
   for (const k of [
     "siteName",
@@ -479,7 +546,8 @@ export async function saveSettings(formData: FormData) {
     const cur = Number(formData.get("__cur__logo"));
     if (cur) data.logo = cur;
   }
-  await pf(`/globals/site-settings`, { method: "POST", body: JSON.stringify(data) });
+  const res = await pf(`/globals/site-settings`, { method: "POST", body: JSON.stringify(data) });
+  if (!res.ok) failRedirect("/ayarlar", res);
   revalidatePath("/ayarlar");
   redirect("/ayarlar?m=saved");
 }
@@ -493,20 +561,17 @@ type TestType = (typeof TEST_TYPES)[number];
  * Tür: tek bir tür ya da "hepsi"; adet 1–10.
  */
 export async function generateTestContent(formData: FormData) {
-  const me = await getMe();
-  if (!me || me.role !== "admin") redirect("/login");
+  await requireRole(ADMIN_ONLY);
 
   const typeSel = String(formData.get("type") ?? "haber");
   let count = parseInt(String(formData.get("count") ?? "3"), 10);
   if (!Number.isFinite(count)) count = 3;
   count = Math.max(1, Math.min(10, count));
 
-  // Medya havuzu
   const mediaRes = await pf("/media?limit=50&depth=0");
   const mediaIds: number[] = (mediaRes.data?.docs ?? []).map((m: any) => m.id);
   const randMedia = () => (mediaIds.length ? fk.pick(mediaIds) : undefined);
 
-  // Kategoriler (haber için zorunlu) — yoksa oluştur
   const catRes = await pf("/categories?limit=100&depth=0");
   const catIds: number[] = (catRes.data?.docs ?? []).map((c: any) => c.id);
   if (catIds.length === 0) {
@@ -521,7 +586,6 @@ export async function generateTestContent(formData: FormData) {
   const newsIds: number[] = [];
   const bump = (k: string) => (done[k] = (done[k] ?? 0) + 1);
 
-  // Haber
   if (want("haber") && catIds.length) {
     for (let i = 0; i < count; i++) {
       const data: any = {
@@ -541,7 +605,6 @@ export async function generateTestContent(formData: FormData) {
     }
   }
 
-  // Galeri (görsel zorunlu)
   if (want("galeri") && mediaIds.length) {
     for (let i = 0; i < count; i++) {
       const items = Array.from({ length: fk.rand(3, 8) }, () => ({ image: randMedia(), caption: fk.ozet().slice(0, 60) }));
@@ -557,7 +620,6 @@ export async function generateTestContent(formData: FormData) {
     }
   }
 
-  // İlan
   if (want("ilan")) {
     for (let i = 0; i < count; i++) {
       const data: any = {
@@ -572,7 +634,6 @@ export async function generateTestContent(formData: FormData) {
     }
   }
 
-  // Firma
   if (want("firma")) {
     for (let i = 0; i < count; i++) {
       const data: any = {
@@ -592,7 +653,6 @@ export async function generateTestContent(formData: FormData) {
     }
   }
 
-  // Vefat
   if (want("vefat")) {
     for (let i = 0; i < count; i++) {
       const data: any = { isim: fk.kisiAdi(), aciklama: "Vefat etmiştir. Ailesine başsağlığı dileriz.", aktif: true, order: i };
@@ -601,7 +661,6 @@ export async function generateTestContent(formData: FormData) {
     }
   }
 
-  // Story (mevcut/üretilen haberlerden)
   if (want("story")) {
     let pool = newsIds;
     if (pool.length < count) {

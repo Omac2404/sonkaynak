@@ -38,16 +38,20 @@ export default async function RollerPage({ searchParams }: { searchParams: Promi
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <a href={`/roller?edit=${r.id}`} className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-600 hover:border-sk-red hover:text-sk-red">
-                  Düzenle
-                </a>
-                {!r.isSystem && (
-                  <form action={deleteRole}>
-                    <input type="hidden" name="id" value={r.id} />
-                    <ConfirmSubmit message={`"${r.label}" rolünü silmek istediğinize emin misiniz?`} className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red">
-                      Sil
-                    </ConfirmSubmit>
-                  </form>
+                {r.isSystem ? (
+                  <span className="rounded-md px-2.5 py-1 text-[11px] font-semibold text-neutral-400">Kilitli</span>
+                ) : (
+                  <>
+                    <a href={`/roller?edit=${r.id}`} className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-600 hover:border-sk-red hover:text-sk-red">
+                      Düzenle
+                    </a>
+                    <form action={deleteRole}>
+                      <input type="hidden" name="id" value={r.id} />
+                      <ConfirmSubmit message={`"${r.label}" rolünü silmek istediğinize emin misiniz?`} className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red">
+                        Sil
+                      </ConfirmSubmit>
+                    </form>
+                  </>
                 )}
               </div>
             </div>
@@ -70,11 +74,12 @@ export default async function RollerPage({ searchParams }: { searchParams: Promi
             </label>
           </div>
 
-          {isAll && (
-            <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700">
-              Bu rol tüm izinlere sahip (*). Aşağıdan tek tek izin seçerek sınırlandırabilirsiniz.
-            </p>
-          )}
+          <label className="flex items-center gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5">
+            <input type="checkbox" name="grantAll" defaultChecked={isAll} className="h-4 w-4 accent-sk-red" />
+            <span className="text-sm font-bold text-ink">
+              Tüm yetkiler (Admin) <span className="font-normal text-neutral-400">— işaretliyse aşağıdaki seçimler yok sayılır</span>
+            </span>
+          </label>
 
           <div>
             <span className="mb-2 block text-[13px] font-bold text-neutral-700">İzinler</span>
