@@ -15,6 +15,7 @@ import {
   categoryUrl,
   categoryColor,
   newsUrl,
+  summaryBullets,
   type News,
 } from "@/lib/cms";
 import { RichText } from "@/lib/lexical";
@@ -121,6 +122,7 @@ export default async function HaberDetay({ params }: Props) {
   const avatar = mediaUrl(news.author?.avatar, "thumbnail");
   const url = `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}${newsUrl(news)}`;
   const readMin = readingMinutes(news);
+  const ozet = summaryBullets(news.excerpt, 4);
 
   const [related, sicak, latest, adjacent, mostRead] = await Promise.all([
     news.category ? getRelatedNews(news.category.id, news.id, 6) : Promise.resolve([]),
@@ -204,8 +206,22 @@ export default async function HaberDetay({ params }: Props) {
 
         <h1 className="mt-3 text-[28px] font-black leading-[1.2] text-sk-ink md:text-[40px]">{news.title}</h1>
 
-        {news.excerpt && (
-          <p className="mt-4 text-lg font-medium leading-relaxed text-neutral-600 md:text-xl">{news.excerpt}</p>
+        {news.excerpt && ozet.length > 0 && (
+          <aside className="mt-5 rounded-xl border border-sk-line bg-neutral-50 p-4 sm:p-5">
+            <div className="mb-2.5 flex items-center gap-2">
+              <span className="rounded bg-sk-red px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-white">
+                Haberin Özeti
+              </span>
+            </div>
+            <ul className="space-y-2">
+              {ozet.map((b, i) => (
+                <li key={i} className="flex gap-2.5 text-[15px] font-medium leading-relaxed text-neutral-700 md:text-base">
+                  <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-sk-red" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
         )}
 
         {/* Başlık altı etiketler */}
