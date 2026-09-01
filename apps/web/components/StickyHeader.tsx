@@ -34,7 +34,7 @@ export function StickyHeader({ categories, secondary }: { categories: Cat[]; sec
             <a
               key={c.id}
               href={`/kategori/${c.slug}`}
-              className="whitespace-nowrap px-2.5 py-1.5 text-[13px] font-bold text-sk-ink transition hover:text-sk-red"
+              className="whitespace-nowrap px-2.5 py-1.5 text-[13px] font-bold capitalize text-sk-ink transition hover:text-sk-red"
             >
               {c.name}
             </a>

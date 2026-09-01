@@ -7,8 +7,9 @@ import { BackToTop } from "@/components/BackToTop";
 import { CookieBanner } from "@/components/CookieBanner";
 import { FinanceTicker } from "@/components/FinanceTicker";
 import { SonDakikaBar } from "@/components/SonDakikaBar";
-import { getSettings, getSonDakika, mediaUrl } from "@/lib/cms";
-import { getFinance } from "@/lib/finance";
+import { AdSlot } from "@/components/AdSlot";
+import { getSettings, getSonDakika, getAds, mediaUrl } from "@/lib/cms";
+import { getFinance, type Finance } from "@/lib/finance";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-inter" });
 
@@ -33,9 +34,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [s, finance, sonDakika] = await Promise.all([getSettings(), getFinance(), getSonDakika(8)]);
+  const [s, finance, sonDakika, headerAds] = await Promise.all([
+    getSettings(),
+    getFinance(),
+    getSonDakika(8),
+    getAds("header"),
+  ]);
   const siteName = s.siteName ?? "Son Kaynak";
   const logo = mediaUrl(s.logo, "feature");
+
+  // Piyasa bandı: admin kapatmadıysa göster; elle girilen değerler canlı veriyi ezer
+  const financeEnabled = s.financeEnabled !== false;
+  const override = s.financeOverride ?? {};
+  const financeMerged: Finance = { ...finance };
+  for (const [k, v] of Object.entries(override)) {
+    if (typeof v === "string" && v.trim()) (financeMerged as Record<string, string>)[k] = v.trim();
+  }
 
   const sameAs = [
     s.twitter ? `https://twitter.com/${s.twitter.replace(/^@/, "")}` : null,
@@ -87,9 +101,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
 
-        <FinanceTicker finance={finance} />
+        {financeEnabled && <FinanceTicker finance={financeMerged} />}
         <Header />
         <SonDakikaBar items={sonDakika} />
+        {headerAds.length > 0 && (
+          <div className="mx-auto max-w-[1360px] px-3 pt-4 sm:px-4">
+            <AdSlot ads={headerAds} variant="banner" />
+          </div>
+        )}
         <main className="min-h-screen">{children}</main>
         <Footer />
         <BackToTop />

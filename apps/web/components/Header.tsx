@@ -92,7 +92,7 @@ export async function Header() {
               <a
                 key={c.id}
                 href={`/kategori/${c.slug}`}
-                className="whitespace-nowrap px-3 py-2 text-[14px] font-bold text-sk-ink transition hover:text-sk-red"
+                className="whitespace-nowrap px-3 py-2 text-[14px] font-bold capitalize text-sk-ink transition hover:text-sk-red"
               >
                 {c.name}
               </a>

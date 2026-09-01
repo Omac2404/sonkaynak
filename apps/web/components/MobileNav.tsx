@@ -93,7 +93,7 @@ export function MobileNav({
               key={c.id}
               href={`/kategori/${c.slug}`}
               onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-2.5 text-[15px] font-bold text-sk-ink transition hover:bg-neutral-50"
+              className="block rounded-lg px-3 py-2.5 text-[15px] font-bold capitalize text-sk-ink transition hover:bg-neutral-50"
             >
               {c.name}
             </a>

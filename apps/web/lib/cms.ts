@@ -254,8 +254,16 @@ export async function getStories(): Promise<Story[]> {
   return r?.docs ?? [];
 }
 
-/** Son haberlerdeki en sık geçen etiketler ("Bugün neler oldu?" şeridi için). */
+/** "Bugün neler oldu?" şeridi: önce admin seçimi (global), yoksa otomatik en sık etiketler. */
 export async function getTrendingTags(limit = 8): Promise<Tag[]> {
+  // 1) Admin elle seçti mi?
+  const g = await cms<{ items?: { tag?: Tag | number }[] }>(`/api/globals/bugun-neler-oldu?depth=1`, 120);
+  const manual = (g?.items ?? [])
+    .map((i) => i.tag)
+    .filter((t): t is Tag => typeof t === "object" && t !== null);
+  if (manual.length) return manual.slice(0, limit);
+
+  // 2) Otomatik: son haberlerdeki en sık etiketler
   const r = await cms<ListResponse<News>>(`/api/news?${PUBLISHED}&depth=1&sort=-publishedAt&limit=40`, 120);
   const counts = new Map<number, { tag: Tag; n: number }>();
   for (const news of r?.docs ?? []) {
@@ -345,6 +353,23 @@ export async function getAdjacentNews(
   return { prev, next };
 }
 
+export type Ad = {
+  id: number;
+  name: string;
+  image?: Media | null;
+  targetUrl?: string;
+  placement?: "header" | "sidebar" | "in-article";
+};
+
+/** Aktif reklamlar (konuma göre). */
+export async function getAds(placement: "header" | "sidebar" | "in-article"): Promise<Ad[]> {
+  const r = await cms<ListResponse<Ad>>(
+    `/api/reklamlar?where[active][equals]=true&where[placement][equals]=${placement}&depth=1&sort=order&limit=10`,
+    120,
+  );
+  return r?.docs ?? [];
+}
+
 export async function getAllNewsForSitemap(limit = 1000): Promise<News[]> {
   const r = await cms<ListResponse<News>>(`/api/news?${PUBLISHED}&depth=0&sort=-publishedAt&limit=${limit}`, 300);
   return r?.docs ?? [];
@@ -364,6 +389,17 @@ export type SiteSettings = {
   footerAbout?: string;
   footerCopyright?: string;
   footerColumns?: { title?: string; links?: { label: string; url: string }[] }[];
+  financeEnabled?: boolean;
+  financeOverride?: {
+    usd?: string;
+    eur?: string;
+    gbp?: string;
+    gold?: string;
+    goldOz?: string;
+    bist?: string;
+    btc?: string;
+    eth?: string;
+  };
 };
 export async function getSettings(): Promise<SiteSettings> {
   return (await cms<SiteSettings>(`/api/globals/site-settings?depth=1`, 900)) ?? {};

@@ -10,6 +10,7 @@ import {
   getLatestNews,
   getAdjacentNews,
   getMostRead,
+  getAds,
   mediaUrl,
   authorName,
   categoryUrl,
@@ -26,6 +27,7 @@ import { ViewTracker } from "@/components/ViewTracker";
 import { MostReadList } from "@/components/MostReadList";
 import { Newsletter } from "@/components/Newsletter";
 import { GoogleNewsBox } from "@/components/GoogleNewsBox";
+import { AdSlot } from "@/components/AdSlot";
 
 export const revalidate = 60;
 
@@ -124,7 +126,7 @@ export default async function HaberDetay({ params }: Props) {
   const readMin = readingMinutes(news);
   const ozet = summaryBullets(news.excerpt, 4);
 
-  const [related, sicak, latest, adjacent, mostRead] = await Promise.all([
+  const [related, sicak, latest, adjacent, mostRead, sidebarAds, inArticleAds] = await Promise.all([
     news.category ? getRelatedNews(news.category.id, news.id, 6) : Promise.resolve([]),
     getSicakGundem(),
     getLatestNews(5),
@@ -132,6 +134,8 @@ export default async function HaberDetay({ params }: Props) {
       ? getAdjacentNews(news.publishedAt, news.category?.id ?? null)
       : Promise.resolve({ prev: null, next: null }),
     getMostRead(5),
+    getAds("sidebar"),
+    getAds("in-article"),
   ]);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -224,17 +228,6 @@ export default async function HaberDetay({ params }: Props) {
           </aside>
         )}
 
-        {/* Başlık altı etiketler */}
-        {news.tags && news.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1">
-            {news.tags.map((t) => (
-              <a key={t.id} href={`/etiket/${t.slug}`} className="text-[13px] font-extrabold uppercase tracking-tight text-sk-red transition hover:underline">
-                #{t.name}
-              </a>
-            ))}
-          </div>
-        )}
-
         {/* Meta + paylaşım */}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-y border-sk-line py-3">
           <div className="flex items-center gap-3">
@@ -289,6 +282,13 @@ export default async function HaberDetay({ params }: Props) {
           )}
         </div>
 
+
+        {/* Haber arası reklam */}
+        {inArticleAds.length > 0 && (
+          <div className="mt-8 max-w-[760px]">
+            <AdSlot ads={inArticleAds} variant="banner" />
+          </div>
+        )}
 
         {/* Etiketler */}
         {news.tags && news.tags.length > 0 && (
@@ -424,6 +424,7 @@ export default async function HaberDetay({ params }: Props) {
 
       {/* ── SIDEBAR ── */}
       <aside className="space-y-6 lg:sticky lg:top-4 lg:self-start">
+        {sidebarAds.length > 0 && <AdSlot ads={sidebarAds} variant="tower" />}
         <MostReadList items={mostRead} />
         <SidebarList title="Sıcak Gündem" items={sicak.length ? sicak : latest.slice(0, 3)} />
         <GoogleNewsBox />
