@@ -21,6 +21,7 @@ import { Firmalar } from "./collections/Firmalar";
 import { Galeriler } from "./collections/Galeriler";
 import { Stories } from "./collections/Stories";
 import { Vefat } from "./collections/Vefat";
+import { Reklamlar } from "./collections/Reklamlar";
 import { Roles } from "./collections/Roles";
 
 // Sistem rolleri (varsayılan izinler)
@@ -56,6 +57,7 @@ import {
   Secmece,
   Ozel,
   GozdenKacmasin,
+  BugunNelerOldu,
 } from "./globals/Curation";
 
 const filename = fileURLToPath(import.meta.url);
@@ -108,12 +110,13 @@ export default buildConfig({
     Galeriler,
     Stories,
     Vefat,
+    Reklamlar,
     Media,
     Roles,
     Users,
   ],
 
-  globals: [Manset, SicakGundem, Secmece, Ozel, GozdenKacmasin, Vitrin, AnaMenu, Ticker, SiteSettings],
+  globals: [Manset, SicakGundem, Secmece, Ozel, GozdenKacmasin, BugunNelerOldu, Vitrin, AnaMenu, Ticker, SiteSettings],
 
   editor: lexicalEditor(),
 

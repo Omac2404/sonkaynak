@@ -35,6 +35,36 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: "Piyasa Bandı",
+          fields: [
+            {
+              name: "financeEnabled",
+              label: "Piyasa bandını göster (sitenin tepesi)",
+              type: "checkbox",
+              defaultValue: true,
+            },
+            {
+              name: "financeOverride",
+              label: "Elle Değerler",
+              type: "group",
+              admin: {
+                description:
+                  "Canlı veri kaynağı çökerse buraya elle değer girin (yalnızca sayı, ör. 48.24). Boş bırakılan alan canlı veriden gelir.",
+              },
+              fields: [
+                { name: "usd", label: "Dolar (₺)", type: "text" },
+                { name: "eur", label: "Euro (₺)", type: "text" },
+                { name: "gbp", label: "Sterlin (₺)", type: "text" },
+                { name: "gold", label: "Gram Altın (₺)", type: "text" },
+                { name: "goldOz", label: "Ons Altın", type: "text" },
+                { name: "bist", label: "BİST 100", type: "text" },
+                { name: "btc", label: "Bitcoin (₺)", type: "text" },
+                { name: "eth", label: "Ethereum (₺)", type: "text" },
+              ],
+            },
+          ],
+        },
+        {
           label: "Footer",
           fields: [
             { name: "footerAbout", label: "Site Hakkında", type: "textarea" },

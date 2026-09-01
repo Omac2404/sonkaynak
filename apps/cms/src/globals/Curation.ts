@@ -105,6 +105,24 @@ export const Ozel: GlobalConfig = {
   ],
 };
 
+/** Bugün Neler Oldu — üst trend etiket şeridi (boşsa otomatik en sık etiketler) */
+export const BugunNelerOldu: GlobalConfig = {
+  slug: "bugun-neler-oldu",
+  label: "Bugün Neler Oldu",
+  admin: { group: "Kürasyon" },
+  access: baseAccess,
+  hooks: curationHooks,
+  fields: [
+    {
+      name: "items",
+      label: "Etiketler (boş bırakılırsa otomatik seçilir)",
+      type: "array",
+      maxRows: 12,
+      fields: [{ name: "tag", type: "relationship", relationTo: "tags", required: true }],
+    },
+  ],
+};
+
 /** Kategori Vitrini — 5 sekmeli */
 export const Vitrin: GlobalConfig = {
   slug: "vitrin",
