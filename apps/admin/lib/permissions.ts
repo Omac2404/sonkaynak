@@ -17,12 +17,14 @@ export const SECTION_GROUPS: { title: string; perms: [string, string][] }[] = [
       ["ilanlar", "İlanlar"],
       ["firmalar", "Firmalar"],
       ["galeriler", "Galeriler"],
+      ["reklamlar", "Reklamlar"],
     ],
   },
   {
     title: "Kürasyon",
     perms: [
       ["manset", "Manşet"],
+      ["bugun-neler-oldu", "Bugün Neler Oldu"],
       ["sicak-gundem", "Sıcak Gündem"],
       ["secmece", "Seçmece"],
       ["gozden-kacmasin", "Gözden Kaçmasın"],

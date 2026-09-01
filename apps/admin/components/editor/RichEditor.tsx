@@ -1,10 +1,12 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
+import { uploadInlineImage } from "@/lib/actions";
 
 function Btn({
   onClick,
@@ -33,6 +35,9 @@ function Btn({
 }
 
 function Toolbar({ editor }: { editor: Editor }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
   const setLink = () => {
     const prev = editor.getAttributes("link").href ?? "";
     const url = window.prompt("Bağlantı URL'si:", prev);
@@ -40,9 +45,24 @@ function Toolbar({ editor }: { editor: Editor }) {
     if (url === "") editor.chain().focus().unsetLink().run();
     else editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
   };
-  const addImage = () => {
+  const addImageByUrl = () => {
     const url = window.prompt("Görsel URL'si:");
     if (url) editor.chain().focus().setImage({ src: url }).run();
+  };
+  const onFilePicked = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file, file.name);
+      const r = await uploadInlineImage(fd);
+      if (r.ok && r.url) editor.chain().focus().setImage({ src: r.url }).run();
+      else window.alert(r.error || "Görsel yüklenemedi");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -77,8 +97,12 @@ function Toolbar({ editor }: { editor: Editor }) {
       <Btn title="Bağlantı" active={editor.isActive("link")} onClick={setLink}>
         🔗
       </Btn>
-      <Btn title="Görsel" onClick={addImage}>
-        🖼
+      <input ref={fileRef} type="file" accept="image/*" hidden onChange={onFilePicked} />
+      <Btn title={uploading ? "Yükleniyor…" : "Görsel yükle (bilgisayardan)"} onClick={() => !uploading && fileRef.current?.click()}>
+        {uploading ? "⏳" : "🖼"}
+      </Btn>
+      <Btn title="Görseli URL ile ekle" onClick={addImageByUrl}>
+        <span className="text-[11px]">URL</span>
       </Btn>
       <span className="mx-1 h-5 w-px bg-neutral-200" />
       <Btn title="Geri al" onClick={() => editor.chain().focus().undo().run()}>

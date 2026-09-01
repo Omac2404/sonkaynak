@@ -54,6 +54,29 @@ export function SettingsForm({ s }: { s: any }) {
           </section>
 
           <section className="sk-card space-y-4 p-5">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-extrabold text-ink">Piyasa Bandı</h2>
+              <label className="flex items-center gap-2 text-[13px] font-bold text-neutral-600">
+                <input type="checkbox" name="financeEnabled" defaultChecked={s?.financeEnabled !== false} className="h-4 w-4 accent-sk-red" />
+                Sitenin tepesinde göster
+              </label>
+            </div>
+            <p className="text-[12px] text-neutral-400">
+              Canlı veri kaynağı çökerse aşağıya elle değer girin (yalnızca sayı, ör. 48.24). Boş alan canlı veriden gelir.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <F label="Dolar (₺)" name="fin_usd" value={s?.financeOverride?.usd} />
+              <F label="Euro (₺)" name="fin_eur" value={s?.financeOverride?.eur} />
+              <F label="Sterlin (₺)" name="fin_gbp" value={s?.financeOverride?.gbp} />
+              <F label="Gram Altın (₺)" name="fin_gold" value={s?.financeOverride?.gold} />
+              <F label="Ons Altın" name="fin_goldOz" value={s?.financeOverride?.goldOz} />
+              <F label="BİST 100" name="fin_bist" value={s?.financeOverride?.bist} />
+              <F label="Bitcoin (₺)" name="fin_btc" value={s?.financeOverride?.btc} />
+              <F label="Ethereum (₺)" name="fin_eth" value={s?.financeOverride?.eth} />
+            </div>
+          </section>
+
+          <section className="sk-card space-y-4 p-5">
             <h2 className="text-sm font-extrabold text-ink">Footer</h2>
             <F label="Site Hakkında" name="footerAbout" value={s?.footerAbout} textarea />
             <F label="Telif Metni" name="footerCopyright" value={s?.footerCopyright} />

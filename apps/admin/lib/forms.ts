@@ -128,6 +128,28 @@ export const FORM_SCHEMAS: Record<string, FormSchema> = {
       { name: "order", label: "Sıra", type: "number", side: true },
     ],
   },
+  reklamlar: {
+    slug: "reklamlar",
+    title: "Reklamlar",
+    singular: "Reklam",
+    fields: [
+      { name: "name", label: "Reklam Adı", type: "text", required: true },
+      { name: "image", label: "Görsel", type: "image", side: true },
+      { name: "targetUrl", label: "Hedef Bağlantı (URL)", type: "url" },
+      {
+        name: "placement",
+        label: "Konum",
+        type: "select",
+        options: [
+          { value: "header", label: "Üst Banner (geniş)" },
+          { value: "sidebar", label: "Yan Sütun (kule)" },
+          { value: "in-article", label: "Haber Arası" },
+        ],
+      },
+      { name: "active", label: "Aktif", type: "checkbox", default: true },
+      { name: "order", label: "Sıra", type: "number", side: true },
+    ],
+  },
   kullanicilar: {
     slug: "users",
     title: "Kullanıcılar",

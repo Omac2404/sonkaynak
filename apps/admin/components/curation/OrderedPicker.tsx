@@ -18,7 +18,7 @@ export function OrderedPicker({
   formAction,
 }: {
   slug: string;
-  relKey: "news" | "category";
+  relKey: "news" | "category" | "tag";
   route: string;
   title: string;
   items: PickItem[];

@@ -166,6 +166,7 @@ const SLUG_TO_ROUTE: Record<string, string> = {
   ilanlar: "/ilanlar",
   galeriler: "/galeriler",
   vefat: "/vefat",
+  reklamlar: "/reklamlar",
   users: "/kullanicilar",
 };
 function backHref(slug: string) {

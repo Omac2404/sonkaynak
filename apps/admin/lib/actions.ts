@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { TOKEN_COOKIE, pf, getMe } from "./payload";
+import { mediaUrl } from "./media";
 import * as fk from "./faker";
 
 const API = process.env.PAYLOAD_URL ?? "http://localhost:3101";
@@ -153,6 +154,33 @@ async function uploadMedia(file: File): Promise<number | undefined> {
   }
 }
 
+/** Metin editörü için görsel yükle → herkese açık (mutlak) URL döndürür. */
+export async function uploadInlineImage(
+  formData: FormData,
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  const me = await getMe();
+  if (!me) return { ok: false, error: "Oturum bulunamadı" };
+  const file = formData.get("file") as File | null;
+  if (!file || typeof file !== "object" || file.size === 0) return { ok: false, error: "Dosya yok" };
+  const token = (await cookies()).get(TOKEN_COOKIE)?.value;
+  const fd = new FormData();
+  fd.append("file", file, file.name);
+  fd.append("alt", file.name);
+  try {
+    const res = await fetch(`${API}/api/media`, {
+      method: "POST",
+      headers: token ? { Authorization: `JWT ${token}` } : {},
+      body: fd,
+    });
+    if (!res.ok) return { ok: false, error: "Yükleme başarısız" };
+    const d = await res.json();
+    const url = mediaUrl(d?.doc);
+    return url ? { ok: true, url } : { ok: false, error: "Görsel URL'si alınamadı" };
+  } catch {
+    return { ok: false, error: "Bağlantı hatası" };
+  }
+}
+
 /** Virgülle ayrılmış etiket adlarını bul/oluştur → id listesi. */
 async function upsertTags(raw: string): Promise<number[]> {
   const names = raw
@@ -234,6 +262,19 @@ export async function saveNews(formData: FormData) {
     redirect(`${id ? `/haberler/${id}` : "/haberler/yeni"}?error=${encodeURIComponent(msg)}`);
   }
 
+  // Hikayelere ekle/çıkar (editör onay kutusu) — başarısızsa kaydı bozmasın
+  const newsId = id || res.data?.doc?.id;
+  if (newsId) {
+    const addToStory = formData.get("addToStory") === "on";
+    const existing = await pf(`/stories?where[news][equals]=${newsId}&limit=1&depth=0`);
+    const storyId = existing.data?.docs?.[0]?.id;
+    if (addToStory && !storyId) {
+      await pf(`/stories`, { method: "POST", body: JSON.stringify({ news: Number(newsId), order: 0 }) });
+    } else if (!addToStory && storyId) {
+      await pf(`/stories/${storyId}`, { method: "DELETE" });
+    }
+  }
+
   revalidatePath("/haberler");
   redirect("/haberler?m=saved");
 }
@@ -246,6 +287,7 @@ const SLUG_ROUTE: Record<string, string> = {
   ilanlar: "/ilanlar",
   galeriler: "/galeriler",
   vefat: "/vefat",
+  reklamlar: "/reklamlar",
   users: "/kullanicilar",
 };
 
@@ -340,6 +382,21 @@ export async function bulkApproveNews(formData: FormData) {
   revalidatePath("/onay-bekleyenler");
   if (failed) redirect(`/onay-bekleyenler?m=error&msg=${encodeURIComponent(`${failed} kayıt onaylanamadı`)}`);
   redirect("/onay-bekleyenler?m=approved");
+}
+
+/** Haberi hızlıca yayına al / pasife al (liste satırından tek tık). */
+export async function togglePublish(formData: FormData) {
+  await requireRole(EDITORIAL);
+  const id = String(formData.get("id") ?? "");
+  const next = String(formData.get("next") ?? "");
+  const back = String(formData.get("back") ?? "/haberler");
+  if (id && (next === "published" || next === "draft")) {
+    const qs = next === "draft" ? "?draft=true" : "";
+    const res = await pf(`/news/${id}${qs}`, { method: "PATCH", body: JSON.stringify({ _status: next }) });
+    if (!res.ok) failRedirect(back, res);
+  }
+  revalidatePath(back);
+  redirect(`${back}?m=${next === "published" ? "published" : "unpublished"}`);
 }
 
 /** Toplu kayıt silme. */
@@ -538,6 +595,18 @@ export async function saveSettings(formData: FormData) {
   ]) {
     data[k] = String(formData.get(k) ?? "");
   }
+  // Piyasa bandı: aç/kapa + elle değerler
+  data.financeEnabled = formData.get("financeEnabled") === "on";
+  data.financeOverride = {
+    usd: String(formData.get("fin_usd") ?? ""),
+    eur: String(formData.get("fin_eur") ?? ""),
+    gbp: String(formData.get("fin_gbp") ?? ""),
+    gold: String(formData.get("fin_gold") ?? ""),
+    goldOz: String(formData.get("fin_goldOz") ?? ""),
+    bist: String(formData.get("fin_bist") ?? ""),
+    btc: String(formData.get("fin_btc") ?? ""),
+    eth: String(formData.get("fin_eth") ?? ""),
+  };
   const file = formData.get("__img__logo") as File | null;
   if (file && typeof file === "object" && file.size > 0) {
     const mid = await uploadMedia(file);

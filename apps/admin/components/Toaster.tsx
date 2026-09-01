@@ -11,6 +11,8 @@ const MESSAGES: Record<string, string> = {
   rejected: "Reddedildi",
   restored: "Geri yüklendi ✓",
   purged: "Kalıcı olarak silindi",
+  published: "Yayına alındı ✓",
+  unpublished: "Pasife alındı",
   uploaded: "Yüklendi ✓",
   generated: "Test içeriği üretildi ✓",
 };

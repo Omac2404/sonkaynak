@@ -1,7 +1,7 @@
 import { RESOURCES } from "@/lib/resources";
 import { pf, getMe } from "@/lib/payload";
 import { mediaUrl, fmtDate } from "@/lib/media";
-import { deleteResource, bulkDeleteResource } from "@/lib/actions";
+import { deleteResource, bulkDeleteResource, togglePublish } from "@/lib/actions";
 import { ConfirmSubmit } from "./ConfirmSubmit";
 
 const SEARCH_FIELD: Record<string, string> = {
@@ -30,6 +30,9 @@ const BADGE_LABELS: Record<string, string> = {
   hazirlaniyor: "Hazırlanıyor",
   reddedildi: "Reddedildi",
   editor_limited: "Sınırlı Editör",
+  header: "Üst Banner",
+  sidebar: "Yan Sütun",
+  "in-article": "Haber Arası",
 };
 
 function Cell({ col, row }: { col: any; row: any }) {
@@ -204,6 +207,24 @@ export async function ResourceListView({
                   ))}
                   <td className="px-4 py-2.5">
                     <div className="flex items-center justify-end gap-1.5">
+                      {isNews && canManage && (
+                        <form action={togglePublish}>
+                          <input type="hidden" name="id" value={row.id} />
+                          <input type="hidden" name="back" value={`/${resourceKey}`} />
+                          <input type="hidden" name="next" value={row._status === "published" ? "draft" : "published"} />
+                          <button
+                            type="submit"
+                            className={`rounded-md border px-2.5 py-1 text-xs font-bold transition ${
+                              row._status === "published"
+                                ? "border-neutral-200 text-neutral-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700"
+                                : "border-green-300 bg-green-50 text-green-700 hover:bg-green-100"
+                            }`}
+                            title={row._status === "published" ? "Yayından kaldır (pasife al)" : "Yayına al"}
+                          >
+                            {row._status === "published" ? "Pasife Al" : "Yayına Al"}
+                          </button>
+                        </form>
+                      )}
                       <a href={`/${resourceKey}/${row.id}`} className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-600 hover:border-sk-red hover:text-sk-red">
                         Düzenle
                       </a>

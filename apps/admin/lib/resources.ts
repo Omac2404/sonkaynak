@@ -118,6 +118,20 @@ export const RESOURCES: Record<string, Resource> = {
       { key: "order", label: "Sıra", type: "text" },
     ],
   },
+  reklamlar: {
+    slug: "reklamlar",
+    title: "Reklamlar",
+    singular: "Reklam",
+    depth: 1,
+    sort: "order",
+    columns: [
+      { key: "image", label: "", type: "image" },
+      { key: "name", label: "Reklam Adı", type: "text" },
+      { key: "placement", label: "Konum", type: "badge" },
+      { key: "active", label: "Aktif", type: "badge" },
+      { key: "order", label: "Sıra", type: "text" },
+    ],
+  },
   kullanicilar: {
     slug: "users",
     title: "Kullanıcılar",

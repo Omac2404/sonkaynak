@@ -14,15 +14,17 @@ export default async function HaberDuzenle({
 }) {
   const { id } = await params;
   const { error } = await searchParams;
-  const [newsRes, cats, auths, me] = await Promise.all([
+  const [newsRes, cats, auths, me, storyRes] = await Promise.all([
     pf(`/news/${id}?depth=2&draft=true`),
     pf("/categories?limit=100&sort=order&depth=0"),
     pf("/authors?limit=100&depth=0"),
     getMe(),
+    pf(`/stories?where[news][equals]=${id}&limit=1&depth=0`),
   ]);
   if (!newsRes.ok || !newsRes.data?.id) notFound();
 
   const news = newsRes.data;
+  const inStory = (storyRes.data?.totalDocs ?? 0) > 0;
   const categories = (cats.data?.docs ?? []).map((c: any) => ({ id: c.id, label: c.name }));
   const authors = (auths.data?.docs ?? []).map((a: any) => ({ id: a.id, label: `${a.name} ${a.surname}` }));
   const canPublish = ["admin", "editor", "editor_limited"].includes(me?.role);
@@ -36,7 +38,7 @@ export default async function HaberDuzenle({
           ⚠ {error}
         </div>
       )}
-      <NewsForm news={news} categories={categories} authors={authors} canPublish={canPublish} mediaUrl={cover} />
+      <NewsForm news={news} categories={categories} authors={authors} canPublish={canPublish} mediaUrl={cover} inStory={inStory} />
     </div>
   );
 }
