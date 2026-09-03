@@ -142,9 +142,9 @@ export const FORM_SCHEMAS: Record<string, FormSchema> = {
         type: "select",
         required: true,
         options: [
-          { value: "header", label: "Üst Banner (geniş)" },
-          { value: "sidebar", label: "Yan Sütun (kule)" },
-          { value: "in-article", label: "Haber Arası" },
+          { value: "header", label: "Üst Banner — tüm sayfalarda üstte" },
+          { value: "sidebar", label: "Yan Sütun (kule) — anasayfa + haber kenarı" },
+          { value: "in-article", label: "Haber Arası — makale içinde" },
         ],
       },
       { name: "active", label: "Aktif", type: "checkbox", default: true },

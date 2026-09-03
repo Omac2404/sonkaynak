@@ -596,6 +596,12 @@ export async function saveSettings(formData: FormData) {
   ]) {
     data[k] = String(formData.get(k) ?? "");
   }
+  // Reklam dönüş süresi (sn) — boşsa varsayılan 7
+  {
+    const raw = String(formData.get("adRotateSeconds") ?? "").trim();
+    const n = parseInt(raw, 10);
+    data.adRotateSeconds = Number.isFinite(n) && n >= 3 ? n : 7;
+  }
   // Piyasa bandı: aç/kapa + elle değerler
   data.financeEnabled = formData.get("financeEnabled") === "on";
   data.financeOverride = {

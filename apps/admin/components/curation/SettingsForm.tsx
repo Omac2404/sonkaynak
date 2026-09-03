@@ -40,6 +40,7 @@ export function SettingsForm({ s }: { s: any }) {
             <F label="Site Adı" name="siteName" value={s?.siteName} />
             <F label="Site Açıklaması" name="siteDescription" value={s?.siteDescription} textarea />
             <F label="Varsayılan Kategori" name="defaultCategory" value={s?.defaultCategory} />
+            <F label="Reklam Dönüş Süresi (sn)" name="adRotateSeconds" type="number" value={s?.adRotateSeconds != null ? String(s.adRotateSeconds) : ""} />
           </section>
 
           <section className="sk-card grid gap-4 p-5 sm:grid-cols-2">

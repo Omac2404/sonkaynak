@@ -49,6 +49,13 @@ function Toolbar({ editor }: { editor: Editor }) {
     const url = window.prompt("Görsel URL'si:");
     if (url) editor.chain().focus().setImage({ src: url }).run();
   };
+  const addVideo = () => {
+    const url = window.prompt("YouTube video bağlantısı (linki yapıştırın):");
+    if (url && url.trim()) {
+      const u = url.trim();
+      editor.chain().focus().insertContent(`<p><a href="${u}">${u}</a></p>`).run();
+    }
+  };
   const onFilePicked = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
@@ -103,6 +110,9 @@ function Toolbar({ editor }: { editor: Editor }) {
       </Btn>
       <Btn title="Görseli URL ile ekle" onClick={addImageByUrl}>
         <span className="text-[11px]">URL</span>
+      </Btn>
+      <Btn title="YouTube videosu ekle" onClick={addVideo}>
+        🎬
       </Btn>
       <span className="mx-1 h-5 w-px bg-neutral-200" />
       <Btn title="Geri al" onClick={() => editor.chain().focus().undo().run()}>
