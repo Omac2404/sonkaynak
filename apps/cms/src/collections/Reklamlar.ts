@@ -15,7 +15,8 @@ export const Reklamlar: CollectionConfig = {
     group: "İçerik",
   },
   access: {
-    read: () => true,
+    // Giriş yapmamış herkes yalnızca aktif reklamları görebilir (pasif kampanyalar gizli)
+    read: ({ req: { user } }) => (user ? true : { active: { equals: true } }),
     create: ({ req: { user } }) => isEditorial(user),
     update: ({ req: { user } }) => isEditorial(user),
     delete: ({ req: { user } }) => isEditorial(user),

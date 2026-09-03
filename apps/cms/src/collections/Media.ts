@@ -19,8 +19,8 @@ export const Media: CollectionConfig = {
   upload: {
     staticDir: "media",
     mimeTypes: ["image/*"],
-    // Ana dosyayı da WebP'ye çevir + sıkıştır (daha küçük dosya, daha hızlı site)
-    formatOptions: { format: "webp", options: { quality: 82 } },
+    // Ana dosyanın orijinal formatı korunur (SVG/animasyon bozulmasın); frontend
+    // her zaman WebP boyut varyantlarını (thumbnail/card/feature) kullanır.
     imageSizes: [
       {
         name: "thumbnail",

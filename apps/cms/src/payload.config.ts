@@ -32,7 +32,7 @@ const SYSTEM_ROLES = [
     label: "Editör",
     permissions: [
       "haberler", "haberler/yeni", "kategoriler", "etiketler", "yazarlar", "medya",
-      "ilanlar", "firmalar", "galeriler", "manset", "sicak-gundem", "secmece", "ozel",
+      "ilanlar", "firmalar", "galeriler", "reklamlar", "manset", "bugun-neler-oldu", "sicak-gundem", "secmece", "ozel",
       "gozden-kacmasin", "vitrin", "ticker", "ana-menu", "storyler", "vefat", "onay-bekleyenler", "arsiv",
     ],
     isSystem: true,
@@ -161,7 +161,12 @@ export default buildConfig({
     for (const r of SYSTEM_ROLES) {
       try {
         const ex = await payload.find({ collection: "roles", where: { name: { equals: r.name } }, limit: 1 });
-        if (!ex.docs.length) await payload.create({ collection: "roles", data: r as any });
+        if (!ex.docs.length) {
+          await payload.create({ collection: "roles", data: r as any });
+        } else if ((ex.docs[0] as any).isSystem) {
+          // Sistem rolünün izinlerini güncel tut (yeni özellik anahtarları eklendikçe)
+          await payload.update({ collection: "roles", id: ex.docs[0].id, data: { permissions: r.permissions } as any });
+        }
       } catch {
         /* roles tablosu henüz hazır değilse yoksay */
       }
