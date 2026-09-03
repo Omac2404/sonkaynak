@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { FORM_SCHEMAS } from "@/lib/forms";
 import { GenericForm } from "@/components/GenericForm";
-import { pf } from "@/lib/payload";
+import { pf, requirePagePerm } from "@/lib/payload";
 import { Placeholder } from "@/components/Placeholder";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +10,7 @@ export default async function EditResource({ params }: { params: Promise<{ resou
   const { resource, id } = await params;
   const schema = FORM_SCHEMAS[resource];
   if (!schema) return <Placeholder title="Düzenle" note="Bu bölüm için form yakında." />;
+  await requirePagePerm(resource);
 
   const res = await pf(`/${schema.slug}/${id}?depth=1`);
   if (!res.ok || !res.data?.id) notFound();

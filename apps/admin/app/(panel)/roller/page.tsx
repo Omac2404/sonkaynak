@@ -1,4 +1,4 @@
-import { pf } from "@/lib/payload";
+import { pf, requirePagePerm } from "@/lib/payload";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 import { saveRole, deleteRole } from "@/lib/actions";
@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 const inputCls = "w-full rounded-lg border border-neutral-300 px-3.5 py-2.5 text-sm outline-none focus:border-sk-red focus:ring-4 focus:ring-sk-red/10";
 
 export default async function RollerPage({ searchParams }: { searchParams: Promise<{ edit?: string }> }) {
+  await requirePagePerm("roller");
   const { edit } = await searchParams;
   const res = await pf("/roles?limit=100&sort=-isSystem&depth=0");
   const roles: any[] = res.data?.docs ?? [];

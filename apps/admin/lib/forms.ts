@@ -140,6 +140,7 @@ export const FORM_SCHEMAS: Record<string, FormSchema> = {
         name: "placement",
         label: "Konum",
         type: "select",
+        required: true,
         options: [
           { value: "header", label: "Üst Banner (geniş)" },
           { value: "sidebar", label: "Yan Sütun (kule)" },

@@ -1,7 +1,7 @@
 import { FORM_SCHEMAS } from "@/lib/forms";
 import { GenericForm } from "@/components/GenericForm";
 import { Placeholder } from "@/components/Placeholder";
-import { pf } from "@/lib/payload";
+import { pf, requirePagePerm } from "@/lib/payload";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +15,7 @@ export default async function NewResource({ params }: { params: Promise<{ resour
   const { resource } = await params;
   const schema = FORM_SCHEMAS[resource];
   if (!schema) return <Placeholder title="Yeni Kayıt" note="Bu bölüm için form yakında." />;
+  await requirePagePerm(resource);
   const options = await loadOptions(schema.slug);
 
   return (

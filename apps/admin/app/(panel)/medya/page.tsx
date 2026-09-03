@@ -1,4 +1,4 @@
-import { pf } from "@/lib/payload";
+import { pf, getMe } from "@/lib/payload";
 import { mediaUrl, fmtDate } from "@/lib/media";
 import { uploadMediaFiles, deleteMedia } from "@/lib/actions";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
@@ -16,8 +16,9 @@ function dayLabel(d?: string): string {
 }
 
 export default async function MedyaPage() {
-  const res = await pf("/media?limit=300&sort=-createdAt");
+  const [res, me] = await Promise.all([pf("/media?limit=300&sort=-createdAt"), getMe()]);
   const rows: any[] = res.data?.docs ?? [];
+  const canManage = ["admin", "editor", "editor_limited"].includes(me?.role ?? "");
 
   // Yükleme gününe göre grupla (sıra korunur: en yeni gün üstte)
   const groups: { label: string; items: any[] }[] = [];
@@ -76,12 +77,14 @@ export default async function MedyaPage() {
                         <div className="truncate text-[11px] font-semibold text-ink">{m.filename ?? m.alt ?? `#${m.id}`}</div>
                         <div className="text-[10px] text-neutral-400">{fmtDate(m.createdAt, true)}</div>
                       </div>
-                      <form action={deleteMedia} className="absolute right-2 top-2 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
-                        <input type="hidden" name="id" value={m.id} />
-                        <ConfirmSubmit message="Bu görseli silmek istediğinize emin misiniz?" className="grid h-7 w-7 place-items-center rounded-md bg-white/90 text-sk-red shadow hover:bg-sk-red hover:text-white">
-                          ✕
-                        </ConfirmSubmit>
-                      </form>
+                      {canManage && (
+                        <form action={deleteMedia} className="absolute right-2 top-2 opacity-100 transition sm:opacity-0 sm:group-hover:opacity-100">
+                          <input type="hidden" name="id" value={m.id} />
+                          <ConfirmSubmit message="Bu görseli silmek istediğinize emin misiniz?" className="grid h-7 w-7 place-items-center rounded-md bg-white/90 text-sk-red shadow hover:bg-sk-red hover:text-white">
+                            ✕
+                          </ConfirmSubmit>
+                        </form>
+                      )}
                     </div>
                   );
                 })}

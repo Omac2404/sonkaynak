@@ -391,8 +391,9 @@ export async function togglePublish(formData: FormData) {
   const next = String(formData.get("next") ?? "");
   const back = String(formData.get("back") ?? "/haberler");
   if (id && (next === "published" || next === "draft")) {
-    const qs = next === "draft" ? "?draft=true" : "";
-    const res = await pf(`/news/${id}${qs}`, { method: "PATCH", body: JSON.stringify({ _status: next }) });
+    // Not: ?draft=true KULLANMA — o yalnızca taslak versiyon yazar, yayındaki
+    // belgeyi kaldırmaz. Ana belgeyi PATCH'leyerek gerçekten yayından kaldırıyoruz.
+    const res = await pf(`/news/${id}`, { method: "PATCH", body: JSON.stringify({ _status: next }) });
     if (!res.ok) failRedirect(back, res);
   }
   revalidatePath(back);

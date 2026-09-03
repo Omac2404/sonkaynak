@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { DEFAULT_PERMS } from "./permissions";
 
 const API = process.env.PAYLOAD_URL ?? "http://localhost:3101";
@@ -47,6 +48,14 @@ export async function getMe() {
 
 export function apiBase() {
   return API;
+}
+
+/** Sayfa düzeyinde yetki kapısı: kullanıcının etkin izinlerinde `key` yoksa yönlendirir. */
+export async function requirePagePerm(key: string): Promise<void> {
+  const me = await getMe();
+  if (!me) redirect("/login");
+  const perms = await getEffectivePerms(me);
+  if (!perms.includes("*") && !perms.includes(key)) redirect("/?m=forbidden");
 }
 
 /** Kullanıcının etkin panel izinleri: özel rol (roleRef) varsa ondan, yoksa temel rolden. */

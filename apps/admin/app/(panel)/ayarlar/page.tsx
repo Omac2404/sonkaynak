@@ -1,9 +1,10 @@
-import { pf } from "@/lib/payload";
+import { pf, requirePagePerm } from "@/lib/payload";
 import { SettingsForm } from "@/components/curation/SettingsForm";
 
 export const dynamic = "force-dynamic";
 
 export default async function AyarlarPage() {
+  await requirePagePerm("ayarlar");
   const g = await pf("/globals/site-settings?depth=1");
   return <SettingsForm s={g.data ?? {}} />;
 }

@@ -81,10 +81,14 @@ export function GenericForm({
       }
       case "select":
       case "status": {
-        const dv = f.type === "status" ? (doc?._status ?? "published") : (val ?? "");
+        const firstOpt = f.options?.[0]?.value ?? "";
+        const dv =
+          f.type === "status"
+            ? (doc?._status ?? "published")
+            : (val ?? (f.required ? firstOpt : ""));
         return (
           <select name={f.type === "status" ? "_status" : f.name} defaultValue={dv} className={inputCls}>
-            {f.type === "select" && <option value="">— Seç —</option>}
+            {f.type === "select" && !f.required && <option value="">— Seç —</option>}
             {(f.options ?? []).map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}

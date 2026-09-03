@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { RESOURCES } from "@/lib/resources";
 import { ResourceListView } from "@/components/ResourceListView";
 import { Placeholder } from "@/components/Placeholder";
+import { requirePagePerm } from "@/lib/payload";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,10 @@ export default async function ResourcePage({
 }) {
   const { resource } = await params;
   const { q, status, review } = await searchParams;
-  if (RESOURCES[resource]) return <ResourceListView resourceKey={resource} search={q} status={status} review={review} />;
+  if (RESOURCES[resource]) {
+    await requirePagePerm(resource);
+    return <ResourceListView resourceKey={resource} search={q} status={status} review={review} />;
+  }
   if (PLACEHOLDER_LABELS[resource]) return <Placeholder title={PLACEHOLDER_LABELS[resource]} />;
   notFound();
 }
