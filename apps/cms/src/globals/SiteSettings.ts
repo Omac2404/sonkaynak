@@ -20,6 +20,13 @@ export const SiteSettings: GlobalConfig = {
             { name: "siteDescription", label: "Site Açıklaması", type: "textarea" },
             { name: "logo", label: "Logo", type: "upload", relationTo: "media" },
             { name: "defaultCategory", label: "Varsayılan Kategori", type: "text", defaultValue: "Gündem" },
+            {
+              name: "adRotateSeconds",
+              label: "Reklam Dönüş Süresi (sn)",
+              type: "number",
+              defaultValue: 7,
+              admin: { description: "Aynı konumda birden fazla reklam varsa kaç saniyede bir değişsin." },
+            },
           ],
         },
         {
