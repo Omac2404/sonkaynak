@@ -7,6 +7,39 @@ import { SocialLinks } from "./SocialIcons";
 type Cat = { id: number; slug: string; name: string };
 type Link = { href: string; label: string };
 
+/** Açılır/kapanır menü bölümü (Hürriyet tarzı +/− akordeon). */
+function AccordionSection({ title, links, onNavigate }: { title: string; links: Link[]; onNavigate: () => void }) {
+  const [open, setOpen] = useState(false);
+  if (!links.length) return null;
+  return (
+    <div className="mt-1 border-t border-sk-line pt-1">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-[13px] font-extrabold uppercase tracking-wide text-sk-muted transition hover:bg-neutral-50"
+      >
+        {title}
+        <span className={`text-xl font-bold leading-none text-sk-red transition-transform ${open ? "rotate-45" : ""}`}>+</span>
+      </button>
+      {open && (
+        <div className="pb-1">
+          {links.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={onNavigate}
+              className="block rounded-lg px-6 py-2.5 text-[14.5px] font-semibold text-sk-ink transition hover:bg-neutral-50"
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function MobileNav({
   categories,
   secondary,
@@ -84,7 +117,7 @@ export function MobileNav({
           <a
             href="/"
             onClick={() => setOpen(false)}
-            className="block rounded-lg px-3 py-2.5 text-[15px] font-bold text-sk-ink transition hover:bg-neutral-50"
+            className="block rounded-lg px-3 py-3 text-[16px] font-extrabold text-sk-ink transition hover:bg-neutral-50"
           >
             Anasayfa
           </a>
@@ -93,33 +126,13 @@ export function MobileNav({
               key={c.id}
               href={`/kategori/${c.slug}`}
               onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-2.5 text-[15px] font-bold capitalize text-sk-ink transition hover:bg-neutral-50"
+              className="block rounded-lg px-3 py-3 text-[16px] font-extrabold capitalize text-sk-ink transition hover:bg-neutral-50"
             >
               {c.name}
             </a>
           ))}
-          <div className="my-2 border-t border-sk-line" />
-          {secondary.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-2.5 text-[14px] font-semibold text-sk-muted transition hover:bg-neutral-50"
-            >
-              {l.label}
-            </a>
-          ))}
-          <div className="my-2 border-t border-sk-line" />
-          {utility.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-2.5 text-[13px] font-medium text-sk-muted transition hover:bg-neutral-50"
-            >
-              {l.label}
-            </a>
-          ))}
+          <AccordionSection title="Keşfet" links={secondary} onNavigate={() => setOpen(false)} />
+          <AccordionSection title="Kurumsal" links={utility} onNavigate={() => setOpen(false)} />
         </nav>
 
         {social.length > 0 && (

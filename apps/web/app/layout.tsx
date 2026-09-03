@@ -102,7 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SonDakikaBar items={sonDakika} />
         {headerAds.length > 0 && (
           <div className="mx-auto max-w-[1360px] px-3 pt-4 sm:px-4">
-            <AdSlot ads={headerAds} variant="banner" />
+            <AdSlot ads={headerAds} variant="banner" intervalSec={s.adRotateSeconds ?? 7} />
           </div>
         )}
         <main className="min-h-screen">{children}</main>

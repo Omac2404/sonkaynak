@@ -17,6 +17,8 @@ import {
   getCategories,
   getNewsByCategory,
   getMostRead,
+  getAds,
+  getSettings,
   categoryUrl,
   categoryColor,
   mediaUrl,
@@ -34,6 +36,7 @@ import { TrendBar } from "@/components/TrendBar";
 import { Ticker } from "@/components/Ticker";
 import { MostReadList } from "@/components/MostReadList";
 import { Newsletter } from "@/components/Newsletter";
+import { AdSlot } from "@/components/AdSlot";
 import { getFinanceView } from "@/lib/finance";
 
 export const revalidate = 60;
@@ -73,7 +76,8 @@ export default async function HomePage() {
       getFinanceView(),
       getTrendingTags(8),
     ]);
-  const mostRead = await getMostRead(6);
+  const [mostRead, homeAds, settings] = await Promise.all([getMostRead(6), getAds("sidebar"), getSettings()]);
+  const adInterval = settings.adRotateSeconds ?? 7;
   const storyItems = stories.map((s) => s.news).filter((n): n is News => Boolean(n));
 
   // Manşet slider: önce manşet kürasyonu, ardından en yeni haberlerle 19'a tamamla
@@ -185,6 +189,7 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="space-y-6 lg:sticky lg:top-4">
+            {homeAds.length > 0 && <AdSlot ads={homeAds} variant="tower" intervalSec={adInterval} />}
             <MostReadList items={mostRead} withImages />
             <Newsletter />
           </div>

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { News } from "@/lib/shared";
-import { mediaUrl, newsUrl, categoryUrl, categoryColor, authorName, sanitizeBody } from "@/lib/shared";
+import { mediaUrl, newsUrl, categoryUrl, categoryColor, authorName, renderArticleBody } from "@/lib/shared";
 
 const MAX_MORE = 4; // ilk haber dahil toplam 5
 
@@ -164,7 +164,7 @@ export function ContinuousReader({
             {a.body && (
               <div
                 className="sk-article-body mt-7 max-w-[760px]"
-                dangerouslySetInnerHTML={{ __html: sanitizeBody(a.body) }}
+                dangerouslySetInnerHTML={{ __html: renderArticleBody(a.body) }}
               />
             )}
           </article>

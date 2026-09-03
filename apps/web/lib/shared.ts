@@ -122,6 +122,34 @@ export function sanitizeBody(html: string): string {
     .replace(/javascript:/gi, "");
 }
 
+/** YouTube video kimliğini gömü iframe'ine çevirir (16:9 responsive sarmalayıcı). */
+function ytEmbed(id: string): string {
+  return `<div class="sk-embed"><iframe src="https://www.youtube.com/embed/${id}" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>`;
+}
+
+/**
+ * Gövdedeki YouTube bağlantılarını otomatik gömülü videoya çevirir.
+ * Hem YouTube linkini saran <a> etiketlerini hem de metindeki çıplak URL'leri kapsar.
+ * Not: iframe src'sinde /embed/ kullanıldığından çıplak-URL adımı /embed/'i EŞLEŞTİRMEZ (döngü yok).
+ */
+export function embedYouTube(html: string): string {
+  const anchorRe =
+    /<a\b[^>]*href="([^"]*(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)[^"]*)"[^>]*>[\s\S]*?<\/a>/gi;
+  const idRe = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+  html = html.replace(anchorRe, (m, href) => {
+    const mm = String(href).match(idRe);
+    return mm ? ytEmbed(mm[1]) : m;
+  });
+  const bareRe = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})[^\s<"']*/gi;
+  html = html.replace(bareRe, (_m, id) => ytEmbed(id));
+  return html;
+}
+
+/** Haber gövdesini yayına hazırlar: güvenlik temizliği + YouTube gömüsü. */
+export function renderArticleBody(html: string): string {
+  return embedYouTube(sanitizeBody(html));
+}
+
 export function newsUrl(n: Pick<News, "slug" | "id">): string {
   return `/haber/${n.slug ?? n.id}`;
 }

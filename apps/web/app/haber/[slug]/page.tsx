@@ -11,13 +11,14 @@ import {
   getAdjacentNews,
   getMostRead,
   getAds,
+  getSettings,
   mediaUrl,
   authorName,
   categoryUrl,
   categoryColor,
   newsUrl,
   summaryBullets,
-  sanitizeBody,
+  renderArticleBody,
   type News,
 } from "@/lib/cms";
 import { RichText } from "@/lib/lexical";
@@ -139,6 +140,7 @@ export default async function HaberDetay({ params }: Props) {
     getAds("sidebar"),
     getAds("in-article"),
   ]);
+  const adInterval = (await getSettings()).adRotateSeconds ?? 7;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
   const catColor = news.category ? categoryColor(news.category) : "#d4141c";
@@ -279,7 +281,7 @@ export default async function HaberDetay({ params }: Props) {
         {/* Gövde — yeni editör HTML (body) varsa onu, yoksa eski Lexical içeriği */}
         <div className="sk-article-body mt-7 max-w-[760px]">
           {news.body ? (
-            <div dangerouslySetInnerHTML={{ __html: sanitizeBody(news.body) }} />
+            <div dangerouslySetInnerHTML={{ __html: renderArticleBody(news.body) }} />
           ) : (
             <RichText data={news.content} />
           )}
@@ -289,7 +291,7 @@ export default async function HaberDetay({ params }: Props) {
         {/* Haber arası reklam */}
         {inArticleAds.length > 0 && (
           <div className="mt-8 max-w-[760px]">
-            <AdSlot ads={inArticleAds} variant="banner" />
+            <AdSlot ads={inArticleAds} variant="banner" intervalSec={adInterval} />
           </div>
         )}
 
@@ -427,7 +429,7 @@ export default async function HaberDetay({ params }: Props) {
 
       {/* ── SIDEBAR ── */}
       <aside className="space-y-6 lg:sticky lg:top-4 lg:self-start">
-        {sidebarAds.length > 0 && <AdSlot ads={sidebarAds} variant="tower" />}
+        {sidebarAds.length > 0 && <AdSlot ads={sidebarAds} variant="tower" intervalSec={adInterval} />}
         <MostReadList items={mostRead} />
         <SidebarList title="Sıcak Gündem" items={sicak.length ? sicak : latest.slice(0, 3)} />
         <GoogleNewsBox />

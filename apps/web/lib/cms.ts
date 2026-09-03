@@ -379,6 +379,7 @@ export type SiteSettings = {
   siteName?: string;
   siteDescription?: string;
   logo?: Media | null;
+  adRotateSeconds?: number;
   twitter?: string;
   facebook?: string;
   instagram?: string;
