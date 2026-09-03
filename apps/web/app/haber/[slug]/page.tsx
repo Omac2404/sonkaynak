@@ -17,6 +17,7 @@ import {
   categoryColor,
   newsUrl,
   summaryBullets,
+  sanitizeBody,
   type News,
 } from "@/lib/cms";
 import { RichText } from "@/lib/lexical";
@@ -41,6 +42,7 @@ function lexText(node: any): string {
 function readingMinutes(news: any): number {
   const text = news.body ? String(news.body).replace(/<[^>]+>/g, " ") : lexText(news.content);
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  if (!words) return 0; // metin yoksa okuma süresi gösterme
   return Math.max(1, Math.round(words / 200));
 }
 
@@ -182,8 +184,8 @@ export default async function HaberDetay({ params }: Props) {
       <StickyShare url={url} title={news.title} />
       <ViewTracker id={news.id} />
       <ArticleLightbox />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }} />
 
       {/* ── ANA SÜTUN ── */}
       <article className="min-w-0">
@@ -248,7 +250,8 @@ export default async function HaberDetay({ params }: Props) {
                 <span className="block text-sm font-bold text-sk-ink">Son Kaynak</span>
               )}
               <span className="text-xs text-neutral-400">
-                {fmtDateTime(news.publishedAt)} · {readMin} dk okuma
+                {fmtDateTime(news.publishedAt)}
+                {readMin > 0 && ` · ${readMin} dk okuma`}
                 {news.updatedAt &&
                   news.publishedAt &&
                   new Date(news.updatedAt).getTime() - new Date(news.publishedAt).getTime() > 300000 && (
@@ -276,7 +279,7 @@ export default async function HaberDetay({ params }: Props) {
         {/* Gövde — yeni editör HTML (body) varsa onu, yoksa eski Lexical içeriği */}
         <div className="sk-article-body mt-7 max-w-[760px]">
           {news.body ? (
-            <div dangerouslySetInnerHTML={{ __html: news.body.replace(/<script[\s\S]*?<\/script>/gi, "") }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeBody(news.body) }} />
           ) : (
             <RichText data={news.content} />
           )}

@@ -1,4 +1,5 @@
 import { cached } from "./redis";
+import { getSettings } from "./cms";
 
 export type Finance = {
   usd?: string;
@@ -68,4 +69,21 @@ export async function getFinance(): Promise<Finance> {
 
     return out;
   });
+}
+
+/**
+ * Site ayarlarını uygulanmış piyasa görünümü: admin bandı kapattıysa `enabled=false`,
+ * elle girilen değerler canlı veriyi ezer. Hem üst bant hem anasayfa InfoBar bunu kullanır.
+ */
+export async function getFinanceView(): Promise<{ enabled: boolean; finance: Finance }> {
+  const [data, s] = await Promise.all([getFinance(), getSettings()]);
+  const enabled = s.financeEnabled !== false;
+  const merged: Finance = { ...data };
+  const ov = s.financeOverride ?? {};
+  for (const [k, v] of Object.entries(ov)) {
+    if (typeof v === "string" && v.trim()) (merged as Record<string, string>)[k] = v.trim();
+  }
+  // BİST değeri elle girildiyse eski/canlı değişim yüzdesini gösterme (tutarsızlık olmasın)
+  if (typeof ov.bist === "string" && ov.bist.trim()) merged.bistChange = undefined;
+  return { enabled, finance: merged };
 }

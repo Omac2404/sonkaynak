@@ -9,7 +9,7 @@ import { FinanceTicker } from "@/components/FinanceTicker";
 import { SonDakikaBar } from "@/components/SonDakikaBar";
 import { AdSlot } from "@/components/AdSlot";
 import { getSettings, getSonDakika, getAds, mediaUrl } from "@/lib/cms";
-import { getFinance, type Finance } from "@/lib/finance";
+import { getFinanceView } from "@/lib/finance";
 
 const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap", variable: "--font-inter" });
 
@@ -34,22 +34,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [s, finance, sonDakika, headerAds] = await Promise.all([
+  const [s, financeView, sonDakika, headerAds] = await Promise.all([
     getSettings(),
-    getFinance(),
+    getFinanceView(),
     getSonDakika(8),
     getAds("header"),
   ]);
   const siteName = s.siteName ?? "Son Kaynak";
   const logo = mediaUrl(s.logo, "feature");
 
-  // Piyasa bandı: admin kapatmadıysa göster; elle girilen değerler canlı veriyi ezer
-  const financeEnabled = s.financeEnabled !== false;
-  const override = s.financeOverride ?? {};
-  const financeMerged: Finance = { ...finance };
-  for (const [k, v] of Object.entries(override)) {
-    if (typeof v === "string" && v.trim()) (financeMerged as Record<string, string>)[k] = v.trim();
-  }
+  // Piyasa bandı: admin kapatmadıysa göster (getFinanceView elle değerleri uygular)
+  const financeEnabled = financeView.enabled;
+  const financeMerged = financeView.finance;
 
   const sameAs = [
     s.twitter ? `https://twitter.com/${s.twitter.replace(/^@/, "")}` : null,
@@ -98,8 +94,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="dns-prefetch" href={CMS_URL} />
 
         {/* Site geneli Organization + WebSite JSON-LD */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd).replace(/</g, "\\u003c") }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd).replace(/</g, "\\u003c") }} />
 
         {financeEnabled && <FinanceTicker finance={financeMerged} />}
         <Header />

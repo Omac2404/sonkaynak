@@ -109,6 +109,19 @@ export function summaryBullets(text?: string, max = 4): string[] {
     .slice(0, max);
 }
 
+/**
+ * Haber gövdesi (editör HTML) için hafif güvenlik temizliği.
+ * Görsel/iframe gibi meşru gömüleri KORUR; yalnızca script, inline olay
+ * yakalayıcıları (onerror/onload…) ve javascript: URL'lerini kaldırır.
+ */
+export function sanitizeBody(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<script[^>]*>/gi, "")
+    .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/javascript:/gi, "");
+}
+
 export function newsUrl(n: Pick<News, "slug" | "id">): string {
   return `/haber/${n.slug ?? n.id}`;
 }

@@ -34,7 +34,7 @@ import { TrendBar } from "@/components/TrendBar";
 import { Ticker } from "@/components/Ticker";
 import { MostReadList } from "@/components/MostReadList";
 import { Newsletter } from "@/components/Newsletter";
-import { getFinance } from "@/lib/finance";
+import { getFinanceView } from "@/lib/finance";
 
 export const revalidate = 60;
 
@@ -54,7 +54,7 @@ function SectionTitle({ children, href, color = "#d4141c" }: { children: React.R
 }
 
 export default async function HomePage() {
-  const [manset, sicak, latest, vitrin, galeriler, ilanlar, firmalar, vefat, stories, secmece, ozel, gozden, authors, ticker, finance, trending] =
+  const [manset, sicak, latest, vitrin, galeriler, ilanlar, firmalar, vefat, stories, secmece, ozel, gozden, authors, ticker, financeView, trending] =
     await Promise.all([
       getManset(),
       getSicakGundem(),
@@ -70,7 +70,7 @@ export default async function HomePage() {
       getGozdenKacmasin(),
       getAuthorsForSlider(20),
       getTicker(),
-      getFinance(),
+      getFinanceView(),
       getTrendingTags(8),
     ]);
   const mostRead = await getMostRead(6);
@@ -135,7 +135,7 @@ export default async function HomePage() {
 
       {/* İnfobar: hava + finans */}
       <div className="mt-5">
-        <InfoBar finance={finance} />
+        <InfoBar finance={financeView.finance} />
       </div>
 
       {/* Editör Seçimi şeridi */}

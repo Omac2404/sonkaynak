@@ -11,7 +11,12 @@ export function ArticleFontSize() {
   const [idx, setIdx] = useState(1); // md varsayılan
 
   useEffect(() => {
-    const saved = (typeof localStorage !== "undefined" && localStorage.getItem(KEY)) as Level | null;
+    let saved: Level | null = null;
+    try {
+      saved = localStorage.getItem(KEY) as Level | null;
+    } catch {
+      /* çerez/site-verisi engelli olabilir — yoksay */
+    }
     const start = saved ? LEVELS.indexOf(saved) : 1;
     if (start >= 0) setIdx(start);
   }, []);

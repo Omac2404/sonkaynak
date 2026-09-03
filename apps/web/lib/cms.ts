@@ -416,7 +416,13 @@ export async function getVitrin(): Promise<{ category: Category; featured?: News
       if (!s.category) continue;
       const list = await getNewsByCategory(s.category.id, 1, 5);
       const featuredId = (s.pinnedNews as any)?.id ?? (s.pinnedNews as any) ?? null;
-      const featured = list.docs.find((n) => n.id === featuredId) ?? list.docs[0];
+      let featured = featuredId ? list.docs.find((n) => n.id === featuredId) : undefined;
+      // Sabitlenen haber son 5'te değilse ayrıca id ile çek (yayında değilse null döner → yoksay)
+      if (featuredId && !featured) {
+        const pinned = await cms<News>(`/api/news/${featuredId}?depth=1`, 60);
+        if (pinned && pinned.id) featured = pinned;
+      }
+      if (!featured) featured = list.docs[0];
       const rest = list.docs.filter((n) => n.id !== featured?.id).slice(0, 4);
       out.push({ category: s.category, featured, rest });
     }
