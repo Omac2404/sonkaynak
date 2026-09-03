@@ -19,10 +19,30 @@ export const Media: CollectionConfig = {
   upload: {
     staticDir: "media",
     mimeTypes: ["image/*"],
+    // Ana dosyayı da WebP'ye çevir + sıkıştır (daha küçük dosya, daha hızlı site)
+    formatOptions: { format: "webp", options: { quality: 82 } },
     imageSizes: [
-      { name: "thumbnail", width: 400, height: 300, position: "centre" },
-      { name: "card", width: 768, height: 512, position: "centre" },
-      { name: "feature", width: 1200, height: 675, position: "centre" },
+      {
+        name: "thumbnail",
+        width: 400,
+        height: 300,
+        position: "centre",
+        formatOptions: { format: "webp", options: { quality: 80 } },
+      },
+      {
+        name: "card",
+        width: 768,
+        height: 512,
+        position: "centre",
+        formatOptions: { format: "webp", options: { quality: 80 } },
+      },
+      {
+        name: "feature",
+        width: 1200,
+        height: 675,
+        position: "centre",
+        formatOptions: { format: "webp", options: { quality: 82 } },
+      },
     ],
   },
   fields: [
