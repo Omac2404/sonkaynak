@@ -76,11 +76,75 @@ function Cell({ col, row }: { col: any; row: any }) {
     case "rel":
       return <span className="text-sm text-neutral-600">{v && typeof v === "object" ? v[col.relField] : "—"}</span>;
     default:
-      return <span className="text-sm font-medium text-ink">{v ?? "—"}</span>;
+      return <span className="line-clamp-2 max-w-[440px] text-sm font-medium text-ink">{v ?? "—"}</span>;
   }
 }
 
 const STATUS_SLUGS = new Set(["news", "ilanlar", "firmalar", "galeriler"]);
+
+/** Satır işlem butonları (Pasife Al / Düzenle / Sil) — tablo ve mobil kart paylaşır. */
+function RowActions({
+  row,
+  resourceKey,
+  slug,
+  isNews,
+  canManage,
+}: {
+  row: any;
+  resourceKey: string;
+  slug: string;
+  isNews: boolean;
+  canManage: boolean;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {isNews && canManage && (
+        <form action={togglePublish}>
+          <input type="hidden" name="id" value={row.id} />
+          <input type="hidden" name="back" value={`/${resourceKey}`} />
+          <input type="hidden" name="next" value={row._status === "published" ? "draft" : "published"} />
+          <button
+            type="submit"
+            className={`rounded-md border px-2.5 py-1 text-xs font-bold transition ${
+              row._status === "published"
+                ? "border-neutral-200 text-neutral-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700"
+                : "border-green-300 bg-green-50 text-green-700 hover:bg-green-100"
+            }`}
+            title={row._status === "published" ? "Yayından kaldır (pasife al)" : "Yayına al"}
+          >
+            {row._status === "published" ? "Pasife Al" : "Yayına Al"}
+          </button>
+        </form>
+      )}
+      <a
+        href={`/${resourceKey}/${row.id}`}
+        className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-600 hover:border-sk-red hover:text-sk-red"
+      >
+        Düzenle
+      </a>
+      {canManage && (
+        <form action={deleteResource}>
+          <input type="hidden" name="slug" value={slug} />
+          <input type="hidden" name="id" value={row.id} />
+          <input type="hidden" name="back" value={`/${resourceKey}`} />
+          <ConfirmSubmit
+            message="Bu kaydı silmek istediğinize emin misiniz?"
+            className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red"
+          >
+            Sil
+          </ConfirmSubmit>
+        </form>
+      )}
+    </div>
+  );
+}
+
+/** Mobil kartta başlık metni (rel ise ilişki alanından). */
+function titleText(col: any, row: any): string {
+  const v = row[col.key];
+  if (col?.type === "rel") return v && typeof v === "object" ? v[col.relField] : "—";
+  return v != null && v !== "" ? String(v) : "—";
+}
 
 export async function ResourceListView({
   resourceKey,
@@ -100,6 +164,11 @@ export async function ResourceListView({
   const term = (search ?? "").trim();
   const hasStatus = STATUS_SLUGS.has(cfg.slug);
   const isNews = cfg.slug === "news";
+
+  // Mobil kart için kolonları ayır: görsel / başlık / diğerleri
+  const imageCol = cfg.columns.find((c) => c.type === "image");
+  const titleCol = cfg.columns.find((c) => c.type === "text" || c.type === "rel");
+  const metaCols = cfg.columns.filter((c) => c !== imageCol && c !== titleCol);
 
   let q = `/${cfg.slug}?limit=100&depth=${cfg.depth ?? 0}${cfg.sort ? `&sort=${cfg.sort}` : ""}`;
   if (term && sf) q += `&where[${sf}][like]=${encodeURIComponent(term)}`;
@@ -172,7 +241,8 @@ export async function ResourceListView({
         </div>
       </div>
 
-      <div className="sk-card overflow-hidden">
+      {/* ── Masaüstü tablo ── */}
+      <div className="sk-card hidden overflow-hidden lg:block">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-line bg-neutral-50/60">
@@ -206,41 +276,8 @@ export async function ResourceListView({
                     </td>
                   ))}
                   <td className="px-4 py-2.5">
-                    <div className="flex items-center justify-end gap-1.5">
-                      {isNews && canManage && (
-                        <form action={togglePublish}>
-                          <input type="hidden" name="id" value={row.id} />
-                          <input type="hidden" name="back" value={`/${resourceKey}`} />
-                          <input type="hidden" name="next" value={row._status === "published" ? "draft" : "published"} />
-                          <button
-                            type="submit"
-                            className={`rounded-md border px-2.5 py-1 text-xs font-bold transition ${
-                              row._status === "published"
-                                ? "border-neutral-200 text-neutral-500 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700"
-                                : "border-green-300 bg-green-50 text-green-700 hover:bg-green-100"
-                            }`}
-                            title={row._status === "published" ? "Yayından kaldır (pasife al)" : "Yayına al"}
-                          >
-                            {row._status === "published" ? "Pasife Al" : "Yayına Al"}
-                          </button>
-                        </form>
-                      )}
-                      <a href={`/${resourceKey}/${row.id}`} className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-600 hover:border-sk-red hover:text-sk-red">
-                        Düzenle
-                      </a>
-                      {canManage && (
-                        <form action={deleteResource}>
-                          <input type="hidden" name="slug" value={cfg.slug} />
-                          <input type="hidden" name="id" value={row.id} />
-                          <input type="hidden" name="back" value={`/${resourceKey}`} />
-                          <ConfirmSubmit
-                            message="Bu kaydı silmek istediğinize emin misiniz?"
-                            className="rounded-md border border-neutral-200 px-2.5 py-1 text-xs font-bold text-neutral-500 hover:border-red-300 hover:bg-red-50 hover:text-sk-red"
-                          >
-                            Sil
-                          </ConfirmSubmit>
-                        </form>
-                      )}
+                    <div className="flex justify-end">
+                      <RowActions row={row} resourceKey={resourceKey} slug={cfg.slug} isNews={isNews} canManage={canManage} />
                     </div>
                   </td>
                 </tr>
@@ -248,6 +285,48 @@ export async function ResourceListView({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* ── Mobil kart listesi ── */}
+      <div className="sk-card divide-y divide-neutral-100 overflow-hidden lg:hidden">
+        {rows.length === 0 ? (
+          <div className="px-4 py-12 text-center text-sm text-neutral-400">Kayıt bulunamadı.</div>
+        ) : (
+          rows.map((row) => {
+            const imgSrc = imageCol ? mediaUrl(row[imageCol.key], "thumbnail") : undefined;
+            return (
+              <div key={row.id} className="flex gap-3 p-3.5">
+                {canManage && (
+                  <input type="checkbox" name="ids" value={row.id} form="bulkDel" className="mt-1 h-4 w-4 shrink-0 accent-sk-red" />
+                )}
+                {imageCol &&
+                  (imgSrc ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={imgSrc} alt="" className="h-16 w-20 shrink-0 rounded-md object-cover" />
+                  ) : (
+                    <div className="grid h-16 w-20 shrink-0 place-items-center rounded-md bg-neutral-100 text-neutral-300">—</div>
+                  ))}
+                <div className="min-w-0 flex-1">
+                  {titleCol && (
+                    <a href={`/${resourceKey}/${row.id}`} className="line-clamp-2 text-[15px] font-bold leading-snug text-ink">
+                      {titleText(titleCol, row)}
+                    </a>
+                  )}
+                  <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
+                    {metaCols.map((c) => (
+                      <span key={c.key} className="inline-flex items-center gap-1">
+                        <Cell col={c} row={row} />
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-2.5">
+                    <RowActions row={row} resourceKey={resourceKey} slug={cfg.slug} isNews={isNews} canManage={canManage} />
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );
