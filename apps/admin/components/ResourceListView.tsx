@@ -3,6 +3,9 @@ import { pf, getMe } from "@/lib/payload";
 import { mediaUrl, fmtDate } from "@/lib/media";
 import { deleteResource, bulkDeleteResource, togglePublish } from "@/lib/actions";
 import { ConfirmSubmit } from "./ConfirmSubmit";
+import { NewsShare } from "./NewsShare";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sonkaynak.com";
 
 const SEARCH_FIELD: Record<string, string> = {
   news: "title",
@@ -98,6 +101,9 @@ function RowActions({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
+      {isNews && row.slug && row._status === "published" && (
+        <NewsShare compact url={`${SITE_URL}/haber/${row.slug}`} title={row.title ?? ""} />
+      )}
       {isNews && canManage && (
         <form action={togglePublish}>
           <input type="hidden" name="id" value={row.id} />

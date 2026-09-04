@@ -7,6 +7,9 @@ import { ImageField } from "../ImageField";
 import { saveNews } from "@/lib/actions";
 import { lexicalToHtml } from "@/lib/lexical";
 import { computeSeo, seoColor } from "@/lib/seo";
+import { NewsShare } from "../NewsShare";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sonkaynak.com";
 
 type Opt = { id: number; label: string };
 
@@ -165,6 +168,21 @@ export function NewsForm({
               Son Dakika <span className="font-normal text-neutral-400">— kartlarda kırmızı rozet</span>
             </span>
           </label>
+
+          {/* Sosyal medyada paylaş (kaydedilmiş haber) */}
+          {news?.slug && (
+            <div className="rounded-xl border border-neutral-200 bg-white p-4">
+              <div className="mb-2.5 flex items-center gap-2">
+                <span className="text-sm font-bold text-ink">Sosyal Medyada Paylaş</span>
+              </div>
+              {news?._status !== "published" && (
+                <p className="mb-2.5 rounded-md bg-amber-50 px-2.5 py-1.5 text-[11px] font-semibold text-amber-700">
+                  Bu haber henüz yayında değil; bağlantı yayınlandıktan sonra çalışır.
+                </p>
+              )}
+              <NewsShare url={`${SITE_URL}/haber/${news.slug}`} title={news.title ?? title} />
+            </div>
+          )}
 
           {/* Hikayelere ekle (yalnızca editör/yayınlayabilenler) */}
           {canPublish && (
