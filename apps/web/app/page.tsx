@@ -89,6 +89,10 @@ export default async function HomePage() {
   const sliderItems = sliderPool.slice(0, 19);
   // Yan kartlar: slider'da olmayan en yeni haberler (slider kısaldı → daha fazla)
   const sideList = latest.filter((n) => !sliderItems.some((s) => s.id === n.id)).slice(0, 7);
+  // Slider altı yatay kartlar: slider ve yan listede olmayanlar
+  const underSlider = latest
+    .filter((n) => !sliderItems.some((s) => s.id === n.id) && !sideList.some((s) => s.id === n.id))
+    .slice(0, 3);
   // Sıcak Gündem: kürasyon boşsa en yeni haberlerle doldur
   const sicakItems = (sicak.length ? sicak : latest).slice(0, 3);
 
@@ -127,8 +131,39 @@ export default async function HomePage() {
 
       {/* Manşet slider (sol) + yan kartlar (sağ) */}
       {sliderItems.length > 0 && (
-        <section className="grid gap-5 lg:grid-cols-[1fr_380px]">
-          <MansetSlider items={sliderItems} />
+        <section className="grid gap-5 lg:grid-cols-[1fr_380px] lg:items-start">
+          <div className="space-y-4">
+            <MansetSlider items={sliderItems} />
+            {underSlider.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {underSlider.map((n) => {
+                  const img = mediaUrl(n.coverImage, "thumbnail");
+                  return (
+                    <a
+                      key={n.id}
+                      href={newsUrl(n)}
+                      className="group flex gap-2.5 rounded-lg border border-sk-line bg-white p-2.5 transition hover:shadow-md"
+                    >
+                      {img ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={img} alt="" loading="lazy" className="h-14 w-20 shrink-0 rounded-md object-cover" />
+                      ) : (
+                        <div className="h-14 w-20 shrink-0 rounded-md bg-neutral-100" />
+                      )}
+                      <div className="min-w-0">
+                        {n.category && (
+                          <span className="text-[10px] font-extrabold uppercase tracking-wide text-sk-red">{n.category.name}</span>
+                        )}
+                        <h3 className="mt-0.5 line-clamp-2 text-[13px] font-bold leading-snug text-sk-ink transition group-hover:text-sk-red">
+                          {n.title}
+                        </h3>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </div>
           <aside className="flex flex-col divide-y divide-sk-line overflow-hidden rounded-lg border border-sk-line">
             {sideList.map((n) => (
               <SideCard key={n.id} news={n} />
