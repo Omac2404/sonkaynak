@@ -73,7 +73,7 @@ export function Shell({ user, perms, children }: { user: User; perms: string[]; 
           </div>
         </header>
 
-        <main className="flex-1 p-5 lg:p-8">{children}</main>
+        <main className="flex-1 overflow-x-hidden p-5 lg:p-8">{children}</main>
       </div>
       <Suspense fallback={null}>
         <Toaster />

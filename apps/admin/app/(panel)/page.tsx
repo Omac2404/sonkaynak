@@ -103,16 +103,16 @@ export default async function Dashboard() {
       {/* Son 14 gün yayın trendi */}
       <section className="sk-card p-5">
         <h2 className="mb-4 text-[15px] font-extrabold tracking-tight text-ink">Son 14 Gün — Yayınlanan Haber</h2>
-        <div className="flex items-end gap-1.5" style={{ height: 120 }}>
+        <div className="flex items-end gap-1 overflow-hidden" style={{ height: 120 }}>
           {days.map((d) => (
-            <div key={d.key} className="group flex flex-1 flex-col items-center justify-end gap-1">
+            <div key={d.key} className="group flex min-w-0 flex-1 flex-col items-center justify-end gap-1">
               <span className="text-[10px] font-bold text-neutral-400 opacity-0 group-hover:opacity-100">{d.count}</span>
               <div
                 className="w-full rounded-t bg-sk-red/80 transition hover:bg-sk-red"
                 style={{ height: `${Math.max(4, (d.count / maxCount) * 96)}px` }}
                 title={`${d.label}: ${d.count}`}
               />
-              <span className="text-[9px] text-neutral-400">{d.label}</span>
+              <span className="text-[9px] text-neutral-400" title={d.label}>{d.label.slice(0, 2)}</span>
             </div>
           ))}
         </div>
