@@ -147,21 +147,21 @@ export function GridCard({ news }: { news: News }) {
           {src && <MediaBadge />}
           <Cover src={src} alt={news.title} className="aspect-[16/9] w-full object-cover" />
         </div>
-        <div className="p-3">
-          <h3 className="line-clamp-3 text-[15px] font-bold leading-tight text-sk-ink transition group-hover:text-sk-red">
+        <div className="p-2.5">
+          <h3 className="line-clamp-3 text-[13.5px] font-bold leading-snug text-sk-ink transition group-hover:text-sk-red">
             {news.title}
           </h3>
           {news.category && (
-            <span className="mt-2 inline-block text-[11px] font-extrabold uppercase tracking-wide text-sk-red">
+            <span className="mt-1.5 inline-block text-[10px] font-extrabold uppercase tracking-wide text-sk-red">
               #{news.category.name}
             </span>
           )}
           {news.excerpt && (
-            <p className="line-clamp-2 max-h-0 overflow-hidden text-[12.5px] leading-snug text-neutral-500 opacity-0 transition-all duration-300 group-hover:mt-2 group-hover:max-h-16 group-hover:opacity-100">
+            <p className="line-clamp-2 max-h-0 overflow-hidden text-[12px] leading-snug text-neutral-500 opacity-0 transition-all duration-300 group-hover:mt-1.5 group-hover:max-h-16 group-hover:opacity-100">
               {news.excerpt}
             </p>
           )}
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[11px] text-neutral-400">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 text-[10.5px] text-neutral-400">
             {news.author && <span className="font-semibold text-neutral-500">{authorName(news.author)}</span>}
             {news.author && <span>·</span>}
             <span>{timeAgo(news.publishedAt ?? news.createdAt)}</span>

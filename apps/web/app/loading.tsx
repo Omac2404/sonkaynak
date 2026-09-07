@@ -19,7 +19,7 @@ export default function Loading() {
           ))}
         </div>
       </div>
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-12 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="overflow-hidden rounded-xl border border-sk-line">
             <div className="aspect-[16/9] w-full bg-neutral-200" />

@@ -166,7 +166,7 @@ export default async function HomePage() {
       {gozden.length > 0 && (
         <section className="mt-8">
           <SectionTitle>Gözden Kaçmasın</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             {gozden.slice(0, 10).map((n) => (
               <GridCard key={n.id} news={n} />
             ))}
@@ -182,7 +182,7 @@ export default async function HomePage() {
         <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start">
           <div>
             <SectionTitle>Son Haberler</SectionTitle>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
               {latest.slice(0, 12).map((n) => (
                 <GridCard key={n.id} news={n} />
               ))}
@@ -202,7 +202,7 @@ export default async function HomePage() {
           <SectionTitle href={categoryUrl(cat)} color={categoryColor(cat)}>
             {cat.name}
           </SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-5">
             {items.map((n) => (
               <GridCard key={n.id} news={n} />
             ))}
@@ -214,7 +214,7 @@ export default async function HomePage() {
       {secmece.length > 0 && (
         <section className="mt-8">
           <SectionTitle>Seçmece Haberler</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             {secmece.slice(0, 10).map((n) => (
               <GridCard key={n.id} news={n} />
             ))}
@@ -234,7 +234,7 @@ export default async function HomePage() {
       {ozel.length > 0 && (
         <section className="mt-8">
           <SectionTitle>Özel Haberler</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {ozel.slice(0, 8).map((n) => (
               <GridCard key={n.id} news={n} />
             ))}
@@ -246,7 +246,7 @@ export default async function HomePage() {
       {galeriler.length > 0 && (
         <section className="mt-8">
           <SectionTitle href="/galeri">Foto Galeri</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {galeriler.map((g) => {
               const cover = mediaUrl(g.cover, "card");
               return (
@@ -279,7 +279,7 @@ export default async function HomePage() {
       {ilanlar.length > 0 && (
         <section className="mt-8">
           <SectionTitle href="/ilanlar">Resmî İlanlar</SectionTitle>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {ilanlar.map((il) => {
               const cover = mediaUrl(il.coverImage, "card");
               return (

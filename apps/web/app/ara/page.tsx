@@ -38,7 +38,7 @@ export default async function AraPage({ searchParams }: Props) {
           {result.hits.length === 0 ? (
             <p className="py-12 text-center text-sk-muted">Sonuç bulunamadı.</p>
           ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
               {result.hits.map((h) => (
                 <GridCard key={h.id} news={hitToNews(h)} />
               ))}

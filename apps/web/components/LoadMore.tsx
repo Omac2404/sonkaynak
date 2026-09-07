@@ -29,7 +29,7 @@ export function LoadMore({ categoryId, totalPages, sort = "-publishedAt" }: { ca
   return (
     <>
       {items.length > 0 && (
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {items.map((n) => (
             <GridCard key={n.id} news={n} />
           ))}

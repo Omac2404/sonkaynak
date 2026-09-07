@@ -34,7 +34,7 @@ export default async function TumKategoriler() {
                   Tümü →
                 </a>
               </div>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
                 {news.map((n) => (
                   <GridCard key={n.id} news={n} />
                 ))}
