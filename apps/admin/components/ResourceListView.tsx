@@ -195,15 +195,15 @@ export async function ResourceListView({
           <h1 className="text-2xl font-black tracking-tight text-ink">{cfg.title}</h1>
           <p className="mt-0.5 text-sm text-neutral-400">{res.data?.totalDocs ?? rows.length} kayıt</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
           {(sf || hasStatus) && (
-            <form action={`/${resourceKey}`} className="flex flex-wrap items-center gap-1.5">
+            <form action={`/${resourceKey}`} className="flex w-full flex-wrap items-center gap-1.5 sm:w-auto">
               {sf && (
                 <input
                   name="q"
                   defaultValue={term}
                   placeholder="Ara…"
-                  className="rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-sk-red focus:ring-2 focus:ring-sk-red/10"
+                  className="min-w-0 flex-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-sk-red focus:ring-2 focus:ring-sk-red/10 sm:w-56 sm:flex-none"
                 />
               )}
               {hasStatus && (
