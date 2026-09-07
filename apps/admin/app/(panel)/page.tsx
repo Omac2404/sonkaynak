@@ -188,12 +188,12 @@ function Empty({ children }: { children: React.ReactNode }) {
 
 function List({ items }: { items: { href: string; title: string; meta: string }[] }) {
   return (
-    <ul className="-mx-2">
+    <ul>
       {items.map((it, i) => (
         <li key={i}>
           <a href={it.href} className="block rounded-lg px-2 py-2.5 transition hover:bg-neutral-50">
-            <div className="truncate text-sm font-semibold text-ink">{it.title}</div>
-            <div className="mt-0.5 text-[11.5px] text-neutral-400">{it.meta}</div>
+            <div className="line-clamp-2 break-words text-sm font-semibold text-ink">{it.title}</div>
+            <div className="mt-0.5 break-words text-[11.5px] text-neutral-400">{it.meta}</div>
           </a>
         </li>
       ))}

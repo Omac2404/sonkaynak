@@ -29,7 +29,7 @@ export function Shell({ user, perms, children }: { user: User; perms: string[]; 
     <div className="flex min-h-screen">
       <Sidebar open={open} onClose={() => setOpen(false)} perms={perms} />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 max-w-full flex-1 flex-col">
         {/* Topbar */}
         <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line bg-white/80 px-4 backdrop-blur-md lg:px-7">
           <button
