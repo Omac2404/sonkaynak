@@ -24,7 +24,7 @@ export function MansetSlider({ items }: { items: News[] }) {
     <div>
       <a
         href={newsUrl(n)}
-        className="group relative block aspect-[16/10] overflow-hidden rounded-lg bg-neutral-800 sm:aspect-[16/9]"
+        className="group relative block aspect-[16/9] overflow-hidden rounded-lg bg-neutral-800 sm:aspect-[16/8]"
       >
         {src && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -36,7 +36,7 @@ export function MansetSlider({ items }: { items: News[] }) {
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-8">
+        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
           {n.category && (
             <span
               className="inline-block rounded px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white"
@@ -45,7 +45,7 @@ export function MansetSlider({ items }: { items: News[] }) {
               {n.category.name}
             </span>
           )}
-          <h2 className="mt-2.5 line-clamp-3 text-2xl font-black leading-tight text-white drop-shadow-sm sm:text-[34px] md:text-[40px]">
+          <h2 className="mt-2 line-clamp-2 text-xl font-black leading-tight text-white drop-shadow-sm sm:text-[26px] md:text-[32px]">
             {n.title}
           </h2>
           {n.excerpt && (

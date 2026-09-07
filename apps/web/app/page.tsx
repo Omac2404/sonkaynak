@@ -61,7 +61,7 @@ export default async function HomePage() {
     await Promise.all([
       getManset(),
       getSicakGundem(),
-      getLatestNews(24),
+      getLatestNews(30),
       getVitrin(),
       getGaleriler(4),
       getIlanlar(4),
@@ -87,8 +87,8 @@ export default async function HomePage() {
     if (!sliderPool.some((p) => p.id === n.id)) sliderPool.push(n);
   }
   const sliderItems = sliderPool.slice(0, 19);
-  // Yan kartlar: slider'da olmayan en yeni haberler
-  const sideList = latest.filter((n) => !sliderItems.some((s) => s.id === n.id)).slice(0, 5);
+  // Yan kartlar: slider'da olmayan en yeni haberler (slider kısaldı → daha fazla)
+  const sideList = latest.filter((n) => !sliderItems.some((s) => s.id === n.id)).slice(0, 7);
   // Sıcak Gündem: kürasyon boşsa en yeni haberlerle doldur
   const sicakItems = (sicak.length ? sicak : latest).slice(0, 3);
 
