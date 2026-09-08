@@ -8,6 +8,7 @@ import { CookieBanner } from "@/components/CookieBanner";
 import { FinanceTicker } from "@/components/FinanceTicker";
 import { SonDakikaBar } from "@/components/SonDakikaBar";
 import { AdSlot } from "@/components/AdSlot";
+import { StickyTopAd } from "@/components/StickyTopAd";
 import { getSettings, getSonDakika, getAds, mediaUrl } from "@/lib/cms";
 import { getFinanceView } from "@/lib/finance";
 
@@ -101,9 +102,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Header />
         <SonDakikaBar items={sonDakika} />
         {headerAds.length > 0 && (
-          <div className="mx-auto max-w-[980px] px-3 py-4 sm:px-4">
-            <AdSlot ads={headerAds} variant="banner" intervalSec={s.adRotateSeconds ?? 7} />
-          </div>
+          <>
+            <div className="mx-auto max-w-[980px] px-3 py-4 sm:px-4">
+              <AdSlot ads={headerAds} variant="banner" intervalSec={s.adRotateSeconds ?? 7} />
+            </div>
+            <StickyTopAd ads={headerAds} intervalSec={s.adRotateSeconds ?? 7} />
+          </>
         )}
         <main className="min-h-screen">{children}</main>
         <Footer />
