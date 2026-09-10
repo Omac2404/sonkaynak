@@ -12,15 +12,15 @@ function AccordionSection({ title, links, onNavigate }: { title: string; links: 
   const [open, setOpen] = useState(false);
   if (!links.length) return null;
   return (
-    <div className="mt-1 border-t border-sk-line pt-1">
+    <div>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-[13px] font-extrabold uppercase tracking-wide text-sk-muted transition hover:bg-neutral-50"
+        className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-[16px] font-extrabold uppercase text-sk-ink transition hover:bg-neutral-50"
       >
         {title}
-        <span className={`text-xl font-bold leading-none text-sk-red transition-transform ${open ? "rotate-45" : ""}`}>+</span>
+        <span className={`text-2xl font-bold leading-none text-sk-red transition-transform ${open ? "rotate-45" : ""}`}>+</span>
       </button>
       {open && (
         <div className="pb-1">
@@ -29,7 +29,7 @@ function AccordionSection({ title, links, onNavigate }: { title: string; links: 
               key={l.href}
               href={l.href}
               onClick={onNavigate}
-              className="block rounded-lg px-6 py-2.5 text-[14.5px] font-semibold text-sk-ink transition hover:bg-neutral-50"
+              className="block rounded-lg px-6 py-2.5 text-[14px] font-bold uppercase text-neutral-600 transition hover:bg-neutral-50 hover:text-sk-red"
             >
               {l.label}
             </a>
@@ -82,12 +82,12 @@ export function MobileNav({
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between border-b border-sk-line px-4 py-4">
+        <div className="relative flex items-center justify-center border-b border-sk-line px-4 py-4">
           <Logo className="h-9 w-auto" />
           <button
             onClick={() => setOpen(false)}
             aria-label="Kapat"
-            className="grid h-9 w-9 place-items-center rounded-lg text-sk-muted transition hover:bg-neutral-100"
+            className="absolute right-3 grid h-9 w-9 place-items-center rounded-lg text-sk-muted transition hover:bg-neutral-100"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <path d="M18 6 6 18M6 6l12 12" />
@@ -117,7 +117,7 @@ export function MobileNav({
           <a
             href="/"
             onClick={() => setOpen(false)}
-            className="block rounded-lg px-3 py-3 text-[16px] font-extrabold text-sk-ink transition hover:bg-neutral-50"
+            className="block rounded-lg px-3 py-3 text-[16px] font-extrabold uppercase text-sk-ink transition hover:bg-neutral-50"
           >
             Anasayfa
           </a>
@@ -126,7 +126,7 @@ export function MobileNav({
               key={c.id}
               href={`/kategori/${c.slug}`}
               onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-3 text-[16px] font-extrabold capitalize text-sk-ink transition hover:bg-neutral-50"
+              className="block rounded-lg px-3 py-3 text-[16px] font-extrabold uppercase text-sk-ink transition hover:bg-neutral-50"
             >
               {c.name}
             </a>
