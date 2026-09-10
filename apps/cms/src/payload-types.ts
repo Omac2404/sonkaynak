@@ -76,6 +76,8 @@ export interface Config {
     galeriler: Galeriler;
     stories: Story;
     vefat: Vefat;
+    reklamlar: Reklamlar;
+    'ajans-kaynaklari': AjansKaynaklari;
     media: Media;
     roles: Role;
     users: User;
@@ -95,6 +97,8 @@ export interface Config {
     galeriler: GalerilerSelect<false> | GalerilerSelect<true>;
     stories: StoriesSelect<false> | StoriesSelect<true>;
     vefat: VefatSelect<false> | VefatSelect<true>;
+    reklamlar: ReklamlarSelect<false> | ReklamlarSelect<true>;
+    'ajans-kaynaklari': AjansKaynaklariSelect<false> | AjansKaynaklariSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     roles: RolesSelect<false> | RolesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -112,6 +116,8 @@ export interface Config {
     'sicak-gundem': SicakGundem;
     secmece: Secmece;
     ozel: Ozel;
+    'gozden-kacmasin': GozdenKacmasin;
+    'bugun-neler-oldu': BugunNelerOldu;
     vitrin: Vitrin;
     'ana-menu': AnaMenu;
     ticker: Ticker;
@@ -122,6 +128,8 @@ export interface Config {
     'sicak-gundem': SicakGundemSelect<false> | SicakGundemSelect<true>;
     secmece: SecmeceSelect<false> | SecmeceSelect<true>;
     ozel: OzelSelect<false> | OzelSelect<true>;
+    'gozden-kacmasin': GozdenKacmasinSelect<false> | GozdenKacmasinSelect<true>;
+    'bugun-neler-oldu': BugunNelerOlduSelect<false> | BugunNelerOlduSelect<true>;
     vitrin: VitrinSelect<false> | VitrinSelect<true>;
     'ana-menu': AnaMenuSelect<false> | AnaMenuSelect<true>;
     ticker: TickerSelect<false> | TickerSelect<true>;
@@ -167,6 +175,10 @@ export interface News {
    */
   slug?: string | null;
   /**
+   * Kartlarda kırmızı SON DAKİKA rozeti gösterir.
+   */
+  sonDakika?: boolean | null;
+  /**
    * 1-2 cümle. Liste ve OG açıklamasında kullanılır.
    */
   excerpt?: string | null;
@@ -201,6 +213,14 @@ export interface News {
    */
   seoScore?: number | null;
   sourceUrl?: string | null;
+  /**
+   * Ajanstan otomatik çekilen haberlerde ajans adı.
+   */
+  sourceName?: string | null;
+  /**
+   * Aynı ajans haberini iki kez almamak için.
+   */
+  sourceGuid?: string | null;
   category: number | Category;
   tags?: (number | Tag)[] | null;
   author?: (number | null) | Author;
@@ -474,6 +494,50 @@ export interface Vefat {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reklamlar".
+ */
+export interface Reklamlar {
+  id: number;
+  name: string;
+  image: number | Media;
+  targetUrl?: string | null;
+  placement?: ('header' | 'sidebar' | 'in-article') | null;
+  active?: boolean | null;
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ajans-kaynaklari".
+ */
+export interface AjansKaynaklari {
+  id: number;
+  name: string;
+  code: string;
+  /**
+   * Bilgiler girilip aktif edilene kadar çekim yapılmaz.
+   */
+  active?: boolean | null;
+  feedUrl?: string | null;
+  username?: string | null;
+  password?: string | null;
+  apiKey?: string | null;
+  /**
+   * Çekilen haberler bu kategoriye eklenir (zorunlu).
+   */
+  category?: (number | null) | Category;
+  /**
+   * Kapalıysa haberler taslak gelir; editör onaylayıp yayınlar.
+   */
+  autoPublish?: boolean | null;
+  lastFetchedAt?: string | null;
+  lastStatus?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -531,6 +595,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'vefat';
         value: number | Vefat;
+      } | null)
+    | ({
+        relationTo: 'reklamlar';
+        value: number | Reklamlar;
+      } | null)
+    | ({
+        relationTo: 'ajans-kaynaklari';
+        value: number | AjansKaynaklari;
       } | null)
     | ({
         relationTo: 'media';
@@ -593,6 +665,7 @@ export interface PayloadMigration {
 export interface NewsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  sonDakika?: T;
   excerpt?: T;
   content?: T;
   body?: T;
@@ -604,6 +677,8 @@ export interface NewsSelect<T extends boolean = true> {
       };
   seoScore?: T;
   sourceUrl?: T;
+  sourceName?: T;
+  sourceGuid?: T;
   category?: T;
   tags?: T;
   author?: T;
@@ -738,6 +813,39 @@ export interface VefatSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reklamlar_select".
+ */
+export interface ReklamlarSelect<T extends boolean = true> {
+  name?: T;
+  image?: T;
+  targetUrl?: T;
+  placement?: T;
+  active?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ajans-kaynaklari_select".
+ */
+export interface AjansKaynaklariSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  active?: T;
+  feedUrl?: T;
+  username?: T;
+  password?: T;
+  apiKey?: T;
+  category?: T;
+  autoPublish?: T;
+  lastFetchedAt?: T;
+  lastStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -931,6 +1039,36 @@ export interface Ozel {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gozden-kacmasin".
+ */
+export interface GozdenKacmasin {
+  id: number;
+  items?:
+    | {
+        news: number | News;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bugun-neler-oldu".
+ */
+export interface BugunNelerOldu {
+  id: number;
+  items?:
+    | {
+        tag: number | Tag;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "vitrin".
  */
 export interface Vitrin {
@@ -995,6 +1133,10 @@ export interface SiteSetting {
   siteDescription?: string | null;
   logo?: (number | null) | Media;
   defaultCategory?: string | null;
+  /**
+   * Aynı konumda birden fazla reklam varsa kaç saniyede bir değişsin.
+   */
+  adRotateSeconds?: number | null;
   twitter?: string | null;
   facebook?: string | null;
   instagram?: string | null;
@@ -1002,6 +1144,20 @@ export interface SiteSetting {
   linkedin?: string | null;
   gaId?: string | null;
   gscVerify?: string | null;
+  financeEnabled?: boolean | null;
+  /**
+   * Canlı veri kaynağı çökerse buraya elle değer girin (yalnızca sayı, ör. 48.24). Boş bırakılan alan canlı veriden gelir.
+   */
+  financeOverride?: {
+    usd?: string | null;
+    eur?: string | null;
+    gbp?: string | null;
+    gold?: string | null;
+    goldOz?: string | null;
+    bist?: string | null;
+    btc?: string | null;
+    eth?: string | null;
+  };
   footerAbout?: string | null;
   footerCopyright?: string | null;
   footerColumns?:
@@ -1082,6 +1238,36 @@ export interface OzelSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gozden-kacmasin_select".
+ */
+export interface GozdenKacmasinSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        news?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bugun-neler-oldu_select".
+ */
+export interface BugunNelerOlduSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        tag?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "vitrin_select".
  */
 export interface VitrinSelect<T extends boolean = true> {
@@ -1145,6 +1331,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   siteDescription?: T;
   logo?: T;
   defaultCategory?: T;
+  adRotateSeconds?: T;
   twitter?: T;
   facebook?: T;
   instagram?: T;
@@ -1152,6 +1339,19 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   linkedin?: T;
   gaId?: T;
   gscVerify?: T;
+  financeEnabled?: T;
+  financeOverride?:
+    | T
+    | {
+        usd?: T;
+        eur?: T;
+        gbp?: T;
+        gold?: T;
+        goldOz?: T;
+        bist?: T;
+        btc?: T;
+        eth?: T;
+      };
   footerAbout?: T;
   footerCopyright?: T;
   footerColumns?:

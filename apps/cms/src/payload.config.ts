@@ -22,7 +22,9 @@ import { Galeriler } from "./collections/Galeriler";
 import { Stories } from "./collections/Stories";
 import { Vefat } from "./collections/Vefat";
 import { Reklamlar } from "./collections/Reklamlar";
+import { AjansKaynaklari } from "./collections/AjansKaynaklari";
 import { Roles } from "./collections/Roles";
+import { runIngest } from "./ingest";
 
 // Sistem rolleri (varsayılan izinler)
 const SYSTEM_ROLES = [
@@ -111,6 +113,7 @@ export default buildConfig({
     Stories,
     Vefat,
     Reklamlar,
+    AjansKaynaklari,
     Media,
     Roles,
     Users,
@@ -188,5 +191,53 @@ export default buildConfig({
     } catch (e) {
       payload.logger.warn(`İlk admin oluşturulamadı: ${(e as Error).message}`);
     }
+
+    // 3) Haber ajansı kaynaklarını garanti et (boş/pasif; sahibi bilgi girip aktif edecek)
+    const AGENCIES = [
+      { code: "iha", name: "İHA (İhlas Haber Ajansı)" },
+      { code: "aa", name: "AA (Anadolu Ajansı)" },
+      { code: "dha", name: "DHA (Demirören Haber Ajansı)" },
+      { code: "anka", name: "ANKA Haber Ajansı" },
+    ];
+    for (const a of AGENCIES) {
+      try {
+        const ex = await payload.find({ collection: "ajans-kaynaklari", where: { code: { equals: a.code } }, limit: 1 });
+        if (!ex.docs.length) {
+          await payload.create({ collection: "ajans-kaynaklari", data: { ...a, active: false, autoPublish: false } as any });
+        }
+      } catch {
+        /* tablo henüz hazır değilse yoksay */
+      }
+    }
+
+    // 4) Ajans çekimi: 30 dakikada bir (yalnız aktif + bilgisi dolu kaynaklar çalışır)
+    if (process.env.INGEST_DISABLED !== "true") {
+      const THIRTY_MIN = 30 * 60 * 1000;
+      const tick = () => {
+        runIngest(payload)
+          .then((r) => {
+            if (r.created) payload.logger.info(`[ingest] ${r.created} haber çekildi`);
+            if (r.errors.length) payload.logger.warn(`[ingest] hatalar: ${r.errors.join(" | ")}`);
+          })
+          .catch((e) => payload.logger.warn(`[ingest] başarısız: ${(e as Error).message}`));
+      };
+      setTimeout(tick, 90_000); // açılıştan 90 sn sonra ilk çekim
+      setInterval(tick, THIRTY_MIN);
+    }
   },
+
+  endpoints: [
+    {
+      path: "/ingest/run",
+      method: "post",
+      handler: async (req: any) => {
+        // Yalnız admin manuel tetikleyebilir
+        if (!req.user || req.user.role !== "admin") {
+          return Response.json({ ok: false, error: "Yetki yok" }, { status: 403 });
+        }
+        const r = await runIngest(req.payload);
+        return Response.json({ ok: true, ...r });
+      },
+    },
+  ],
 });
