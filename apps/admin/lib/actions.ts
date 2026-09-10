@@ -753,3 +753,35 @@ export async function generateTestContent(formData: FormData) {
   const summary = Object.entries(done).map(([k, v]) => `${k}:${v}`).join(",") || "yok";
   redirect(`/test-uret?m=generated&ozet=${encodeURIComponent(summary)}`);
 }
+
+/* ── Haber Ajansları (RSS) ── */
+
+/** Ajans kaynağı bilgilerini kaydet (yalnız admin). */
+export async function saveAgencySource(formData: FormData) {
+  await requireRole(ADMIN_ONLY);
+  const id = String(formData.get("id") ?? "");
+  if (!id) redirect(`/ajanslar?m=error&msg=${encodeURIComponent("Kayıt bulunamadı")}`);
+  const category = Number(formData.get("category")) || null;
+  const data = {
+    active: formData.get("active") === "on",
+    feedUrl: String(formData.get("feedUrl") ?? "").trim(),
+    username: String(formData.get("username") ?? "").trim(),
+    password: String(formData.get("password") ?? ""),
+    apiKey: String(formData.get("apiKey") ?? "").trim(),
+    autoPublish: formData.get("autoPublish") === "on",
+    category,
+  };
+  const res = await pf(`/ajans-kaynaklari/${id}`, { method: "PATCH", body: JSON.stringify(data) });
+  if (!res.ok) failRedirect("/ajanslar", res);
+  revalidatePath("/ajanslar");
+  redirect("/ajanslar?m=saved");
+}
+
+/** Ajanslardan şimdi çek (manuel tetik, yalnız admin). */
+export async function runIngestNow() {
+  await requireRole(ADMIN_ONLY);
+  const res = await pf(`/ingest/run`, { method: "POST" });
+  revalidatePath("/ajanslar");
+  if (!res.ok) redirect(`/ajanslar?m=error&msg=${encodeURIComponent("Çekim başarısız — aktif kaynak ve bilgileri kontrol edin")}`);
+  redirect("/ajanslar?m=cekildi");
+}

@@ -13,6 +13,7 @@ const MESSAGES: Record<string, string> = {
   purged: "Kalıcı olarak silindi",
   published: "Yayına alındı ✓",
   unpublished: "Pasife alındı",
+  cekildi: "Ajans çekimi tamamlandı ✓",
   uploaded: "Yüklendi ✓",
   generated: "Test içeriği üretildi ✓",
 };
