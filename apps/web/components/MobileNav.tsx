@@ -17,7 +17,7 @@ function AccordionSection({ title, links, onNavigate }: { title: string; links: 
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-3 text-[16px] font-extrabold uppercase text-sk-ink transition hover:bg-neutral-50"
+        className="flex w-full items-center justify-between rounded-lg px-3 py-3.5 text-[18px] font-semibold uppercase text-sk-ink transition hover:bg-neutral-50"
       >
         {title}
         <span className={`text-2xl font-bold leading-none text-sk-red transition-transform ${open ? "rotate-45" : ""}`}>+</span>
@@ -29,7 +29,7 @@ function AccordionSection({ title, links, onNavigate }: { title: string; links: 
               key={l.href}
               href={l.href}
               onClick={onNavigate}
-              className="block rounded-lg px-6 py-2.5 text-[14px] font-bold uppercase text-neutral-600 transition hover:bg-neutral-50 hover:text-sk-red"
+              className="block rounded-lg px-6 py-3 text-[15px] font-medium uppercase text-neutral-600 transition hover:bg-neutral-50 hover:text-sk-red"
             >
               {l.label}
             </a>
@@ -117,7 +117,7 @@ export function MobileNav({
           <a
             href="/"
             onClick={() => setOpen(false)}
-            className="block rounded-lg px-3 py-3 text-[16px] font-extrabold uppercase text-sk-ink transition hover:bg-neutral-50"
+            className="block rounded-lg px-3 py-3.5 text-[18px] font-semibold uppercase text-sk-ink transition hover:bg-neutral-50"
           >
             Anasayfa
           </a>
@@ -126,7 +126,7 @@ export function MobileNav({
               key={c.id}
               href={`/kategori/${c.slug}`}
               onClick={() => setOpen(false)}
-              className="block rounded-lg px-3 py-3 text-[16px] font-extrabold uppercase text-sk-ink transition hover:bg-neutral-50"
+              className="block rounded-lg px-3 py-3.5 text-[18px] font-semibold uppercase text-sk-ink transition hover:bg-neutral-50"
             >
               {c.name}
             </a>
