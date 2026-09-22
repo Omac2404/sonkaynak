@@ -1158,6 +1158,17 @@ export interface SiteSetting {
     btc?: string | null;
     eth?: string | null;
   };
+  kunyeTitle?: string | null;
+  /**
+   * Başlık + metin. Metni boş bırakılan satır sitede gösterilmez.
+   */
+  kunyeRows?:
+    | {
+        baslik: string;
+        metin?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   footerAbout?: string | null;
   footerCopyright?: string | null;
   footerColumns?:
@@ -1351,6 +1362,14 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         bist?: T;
         btc?: T;
         eth?: T;
+      };
+  kunyeTitle?: T;
+  kunyeRows?:
+    | T
+    | {
+        baslik?: T;
+        metin?: T;
+        id?: T;
       };
   footerAbout?: T;
   footerCopyright?: T;

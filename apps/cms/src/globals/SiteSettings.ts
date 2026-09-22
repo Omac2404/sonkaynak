@@ -72,6 +72,29 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: "Künye",
+          fields: [
+            { name: "kunyeTitle", label: "Sayfa Başlığı", type: "text", defaultValue: "Künye" },
+            {
+              name: "kunyeRows",
+              label: "Künye Satırları",
+              type: "array",
+              admin: { description: "Başlık + metin. Metni boş bırakılan satır sitede gösterilmez." },
+              defaultValue: [
+                { baslik: "Yayın Sahibi", metin: "SONKAYNAK" },
+                { baslik: "Sorumlu Müdür / Yazı İşleri Müdürü", metin: "" },
+                { baslik: "Yönetim Yeri", metin: "Gürler Mh. 668. Sk. Yaprak Yapı Koop. A Blok No:10 Merkez / Kırıkkale" },
+                { baslik: "İletişim / WhatsApp İhbar Hattı", metin: "0538 441 07 71" },
+                { baslik: "Kurumsal E-Posta", metin: "info@sonkaynak.com" },
+              ],
+              fields: [
+                { name: "baslik", label: "Başlık", type: "text", required: true },
+                { name: "metin", label: "Metin (boşsa gizlenir)", type: "textarea" },
+              ],
+            },
+          ],
+        },
+        {
           label: "Footer",
           fields: [
             { name: "footerAbout", label: "Site Hakkında", type: "textarea" },
