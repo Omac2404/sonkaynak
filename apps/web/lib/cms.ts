@@ -390,6 +390,8 @@ export type SiteSettings = {
   footerAbout?: string;
   footerCopyright?: string;
   footerColumns?: { title?: string; links?: { label: string; url: string }[] }[];
+  kunyeTitle?: string;
+  kunyeRows?: { baslik?: string; metin?: string }[];
   financeEnabled?: boolean;
   financeOverride?: {
     usd?: string;
