@@ -22,13 +22,13 @@ export default async function ResourcePage({
   searchParams,
 }: {
   params: Promise<{ resource: string }>;
-  searchParams: Promise<{ q?: string; status?: string; review?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; review?: string; sayfa?: string }>;
 }) {
   const { resource } = await params;
-  const { q, status, review } = await searchParams;
+  const { q, status, review, sayfa } = await searchParams;
   if (RESOURCES[resource]) {
     await requirePagePerm(resource);
-    return <ResourceListView resourceKey={resource} search={q} status={status} review={review} />;
+    return <ResourceListView resourceKey={resource} search={q} status={status} review={review} page={sayfa} />;
   }
   if (PLACEHOLDER_LABELS[resource]) return <Placeholder title={PLACEHOLDER_LABELS[resource]} />;
   notFound();

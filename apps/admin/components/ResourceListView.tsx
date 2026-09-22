@@ -152,19 +152,24 @@ function titleText(col: any, row: any): string {
   return v != null && v !== "" ? String(v) : "—";
 }
 
+const PAGE_SIZE = 50;
+
 export async function ResourceListView({
   resourceKey,
   search,
   status,
   review,
+  page,
 }: {
   resourceKey: string;
   search?: string;
   status?: string;
   review?: string;
+  page?: string;
 }) {
   const cfg = RESOURCES[resourceKey];
   if (!cfg) return null;
+  const pageNum = Math.max(1, parseInt(page ?? "1", 10) || 1);
 
   const sf = SEARCH_FIELD[cfg.slug];
   const term = (search ?? "").trim();
@@ -176,12 +181,28 @@ export async function ResourceListView({
   const titleCol = cfg.columns.find((c) => c.type === "text" || c.type === "rel");
   const metaCols = cfg.columns.filter((c) => c !== imageCol && c !== titleCol);
 
-  let q = `/${cfg.slug}?limit=100&depth=${cfg.depth ?? 0}${cfg.sort ? `&sort=${cfg.sort}` : ""}`;
+  let q = `/${cfg.slug}?limit=${PAGE_SIZE}&page=${pageNum}&depth=${cfg.depth ?? 0}${cfg.sort ? `&sort=${cfg.sort}` : ""}`;
   if (term && sf) q += `&where[${sf}][like]=${encodeURIComponent(term)}`;
   if (hasStatus && status && status !== "all") q += `&where[_status][equals]=${status}`;
   if (isNews && review && review !== "all") q += `&where[reviewState][equals]=${review}`;
   const res = await pf(q);
   const rows: any[] = res.data?.docs ?? [];
+  const totalDocs: number = res.data?.totalDocs ?? rows.length;
+  const totalPages: number = res.data?.totalPages ?? 1;
+
+  // Sayfalama bağlantıları mevcut filtreleri korur
+  const baseParams = new URLSearchParams();
+  if (term) baseParams.set("q", term);
+  if (hasStatus && status && status !== "all") baseParams.set("status", status);
+  if (isNews && review && review !== "all") baseParams.set("review", review);
+  const pageHref = (p: number) => {
+    const u = new URLSearchParams(baseParams);
+    u.set("sayfa", String(p));
+    return `/${resourceKey}?${u.toString()}`;
+  };
+  // Görünecek sayfa numaraları penceresi (aktif ±2)
+  const windowPages: number[] = [];
+  for (let p = Math.max(1, pageNum - 2); p <= Math.min(totalPages, pageNum + 2); p++) windowPages.push(p);
   // Silme yalnızca editöryel kadroda (yazar yıkıcı buton görmesin)
   const me = await getMe();
   const canManage = ["admin", "editor", "editor_limited"].includes(me?.role ?? "");
@@ -193,7 +214,9 @@ export async function ResourceListView({
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-ink">{cfg.title}</h1>
-          <p className="mt-0.5 text-sm text-neutral-400">{res.data?.totalDocs ?? rows.length} kayıt</p>
+          <p className="mt-0.5 text-sm text-neutral-400">
+            {totalDocs} kayıt{totalPages > 1 ? ` · Sayfa ${pageNum}/${totalPages}` : ""}
+          </p>
         </div>
         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
           {(sf || hasStatus) && (
@@ -334,6 +357,54 @@ export async function ResourceListView({
           })
         )}
       </div>
+
+      {/* ── Sayfalama ── */}
+      {totalPages > 1 && (
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-1.5">
+          <PageLink href={pageHref(pageNum - 1)} disabled={pageNum <= 1}>‹ Önceki</PageLink>
+          {windowPages[0] > 1 && (
+            <>
+              <PageLink href={pageHref(1)}>1</PageLink>
+              {windowPages[0] > 2 && <span className="px-1 text-neutral-300">…</span>}
+            </>
+          )}
+          {windowPages.map((p) => (
+            <PageLink key={p} href={pageHref(p)} active={p === pageNum}>{p}</PageLink>
+          ))}
+          {windowPages[windowPages.length - 1] < totalPages && (
+            <>
+              {windowPages[windowPages.length - 1] < totalPages - 1 && <span className="px-1 text-neutral-300">…</span>}
+              <PageLink href={pageHref(totalPages)}>{totalPages}</PageLink>
+            </>
+          )}
+          <PageLink href={pageHref(pageNum + 1)} disabled={pageNum >= totalPages}>Sonraki ›</PageLink>
+        </div>
+      )}
     </div>
+  );
+}
+
+function PageLink({
+  href,
+  active,
+  disabled,
+  children,
+}: {
+  href: string;
+  active?: boolean;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  const cls = "rounded-md border px-3 py-1.5 text-sm font-bold transition";
+  if (disabled) {
+    return <span className={`${cls} border-neutral-100 text-neutral-300`}>{children}</span>;
+  }
+  return (
+    <a
+      href={href}
+      className={`${cls} ${active ? "border-sk-red bg-sk-red text-white" : "border-neutral-200 text-neutral-600 hover:border-sk-red hover:text-sk-red"}`}
+    >
+      {children}
+    </a>
   );
 }

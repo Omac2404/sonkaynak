@@ -94,6 +94,40 @@ export async function purgeResource(formData: FormData) {
   redirect("/arsiv?m=purged");
 }
 
+/** Seçili kayıtları kalıcı sil (çöp kutusu çoklu seçim). */
+export async function bulkPurge(formData: FormData) {
+  await requireRole(EDITORIAL);
+  const slug = String(formData.get("slug") ?? "");
+  const ids = formData.getAll("ids").map(String).filter(Boolean);
+  let failed = 0;
+  for (const id of ids) {
+    if (!slug) break;
+    const res = await pf(`/${slug}/${id}`, { method: "DELETE" });
+    if (!res.ok) failed++;
+  }
+  revalidatePath("/arsiv");
+  if (failed) redirect(`/arsiv?m=error&msg=${encodeURIComponent(`${failed} kayıt silinemedi`)}`);
+  redirect("/arsiv?m=purged");
+}
+
+/** Çöp kutusundaki tüm kayıtları kalıcı sil (hepsini boşalt). */
+export async function purgeAllTrash() {
+  await requireRole(EDITORIAL);
+  const slugs = ["news", "ilanlar", "firmalar", "galeriler", "vefat"];
+  let failed = 0;
+  for (const slug of slugs) {
+    const list = await pf(`/${slug}?trash=true&where[deletedAt][exists]=true&limit=1000&depth=0`);
+    const ids = (list.data?.docs ?? []).map((d: any) => d.id);
+    for (const id of ids) {
+      const res = await pf(`/${slug}/${id}`, { method: "DELETE" });
+      if (!res.ok) failed++;
+    }
+  }
+  revalidatePath("/arsiv");
+  if (failed) redirect(`/arsiv?m=error&msg=${encodeURIComponent(`${failed} kayıt silinemedi`)}`);
+  redirect("/arsiv?m=purged");
+}
+
 export async function loginAction(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");

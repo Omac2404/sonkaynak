@@ -1,6 +1,6 @@
 import { pf } from "@/lib/payload";
 import { fmtDate } from "@/lib/media";
-import { restoreResource, purgeResource } from "@/lib/actions";
+import { restoreResource, purgeResource, bulkPurge, purgeAllTrash } from "@/lib/actions";
 import { ConfirmSubmit } from "@/components/ConfirmSubmit";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ const GROUPS: { slug: string; title: string; field: string }[] = [
 export default async function ArsivPage() {
   const results = await Promise.all(
     GROUPS.map(async (g) => {
-      const r = await pf(`/${g.slug}?trash=true&where[deletedAt][exists]=true&limit=100&depth=0&sort=-deletedAt`);
+      const r = await pf(`/${g.slug}?trash=true&where[deletedAt][exists]=true&limit=500&depth=0&sort=-deletedAt`);
       return { ...g, rows: (r.data?.docs ?? []) as any[] };
     }),
   );
@@ -24,9 +24,19 @@ export default async function ArsivPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="mb-5 flex items-center gap-3">
+      <div className="mb-5 flex flex-wrap items-center gap-3">
         <h1 className="text-2xl font-black tracking-tight text-ink">Arşiv / Çöp Kutusu</h1>
         {total > 0 && <span className="rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-bold text-neutral-600">{total}</span>}
+        {total > 0 && (
+          <form action={purgeAllTrash} className="ml-auto">
+            <ConfirmSubmit
+              message={`Çöp kutusundaki TÜM kayıtlar (${total}) KALICI olarak silinecek. Bu işlem geri alınamaz. Emin misiniz?`}
+              className="rounded-lg bg-sk-red px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-sk-red-dark"
+            >
+              Hepsini Kalıcı Sil
+            </ConfirmSubmit>
+          </form>
+        )}
       </div>
 
       {total === 0 ? (
@@ -41,12 +51,25 @@ export default async function ArsivPage() {
             .filter((g) => g.rows.length > 0)
             .map((g) => (
               <section key={g.slug}>
-                <h2 className="mb-3 text-sm font-extrabold uppercase tracking-wide text-neutral-400">
-                  {g.title} ({g.rows.length})
-                </h2>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-sm font-extrabold uppercase tracking-wide text-neutral-400">
+                    {g.title} ({g.rows.length})
+                  </h2>
+                  {/* Toplu kalıcı sil (checkbox'lar bu formu hedefler) */}
+                  <form id={`bulk-${g.slug}`} action={bulkPurge}>
+                    <input type="hidden" name="slug" value={g.slug} />
+                    <ConfirmSubmit
+                      message="Seçili kayıtlar KALICI olarak silinecek. Emin misiniz?"
+                      className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-bold text-sk-red hover:border-red-300 hover:bg-red-50"
+                    >
+                      Seçilenleri Kalıcı Sil
+                    </ConfirmSubmit>
+                  </form>
+                </div>
                 <div className="space-y-2">
                   {g.rows.map((row) => (
                     <div key={row.id} className="sk-card flex items-center gap-3 p-3">
+                      <input type="checkbox" name="ids" value={row.id} form={`bulk-${g.slug}`} className="h-4 w-4 shrink-0 accent-sk-red" />
                       <div className="min-w-0 flex-1">
                         <div className="line-clamp-1 text-sm font-bold text-ink">{row[g.field] ?? `#${row.id}`}</div>
                         <div className="text-[11px] text-neutral-400">Silinme: {fmtDate(row.deletedAt, true)}</div>
