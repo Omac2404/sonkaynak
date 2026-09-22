@@ -87,7 +87,8 @@ export async function purgeResource(formData: FormData) {
   const slug = String(formData.get("slug") ?? "");
   const id = String(formData.get("id") ?? "");
   if (slug && id) {
-    const res = await pf(`/${slug}/${id}`, { method: "DELETE" });
+    // Çöpe atılmış kaydı kalıcı silmek için ?trash=true şart (yoksa bulunamaz)
+    const res = await pf(`/${slug}/${id}?trash=true`, { method: "DELETE" });
     if (!res.ok) failRedirect("/arsiv", res);
     revalidatePath("/arsiv");
   }
@@ -102,7 +103,7 @@ export async function bulkPurge(formData: FormData) {
   let failed = 0;
   for (const id of ids) {
     if (!slug) break;
-    const res = await pf(`/${slug}/${id}`, { method: "DELETE" });
+    const res = await pf(`/${slug}/${id}?trash=true`, { method: "DELETE" });
     if (!res.ok) failed++;
   }
   revalidatePath("/arsiv");
@@ -119,7 +120,7 @@ export async function purgeAllTrash() {
     const list = await pf(`/${slug}?trash=true&where[deletedAt][exists]=true&limit=1000&depth=0`);
     const ids = (list.data?.docs ?? []).map((d: any) => d.id);
     for (const id of ids) {
-      const res = await pf(`/${slug}/${id}`, { method: "DELETE" });
+      const res = await pf(`/${slug}/${id}?trash=true`, { method: "DELETE" });
       if (!res.ok) failed++;
     }
   }
