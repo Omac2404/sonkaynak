@@ -628,6 +628,25 @@ export async function saveSettings(formData: FormData) {
   redirect("/ayarlar?m=saved");
 }
 
+/** Künye sayfası (başlık + satırlar) — yalnız admin. */
+export async function saveKunye(formData: FormData) {
+  await requireRole(ADMIN_ONLY);
+  const kunyeTitle = String(formData.get("kunyeTitle") ?? "Künye").trim() || "Künye";
+  let raw: any[] = [];
+  try {
+    raw = JSON.parse(String(formData.get("rows") ?? "[]"));
+  } catch {
+    /* geçersizse boş */
+  }
+  const kunyeRows = (Array.isArray(raw) ? raw : [])
+    .map((r) => ({ baslik: String(r?.baslik ?? "").trim(), metin: String(r?.metin ?? "") }))
+    .filter((r) => r.baslik); // başlığı olmayan satır atılır
+  const res = await pf(`/globals/site-settings`, { method: "POST", body: JSON.stringify({ kunyeTitle, kunyeRows }) });
+  if (!res.ok) failRedirect("/kunye", res);
+  revalidatePath("/kunye");
+  redirect("/kunye?m=saved");
+}
+
 /* ───────────────────────── Test İçerik Üreteci ───────────────────────── */
 const TEST_TYPES = ["haber", "galeri", "ilan", "firma", "vefat", "story"] as const;
 type TestType = (typeof TEST_TYPES)[number];

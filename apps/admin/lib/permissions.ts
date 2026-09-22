@@ -44,6 +44,7 @@ export const SECTION_GROUPS: { title: string; perms: [string, string][] }[] = [
       ["kullanicilar", "Kullanıcılar"],
       ["roller", "Roller"],
       ["ajanslar", "Haber Ajansları"],
+      ["kunye", "Künye"],
       ["ayarlar", "Site Ayarları"],
     ],
   },
@@ -54,7 +55,7 @@ export const ALL_PERMS = SECTION_GROUPS.flatMap((g) => g.perms.map((p) => p[0]))
 /** Sistem rolleri için varsayılan izinler (roleRef yoksa kullanılır). */
 export const DEFAULT_PERMS: Record<string, string[]> = {
   admin: ["*"],
-  editor: ALL_PERMS.filter((p) => !["kullanicilar", "roller", "ayarlar", "ajanslar"].includes(p)),
+  editor: ALL_PERMS.filter((p) => !["kullanicilar", "roller", "ayarlar", "ajanslar", "kunye"].includes(p)),
   editor_limited: ["haberler", "haberler/yeni", "medya", "ilanlar", "galeriler", "onay-bekleyenler", "arsiv"],
   yazar: ["haberler", "haberler/yeni", "medya"],
 };
