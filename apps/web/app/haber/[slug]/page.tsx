@@ -221,14 +221,18 @@ export default async function HaberDetay({ params }: Props) {
                 Haberin Özeti
               </span>
             </div>
-            <ul className="space-y-2">
-              {ozet.map((b, i) => (
-                <li key={i} className="flex gap-2.5 text-[15px] font-medium leading-relaxed text-neutral-700 md:text-base">
-                  <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-sk-red" />
-                  <span>{b}</span>
-                </li>
-              ))}
-            </ul>
+            {ozet.length > 1 ? (
+              <ul className="space-y-2">
+                {ozet.map((b, i) => (
+                  <li key={i} className="flex gap-2.5 text-[15px] font-medium leading-relaxed text-neutral-700 md:text-base">
+                    <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-sk-red" />
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[15px] font-medium leading-relaxed text-neutral-700 md:text-base">{ozet[0]}</p>
+            )}
           </aside>
         )}
 

@@ -100,10 +100,10 @@ export function readingTime(news: Pick<News, "body" | "excerpt">): number | null
 /** Özet metnini cümlelere bölüp madde madde listeye çevirir (Haberin Özeti kutusu). */
 export function summaryBullets(text?: string, max = 4): string[] {
   if (!text) return [];
+  // Noktadan DEĞİL, yalnızca satır sonundan böl (kısaltmalar bozulmasın:
+  // "Doç. Dr. Ersin Korkmaz" tek satırsa tek madde kalır). Editör Enter ile madde yapar.
   return text
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(/(?<=[.!?…])\s+/)
+    .split(/\r?\n+/)
     .map((s) => s.trim())
     .filter((s) => s.length > 0)
     .slice(0, max);
