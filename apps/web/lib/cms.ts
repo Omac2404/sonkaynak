@@ -4,6 +4,7 @@
  */
 
 import { cached, ztop } from "./redis";
+import { newsUrl } from "./shared";
 import type { Media, Category, Tag, Author, News } from "./shared";
 
 // İstemci-güvenli tipler + saf yardımcıları (mediaUrl, newsUrl, categoryUrl, authorName) yeniden ihraç et
@@ -254,7 +255,19 @@ export async function getStories(): Promise<Story[]> {
   return r?.docs ?? [];
 }
 
-/** "Bugün neler oldu?" şeridi: önce admin seçimi (global), yoksa otomatik en sık etiketler. */
+/** "Bugün Neler Oldu?" şeridi: 'bugunNeOldu' alanı dolu en yeni haberler (yeniden eskiye). */
+export async function getBugunNeOldu(limit = 10): Promise<{ text: string; url: string }[]> {
+  const r = await cms<ListResponse<News>>(
+    `/api/news?where[bugunNeOldu][exists]=true&${PUBLISHED}&depth=0&sort=-publishedAt&limit=${limit * 2}`,
+    60,
+  );
+  return (r?.docs ?? [])
+    .filter((n) => (n.bugunNeOldu ?? "").trim())
+    .slice(0, limit)
+    .map((n) => ({ text: (n.bugunNeOldu ?? "").trim(), url: newsUrl(n) }));
+}
+
+/** (Eski) etiket tabanlı trend şeridi — artık kullanılmıyor, geriye dönük bırakıldı. */
 export async function getTrendingTags(limit = 8): Promise<Tag[]> {
   // 1) Admin elle seçti mi?
   const g = await cms<{ items?: { tag?: Tag | number }[] }>(`/api/globals/bugun-neler-oldu?depth=1`, 120);
@@ -387,6 +400,9 @@ export type SiteSettings = {
   linkedin?: string;
   gaId?: string;
   gscVerify?: string;
+  adsenseCode?: string;
+  adsTxt?: string;
+  headCode?: string;
   footerAbout?: string;
   footerCopyright?: string;
   footerColumns?: { title?: string; links?: { label: string; url: string }[] }[];

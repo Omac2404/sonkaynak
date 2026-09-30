@@ -9,6 +9,7 @@ import { FinanceTicker } from "@/components/FinanceTicker";
 import { SonDakikaBar } from "@/components/SonDakikaBar";
 import { AdSlot } from "@/components/AdSlot";
 import { StickyTopAd } from "@/components/StickyTopAd";
+import { RawHead } from "@/components/RawHead";
 import { getSettings, getSonDakika, getAds, mediaUrl } from "@/lib/cms";
 import { getFinanceView } from "@/lib/finance";
 
@@ -21,6 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   const siteName = s.siteName ?? "Son Kaynak";
   const desc = s.siteDescription ?? "Son Kaynak: gündem, ekonomi, spor, dünya ve yerel son dakika haberleri.";
+  const caPub = (s.adsenseCode ?? "").match(/ca-pub-\d+/)?.[0];
   return {
     title: { default: `${siteName} — Son Dakika Haberleri`, template: `%s — ${siteName}` },
     description: desc,
@@ -31,6 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: { type: "website", siteName, title: siteName, description: desc, url: SITE_URL, locale: "tr_TR" },
     ...(s.gscVerify ? { verification: { other: { "google-site-verification": s.gscVerify } } } : {}),
+    ...(caPub ? { other: { "google-adsense-account": caPub } } : {}),
   };
 }
 
@@ -43,6 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   ]);
   const siteName = s.siteName ?? "Son Kaynak";
   const logo = mediaUrl(s.logo, "feature");
+  const caPub = (s.adsenseCode ?? "").match(/ca-pub-\d+/)?.[0];
 
   // Piyasa bandı: admin kapatmadıysa göster (getFinanceView elle değerleri uygular)
   const financeEnabled = financeView.enabled;
@@ -97,6 +101,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Site geneli Organization + WebSite JSON-LD */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd).replace(/</g, "\\u003c") }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd).replace(/</g, "\\u003c") }} />
+
+        {/* Google AdSense (panelden girilen ca-pub) */}
+        {caPub && (
+          // eslint-disable-next-line @next/next/no-sync-scripts
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${caPub}`}
+            crossOrigin="anonymous"
+          />
+        )}
+        {/* Panelden girilen ek head kodu (doğrulama/analitik) */}
+        <RawHead html={s.headCode} />
 
         {financeEnabled && <FinanceTicker finance={financeMerged} />}
         <Header />

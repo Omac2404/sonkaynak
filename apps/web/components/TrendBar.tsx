@@ -1,16 +1,17 @@
-import type { Tag } from "@/lib/shared";
-
-/** "Bugün neler oldu?" — tam genişlik, kayan (marquee) trend etiketleri. */
-export function TrendBar({ tags }: { tags: Tag[] }) {
-  if (!tags.length) return null;
-  const duration = Math.max(24, tags.length * 6);
+/** "Bugün neler oldu?" — habere eklenen metinlerden oluşan tam genişlik kayan şerit. */
+export function TrendBar({ items }: { items: { text: string; url: string }[] }) {
+  if (!items.length) return null;
+  const duration = Math.max(24, items.length * 7);
 
   const row = (key: string) => (
     <div className="sk-ticker-row" aria-hidden={key === "clone" ? true : undefined}>
-      {tags.map((t, i) => (
+      {items.map((it, i) => (
         <span key={`${key}-${i}`} className="inline-flex items-center">
-          <a href={`/etiket/${t.slug}`} className="whitespace-nowrap px-1 text-[13px] font-extrabold uppercase tracking-tight text-sk-red hover:underline">
-            #{t.name}
+          <a
+            href={it.url}
+            className="whitespace-nowrap px-1 text-[13px] font-bold tracking-tight text-sk-red hover:underline"
+          >
+            {it.text}
           </a>
           <span className="px-7 text-neutral-300">•</span>
         </span>

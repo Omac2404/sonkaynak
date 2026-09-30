@@ -45,6 +45,7 @@ export type News = {
   author?: Author | null;
   tags?: Tag[];
   sonDakika?: boolean;
+  bugunNeOldu?: string;
   publishedAt?: string;
   createdAt?: string;
   updatedAt?: string;

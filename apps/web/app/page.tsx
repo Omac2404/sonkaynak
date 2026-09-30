@@ -13,7 +13,7 @@ import {
   getGozdenKacmasin,
   getAuthorsForSlider,
   getTicker,
-  getTrendingTags,
+  getBugunNeOldu,
   getCategories,
   getNewsByCategory,
   getMostRead,
@@ -57,7 +57,7 @@ function SectionTitle({ children, href, color = "#d4141c" }: { children: React.R
 }
 
 export default async function HomePage() {
-  const [manset, sicak, latest, vitrin, galeriler, ilanlar, firmalar, vefat, stories, secmece, ozel, gozden, authors, ticker, financeView, trending] =
+  const [manset, sicak, latest, vitrin, galeriler, ilanlar, firmalar, vefat, stories, secmece, ozel, gozden, authors, ticker, financeView, bugunNeOldu] =
     await Promise.all([
       getManset(),
       getSicakGundem(),
@@ -74,25 +74,16 @@ export default async function HomePage() {
       getAuthorsForSlider(20),
       getTicker(),
       getFinanceView(),
-      getTrendingTags(8),
+      getBugunNeOldu(10),
     ]);
   const [mostRead, homeAds, settings] = await Promise.all([getMostRead(6), getAds("sidebar"), getSettings()]);
   const adInterval = settings.adRotateSeconds ?? 7;
   const storyItems = stories.map((s) => s.news).filter((n): n is News => Boolean(n));
 
-  // Manşet slider: önce manşet kürasyonu, ardından en yeni haberlerle 19'a tamamla
-  const sliderPool: News[] = [...(manset as News[])];
-  for (const n of latest) {
-    if (sliderPool.length >= 19) break;
-    if (!sliderPool.some((p) => p.id === n.id)) sliderPool.push(n);
-  }
-  const sliderItems = sliderPool.slice(0, 19);
-  // Yan kartlar: slider'da olmayan en yeni haberler (slider kısaldı → daha fazla)
-  const sideList = latest.filter((n) => !sliderItems.some((s) => s.id === n.id)).slice(0, 7);
-  // Slider altı yatay kartlar: slider ve yan listede olmayanlar
-  const underSlider = latest
-    .filter((n) => !sliderItems.some((s) => s.id === n.id) && !sideList.some((s) => s.id === n.id))
-    .slice(0, 3);
+  // Manşet slider: en yeni 10 haber (#1 = en yeni). Kalanlar yana/aşağıya.
+  const sliderItems = latest.slice(0, 10);
+  const sideList = latest.slice(10, 17); // slider'a sığmayan sıradaki en yeni haberler
+  const underSlider = latest.slice(17, 20); // onların altındaki 3 yatay kart
   // Sıcak Gündem: kürasyon boşsa en yeni haberlerle doldur
   const sicakItems = (sicak.length ? sicak : latest).slice(0, 3);
 
@@ -106,8 +97,8 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Bugün neler oldu? — tam genişlik, kayan trend etiketler */}
-      {trending.length > 0 && <TrendBar tags={trending} />}
+      {/* Bugün neler oldu? — habere eklenen metinler, kayan şerit (en yeni 10) */}
+      {bugunNeOldu.length > 0 && <TrendBar items={bugunNeOldu} />}
 
       <div className="mx-auto max-w-[1360px] px-3 py-4 sm:px-4 sm:py-6">
       {/* Story'ler — yalnızca mobil, tıklayınca tam ekran görüntüleyici */}
