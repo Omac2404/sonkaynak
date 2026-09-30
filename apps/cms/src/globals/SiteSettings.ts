@@ -72,6 +72,35 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          label: "Reklam & Kodlar",
+          fields: [
+            {
+              name: "adsenseCode",
+              label: "Google AdSense Kodu",
+              type: "textarea",
+              admin: {
+                description: "AdSense'in verdiği kod snippet'ini yapıştırın. İçinden ca-pub-XXXX alınıp tüm sayfalara eklenir (doğrulama + reklam).",
+              },
+            },
+            {
+              name: "adsTxt",
+              label: "ads.txt İçeriği",
+              type: "textarea",
+              admin: {
+                description: "sonkaynak.com/ads.txt olarak yayınlanır. Boş bırakılırsa AdSense kodundan otomatik satır üretilir.",
+              },
+            },
+            {
+              name: "headCode",
+              label: "Ek Head Kodu (doğrulama/analitik)",
+              type: "textarea",
+              admin: {
+                description: "Search Console meta etiketi, analitik, piksel vb. head'e eklenecek ek kodlar.",
+              },
+            },
+          ],
+        },
+        {
           label: "Künye",
           fields: [
             { name: "kunyeTitle", label: "Sayfa Başlığı", type: "text", defaultValue: "Künye" },

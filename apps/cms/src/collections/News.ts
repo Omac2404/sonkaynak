@@ -117,6 +117,16 @@ export const News: CollectionConfig = {
       admin: { position: "sidebar", description: "Kartlarda kırmızı SON DAKİKA rozeti gösterir." },
     },
     {
+      name: "bugunNeOldu",
+      label: "Bugün Ne Oldu (kayan şerit)",
+      type: "text",
+      maxLength: 160,
+      admin: {
+        position: "sidebar",
+        description: "Doluysa üstteki 'Bugün Neler Oldu?' şeridinde görünür; tıklayınca bu habere gider.",
+      },
+    },
+    {
       type: "tabs",
       tabs: [
         {

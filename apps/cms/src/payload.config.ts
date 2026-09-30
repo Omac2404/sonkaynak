@@ -34,7 +34,7 @@ const SYSTEM_ROLES = [
     label: "Editör",
     permissions: [
       "haberler", "haberler/yeni", "kategoriler", "etiketler", "yazarlar", "medya",
-      "ilanlar", "firmalar", "galeriler", "reklamlar", "manset", "bugun-neler-oldu", "sicak-gundem", "secmece", "ozel",
+      "ilanlar", "firmalar", "galeriler", "reklamlar", "manset", "sicak-gundem", "secmece", "ozel",
       "gozden-kacmasin", "vitrin", "ticker", "ana-menu", "storyler", "vefat", "onay-bekleyenler", "arsiv",
     ],
     isSystem: true,

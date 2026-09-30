@@ -179,6 +179,10 @@ export interface News {
    */
   sonDakika?: boolean | null;
   /**
+   * Doluysa üstteki 'Bugün Neler Oldu?' şeridinde görünür; tıklayınca bu habere gider.
+   */
+  bugunNeOldu?: string | null;
+  /**
    * 1-2 cümle. Liste ve OG açıklamasında kullanılır.
    */
   excerpt?: string | null;
@@ -666,6 +670,7 @@ export interface NewsSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   sonDakika?: T;
+  bugunNeOldu?: T;
   excerpt?: T;
   content?: T;
   body?: T;
@@ -1158,6 +1163,18 @@ export interface SiteSetting {
     btc?: string | null;
     eth?: string | null;
   };
+  /**
+   * AdSense'in verdiği kod snippet'ini yapıştırın. İçinden ca-pub-XXXX alınıp tüm sayfalara eklenir (doğrulama + reklam).
+   */
+  adsenseCode?: string | null;
+  /**
+   * sonkaynak.com/ads.txt olarak yayınlanır. Boş bırakılırsa AdSense kodundan otomatik satır üretilir.
+   */
+  adsTxt?: string | null;
+  /**
+   * Search Console meta etiketi, analitik, piksel vb. head'e eklenecek ek kodlar.
+   */
+  headCode?: string | null;
   kunyeTitle?: string | null;
   /**
    * Başlık + metin. Metni boş bırakılan satır sitede gösterilmez.
@@ -1363,6 +1380,9 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         btc?: T;
         eth?: T;
       };
+  adsenseCode?: T;
+  adsTxt?: T;
+  headCode?: T;
   kunyeTitle?: T;
   kunyeRows?:
     | T
