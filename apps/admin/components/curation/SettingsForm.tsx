@@ -78,6 +78,14 @@ export function SettingsForm({ s }: { s: any }) {
           </section>
 
           <section className="sk-card space-y-4 p-5">
+            <h2 className="text-sm font-extrabold text-ink">Reklam & Kodlar</h2>
+            <F label="Google AdSense Kodu" name="adsenseCode" value={s?.adsenseCode} textarea />
+            <p className="-mt-2 text-[12px] text-neutral-400">AdSense'in verdiği kodu yapıştırın; ca-pub otomatik alınıp tüm sayfalara + ads.txt'e eklenir.</p>
+            <F label="ads.txt İçeriği (opsiyonel)" name="adsTxt" value={s?.adsTxt} textarea />
+            <F label="Ek Head Kodu (doğrulama/analitik)" name="headCode" value={s?.headCode} textarea />
+          </section>
+
+          <section className="sk-card space-y-4 p-5">
             <h2 className="text-sm font-extrabold text-ink">Footer</h2>
             <F label="Site Hakkında" name="footerAbout" value={s?.footerAbout} textarea />
             <F label="Telif Metni" name="footerCopyright" value={s?.footerCopyright} />

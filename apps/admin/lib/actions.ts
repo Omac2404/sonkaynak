@@ -275,6 +275,7 @@ export async function saveNews(formData: FormData) {
     _status,
     reviewState,
     sonDakika: formData.get("sonDakika") === "on",
+    bugunNeOldu: String(formData.get("bugunNeOldu") ?? "").trim(),
     author: authorVal ?? null,
     tags: tagIds,
     seo: { focusKeyword, metaDescription },
@@ -628,6 +629,9 @@ export async function saveSettings(formData: FormData) {
     "gscVerify",
     "footerAbout",
     "footerCopyright",
+    "adsenseCode",
+    "adsTxt",
+    "headCode",
   ]) {
     data[k] = String(formData.get(k) ?? "");
   }

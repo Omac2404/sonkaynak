@@ -169,6 +169,13 @@ export function NewsForm({
             </span>
           </label>
 
+          {/* Bugün Ne Oldu — üst kayan şerit metni */}
+          <div className="rounded-xl border border-neutral-200 bg-white p-4">
+            <Field label="Bugün Ne Oldu?" hint="Doluysa üstteki kayan şeritte görünür; tıklayınca bu habere gider. Boşsa görünmez.">
+              <input name="bugunNeOldu" defaultValue={news?.bugunNeOldu ?? ""} maxLength={160} placeholder="Şeritte görünecek kısa metin" className={inputCls} />
+            </Field>
+          </div>
+
           {/* Sosyal medyada paylaş (kaydedilmiş haber) */}
           {news?.slug && (
             <div className="rounded-xl border border-neutral-200 bg-white p-4">

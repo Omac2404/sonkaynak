@@ -46,7 +46,6 @@ export const NAV: NavGroup[] = [
     title: "Kürasyon",
     items: [
       { href: "/manset", label: "Manşet", icon: "star", roles: SENIOR },
-      { href: "/bugun-neler-oldu", label: "Bugün Neler Oldu", icon: "ticker", roles: SENIOR },
       { href: "/sicak-gundem", label: "Sıcak Gündem", icon: "flame", roles: SENIOR },
       { href: "/secmece", label: "Seçmece", icon: "star", roles: SENIOR },
       { href: "/gozden-kacmasin", label: "Gözden Kaçmasın", icon: "star", roles: SENIOR },
