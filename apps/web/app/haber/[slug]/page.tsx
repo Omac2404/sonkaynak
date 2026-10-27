@@ -435,7 +435,7 @@ export default async function HaberDetay({ params }: Props) {
       <aside className="space-y-6 lg:sticky lg:top-4 lg:self-start">
         {sidebarAds.length > 0 && <AdSlot ads={sidebarAds} variant="tower" intervalSec={adInterval} />}
         <MostReadList items={mostRead} />
-        <SidebarList title="Sıcak Gündem" items={sicak.length ? sicak : latest.slice(0, 3)} />
+        <SidebarList title="Sıcak Gündem" items={sicak.slice(0, 3)} />
         <GoogleNewsBox />
         <SidebarList title="Son Haberler" items={latest.slice(0, 3)} />
       </aside>

@@ -58,13 +58,16 @@ export function MansetSlider({ items }: { items: News[] }) {
 
       {/* Numaralı geçiş butonları */}
       {items.length > 1 && (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div
+          className="mt-3 grid gap-1 sm:gap-1.5"
+          style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
+        >
           {items.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setI(idx)}
               aria-label={`${idx + 1}. haber`}
-              className={`grid h-9 w-9 place-items-center rounded-full border text-sm font-bold transition ${
+              className={`grid h-8 w-full place-items-center rounded-md border text-[13px] font-bold transition sm:h-9 sm:text-sm ${
                 idx === i
                   ? "border-sk-red bg-sk-red text-white"
                   : "border-sk-line bg-white text-sk-ink hover:border-sk-red hover:text-sk-red"

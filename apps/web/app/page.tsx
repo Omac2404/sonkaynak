@@ -85,7 +85,7 @@ export default async function HomePage() {
   const sideList = latest.slice(10, 17); // slider'a sığmayan sıradaki en yeni haberler
   const underSlider = latest.slice(17, 20); // onların altındaki 3 yatay kart
   // Sıcak Gündem: kürasyon boşsa en yeni haberlerle doldur
-  const sicakItems = (sicak.length ? sicak : latest).slice(0, 3);
+  const sicakItems = sicak.slice(0, 6); // yalnız panelde seçilenler; boşsa bölüm gizlenir
 
   // Her kategoriden en son 5 haber
   const categories = await getCategories();
